@@ -1,0 +1,129 @@
+<div class="book-search-container">
+  <div class="search-section">
+    <h2>Buscar Libros</h2>
+    
+    <!-- Mensajes de error y éxito -->
+    <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+    <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+    <!-- Barra de búsqueda -->
+    <div class="search-bar">
+      <input
+        [(ngModel)]="searchQuery"
+        type="text"
+        placeholder="Buscar por título, autor o término..."
+        (keyup.enter)="search()"
+        [disabled]="loading"
+        class="search-input"
+      />
+      <button
+        (click)="search()"
+        [disabled]="loading"
+        class="btn btn-primary"
+      >
+        {{ loading ? 'Buscando...' : 'Buscar' }}
+      </button>
+      <button
+        (click)="searchByAuthor()"
+        [disabled]="loading"
+        class="btn btn-secondary"
+      >
+        Buscar por Autor
+      </button>
+    </div>
+
+    <!-- Información de resultados -->
+    <div *ngIf="totalResults > 0" class="results-info">
+      <p>Se encontraron <strong>{{ totalResults }}</strong> libros</p>
+      <p>Mostrando <strong>{{ searchResults.length }}</strong> resultados por página</p>
+    </div>
+  </div>
+
+  <!-- Lista de resultados -->
+  <div *ngIf="searchResults.length > 0" class="results-section">
+    <div class="books-grid">
+      <div *ngFor="let book of searchResults" class="book-card">
+        <!-- Portada -->
+        <div class="book-cover">
+          <img
+            [src]="getCoverUrl(book)"
+            [alt]="book.title"
+            class="cover-image"
+          />
+        </div>
+
+        <!-- Información del libro -->
+        <div class="book-info">
+          <h3 class="book-title">{{ book.title }}</h3>
+          <p class="book-author">
+            <strong>Autor:</strong> {{ getFirstAuthor(book) }}
+          </p>
+          <p *ngIf="book.firstPublishYear" class="book-year">
+            <strong>Año:</strong> {{ book.firstPublishYear }}
+          </p>
+          <p *ngIf="book.editionCount" class="book-editions">
+            <strong>Ediciones:</strong> {{ book.editionCount }}
+          </p>
+          <p *ngIf="book.ratingsAverage" class="book-rating">
+            <strong>Puntuación:</strong> {{ book.ratingsAverage | number: '1.1-1' }} / 5
+          </p>
+          <p *ngIf="book.description" class="book-description">
+            <strong>Descripción:</strong> {{ book.description | slice: 0: 150 }}{{ book.description && book.description.length > 150 ? '...' : '' }}
+          </p>
+
+          <!-- Acciones -->
+          <div class="book-actions">
+            <button
+              (click)="importBook(book)"
+              [disabled]="loading"
+              class="btn btn-import"
+            >
+              Importar a Mi Biblioteca
+            </button>
+            <a
+              [href]="'https://openlibrary.org' + book.key"
+              target="_blank"
+              class="btn btn-external"
+            >
+              Ver en Open Library
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paginación -->
+    <div class="pagination">
+      <button
+        (click)="previousPage()"
+        [disabled]="!hasPreviousPage() || loading"
+        class="btn btn-pagination"
+      >
+        ← Anterior
+      </button>
+
+      <div class="page-info">
+        Página <strong>{{ currentPage }}</strong> de <strong>{{ getTotalPages() }}</strong>
+      </div>
+
+      <button
+        (click)="nextPage()"
+        [disabled]="!hasNextPage() || loading"
+        class="btn btn-pagination"
+      >
+        Siguiente →
+      </button>
+    </div>
+  </div>
+
+  <!-- Estado vacío -->
+  <div *ngIf="!loading && searchResults.length === 0 && searchQuery" class="empty-state">
+    <p>No hay resultados para tu búsqueda.</p>
+    <p>Intenta con otros términos o prueba la búsqueda por autor.</p>
+  </div>
+
+  <!-- Estado inicial -->
+  <div *ngIf="!loading && searchResults.length === 0 && !searchQuery" class="initial-state">
+    <p>Utiliza la barra de búsqueda para encontrar libros en Open Library.</p>
+  </div>
+</div>
