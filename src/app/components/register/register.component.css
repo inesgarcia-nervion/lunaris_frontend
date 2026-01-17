@@ -1,0 +1,11 @@
+.register-container {
+  max-width: 420px;
+  margin: 40px auto;
+  padding: 18px;
+  background: white;
+  border-radius: 6px;
+}
+.register-container label { display:block; margin-bottom:8px }
+.register-container input { width:100%; padding:8px; margin-top:4px }
+.register-container .success { color: green; margin-top:8px }
+.register-container .error { color: #b00020; margin-top:8px }

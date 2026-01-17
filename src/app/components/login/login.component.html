@@ -1,0 +1,19 @@
+<div class="login-container">
+  <h2>Iniciar sesión</h2>
+  <form (ngSubmit)="submit()">
+    <label>
+      Usuario
+      <input [(ngModel)]="username" name="username" required />
+    </label>
+
+    <label>
+      Contraseña
+      <input [(ngModel)]="password" name="password" type="password" required />
+    </label>
+
+    <button type="submit">Entrar</button>
+    <button type="button" (click)="router.navigate(['/register'])" style="margin-left:8px">Registrarse</button>
+  </form>
+
+  <div *ngIf="error" class="error">{{ error }}</div>
+</div>
