@@ -14,6 +14,11 @@
       </div>
 
       <div class="field">
+        <label class="label">Correo electrónico</label>
+        <input class="input" [(ngModel)]="email" name="email" placeholder="Inserte el correo electrónico" required />
+      </div>
+
+      <div class="field">
         <label class="label">Contraseña</label>
         <div class="password-row">
           <input class="input" [(ngModel)]="password" name="password" [type]="showPassword ? 'text' : 'password'" placeholder="Inserte la contraseña" required />
