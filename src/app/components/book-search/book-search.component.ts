@@ -2,6 +2,8 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BookSearchService, OpenLibraryBook, OpenLibrarySearchResponse } from '../../services/book-search.service';
+import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-book-search',
@@ -20,10 +22,23 @@ export class BookSearchComponent implements OnInit {
   totalResults: number = 0;
   successMessage: string | null = null;
 
-  constructor(private bookSearchService: BookSearchService, private cdr: ChangeDetectorRef) { }
+  constructor(
+    private bookSearchService: BookSearchService,
+    private cdr: ChangeDetectorRef,
+    private auth: AuthService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     // Inicialización si es necesaria
+  }
+
+  /**
+   * Cierra la sesión del usuario y redirige al login
+   */
+  logout(): void {
+    this.auth.logout();
+    this.router.navigate(['/login']);
   }
 
   /**

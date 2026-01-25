@@ -1,6 +1,9 @@
 <div class="book-search-container">
   <div class="search-section">
-    <h2>Buscar Libros</h2>
+    <div class="header-row">
+      <h2>Buscar Libros</h2>
+      <button (click)="logout()" class="btn btn-logout">Cerrar sesión</button>
+    </div>
     
     <!-- Mensajes de error y éxito -->
     <div *ngIf="error" class="alert alert-error">{{ error }}</div>

@@ -1,21 +1,78 @@
-.login-container {
-  max-width: 360px;
-  margin: 40px auto;
-  padding: 20px;
+.page-wrap {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 64px;
+  background: #fafafa;
+  color: #2b1b1b;
+}
+
+.back-arrow {
+  position: absolute;
+  left: 18px;
+  top: 18px;
+  font-size: 28px;
+  color: #222;
+  text-decoration: none;
+}
+
+.brand { text-align: center; margin: 18px 0 8px; }
+.brand-icon { display: block; margin: 0 auto 6px; }
+.brand h1 { margin: 0; font-size: 18px; letter-spacing: 2px; color: #4e2a6a; }
+.title { margin: 6px 0 0; font-size: 36px; color: #caa6ff; text-shadow: 0 6px 10px rgba(154,124,255,0.35); }
+.subtitle { margin: 6px 0 20px; color: #9e88b8; font-weight: 600; }
+
+.card {
+  width: 520px;
+  max-width: calc(100% - 40px);
   background: white;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  padding: 28px 36px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
-.login-container label {
-  display: block;
-  margin-bottom: 10px;
+
+.login-form { display: flex; flex-direction: column; }
+.field { margin-bottom: 18px; }
+.label { display:block; font-weight:700; margin-bottom:10px; color:#2f1b1b; }
+.input {
+  width:100%;
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #f1f1f1;
+  box-shadow: inset 0 2px 0 rgba(0,0,0,0.02), 0 6px 14px rgba(0,0,0,0.04);
+  font-size: 14px;
+  outline: none;
 }
-.login-container input {
-  width: 100%;
-  padding: 8px;
-  margin-top: 4px;
+.input::placeholder { color: #bfbfbf; }
+
+.password-row { position: relative; }
+.password-row .eye {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  border: none; background: transparent; font-size: 18px; cursor: default;
 }
-.login-container button {
-  margin-top: 10px;
+
+.forgot { display:inline-block; margin-top:8px; float:right; color:#3b2aa6; text-decoration:none; font-size:13px; }
+
+.remember-row { margin: 8px 0 18px; }
+.remember { display:flex; align-items:center; gap:8px; font-weight:600; color:#2f1b1b; }
+.remember input { width:16px; height:16px; }
+
+.submit {
+  margin-top: 6px;
+  background: linear-gradient(90deg,#b48bff,#b18bff 60%);
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-weight:700;
+  font-size:16px;
+  box-shadow: 0 8px 14px rgba(178,120,255,0.18);
+  cursor: pointer;
 }
+
+.signup { text-align:center; margin-top:14px; color:#3b2aa6; font-weight:600; }
+.signup a { color:#3b2aa6; text-decoration:none; }
+
 .error { color: #b00020; margin-top: 8px; }

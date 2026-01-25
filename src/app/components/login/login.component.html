@@ -1,19 +1,40 @@
-<div class="login-container">
-  <h2>Iniciar sesión</h2>
-  <form (ngSubmit)="submit()">
-    <label>
-      Usuario
-      <input [(ngModel)]="username" name="username" required />
-    </label>
+<div class="page-wrap">
+  <a class="back-arrow" title="Volver">←</a>
 
-    <label>
-      Contraseña
-      <input [(ngModel)]="password" name="password" type="password" required />
-    </label>
+  <header class="brand">
+    <img src="/assets/LunarisLogo.png" class="brand-icon" width="72" height="72" alt="Lunaris" />
+    <h2 class="title">Inicio de sesión</h2>
+    <p class="subtitle">Bienvenido/a de vuelta!</p>
+  </header>
 
-    <button type="submit">Entrar</button>
-    <button type="button" (click)="router.navigate(['/register'])" style="margin-left:8px">Registrarse</button>
-  </form>
+  <main class="card">
+    <form (ngSubmit)="submit()" class="login-form" autocomplete="off">
+      <div class="field">
+        <label class="label">Usuario</label>
+        <input class="input" [(ngModel)]="username" name="username" placeholder="Inserte el usuario" required />
+      </div>
 
-  <div *ngIf="error" class="error">{{ error }}</div>
+      <div class="field">
+        <label class="label">Contraseña</label>
+        <div class="password-row">
+          <input class="input" [(ngModel)]="password" name="password" type="password" placeholder="Inserte la contraseña" required />
+          <button type="button" class="eye" aria-hidden="true">👁</button>
+        </div>
+        <a class="forgot" href="#">¿Olvidaste la contraseña?</a>
+      </div>
+
+      <div class="remember-row">
+        <label class="remember">
+          <input type="checkbox" name="remember" />
+          <span>Recuérdame</span>
+        </label>
+      </div>
+
+      <button class="submit" type="submit">Inicia sesión</button>
+
+      <div class="signup">
+        ¿No tienes cuenta? <a href="#" (click)="router.navigate(['/register'])">Crea una</a>
+      </div>
+    </form>
+  </main>
 </div>

@@ -4,6 +4,29 @@
   margin: 0 auto;
 }
 
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.logo-and-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.app-logo {
+  width: 56px;
+  height: 56px;
+}
+.btn-logout {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 6px 10px;
+  border-radius: 4px;
+  color: white;
+}
+
 /* Sección de búsqueda */
 .search-section {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
