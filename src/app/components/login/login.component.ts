@@ -15,6 +15,7 @@ export class LoginComponent {
   username = '';
   password = '';
   error: string | null = null;
+  showPassword: boolean = false;
 
   constructor(private auth: AuthService, public router: Router) {}
 
@@ -22,12 +23,16 @@ export class LoginComponent {
     this.error = null;
     this.auth.login(this.username, this.password).subscribe({
       next: () => {
-        this.router.navigate(['/']);
+        this.router.navigate(['/search']);
       },
       error: (err) => {
         this.error = 'Credenciales inválidas';
         console.error(err);
       }
     });
+  }
+
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
   }
 }

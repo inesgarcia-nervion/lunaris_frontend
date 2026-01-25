@@ -16,16 +16,14 @@ export class RegisterComponent {
   email = '';
   password = '';
   error: string | null = null;
-  success: string | null = null;
+  showPassword: boolean = false;
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, public router: Router) {}
 
   submit() {
     this.error = null;
-    this.success = null;
     this.auth.register(this.username, this.email, this.password).subscribe({
       next: () => {
-        this.success = 'Usuario creado correctamente. Puedes iniciar sesión.';
         setTimeout(() => this.router.navigate(['/login']), 1200);
       },
       error: (err) => {
@@ -33,5 +31,8 @@ export class RegisterComponent {
         console.error(err);
       }
     });
+  }
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
   }
 }

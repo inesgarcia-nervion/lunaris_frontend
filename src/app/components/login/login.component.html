@@ -2,7 +2,7 @@
   <a class="back-arrow" title="Volver">←</a>
 
   <header class="brand">
-    <img src="/assets/LunarisLogo.png" class="brand-icon" width="72" height="72" alt="Lunaris" />
+    <img src="/assets/LunarisLogo.png" class="brand-icon" width="150" height="150" alt="Lunaris" />
     <h2 class="title">Inicio de sesión</h2>
     <p class="subtitle">Bienvenido/a de vuelta!</p>
   </header>
@@ -17,8 +17,18 @@
       <div class="field">
         <label class="label">Contraseña</label>
         <div class="password-row">
-          <input class="input" [(ngModel)]="password" name="password" type="password" placeholder="Inserte la contraseña" required />
-          <button type="button" class="eye" aria-hidden="true">👁</button>
+          <input class="input" [(ngModel)]="password" name="password" [type]="showPassword ? 'text' : 'password'" placeholder="Inserte la contraseña" required />
+          <button type="button" class="eye" (click)="togglePassword()" [attr.aria-pressed]="showPassword">
+            <!-- Mostrar icono de ojo taclado cuando la contraseña está oculta -->
+            <svg *ngIf="!showPassword" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path fill="#333" d="M12 5c-7 0-11 6-11 7s4 7 11 7 11-6 11-7-4-7-11-7zm0 12a5 5 0 110-10 5 5 0 010 10z" opacity="0.3"/>
+              <path fill="#333" d="M2 2l20 20-1.5 1.5L.5 3.5 2 2z"/>
+            </svg>
+            <!-- Mostrar icono de ojo cuando la contraseña está visible -->
+            <svg *ngIf="showPassword" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path fill="#333" d="M12 5c-7 0-11 6-11 7s4 7 11 7 11-6 11-7-4-7-11-7zm0 12a5 5 0 110-10 5 5 0 010 10z"/>
+            </svg>
+          </button>
         </div>
         <a class="forgot" href="#">¿Olvidaste la contraseña?</a>
       </div>
@@ -33,7 +43,7 @@
       <button class="submit" type="submit">Inicia sesión</button>
 
       <div class="signup">
-        ¿No tienes cuenta? <a href="#" (click)="router.navigate(['/register'])">Crea una</a>
+        ¿No tienes cuenta? <a href="#" (click)="router.navigate(['/register']); $event.preventDefault()">Crea una</a>
       </div>
     </form>
   </main>
