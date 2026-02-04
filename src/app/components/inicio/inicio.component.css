@@ -26,15 +26,38 @@
 .stars{display:flex;gap:5px;justify-content:center}
 .star{font-size:50px;color:#d0d0d0}
 .star.filled{color:#ffc107}
-.info-rows{display:flex;gap:40px;padding:40px 10%;align-items:flex-start}
+
+.info-rows{display:flex;gap:30px;padding:40px 5%;align-items:stretch; }
 .info-rows .col{flex:1}
-.mini-cards{background:#fff;border-radius:8px;padding:18px;border:1px solid #eaeaea}
-.mini-cards img{width:100%;height:140px;object-fit:cover;border-radius:6px}
+.lists-col{display:flex;flex-direction:column;gap:20px;flex:2}
+.lists-col h3{color:#888;font-size:20px;margin:0 0 2px 0;text-align:center; font-family: 'Poppins'; font-size:40px; font-weight:800;}
+.lists-wrapper{display:flex;gap:20px;flex:1}
+.list-item{border:2px solid #d0d0d0;border-radius:12px;padding:20px;background:#fff;flex:1;display:flex;flex-direction:column}
+.list-books-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px}
+.list-book{width:100%;height:250px;object-fit:cover;border-radius:8px}
+.list-item h4{font-size:16px;color:#000;margin:0 0 8px 0;font-weight:700; font-family: 'Urbanist'}
+.list-desc{font-size:13px;color:#666;margin:0 0 15px 0;line-height:1.5;flex:1}
+.badge-discover{background:#6b3bff;color:#fff;border-radius:8px;padding:12px 24px;font-size:15px;font-weight:600;align-self:center;display:inline-block;margin-bottom:15px}
+.btn-discover{background:#6b3bff;color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:15px;font-weight:600;cursor:pointer;width:100%}
+.btn-discover:hover{background:#5a2dcc}
+.community-col{flex:1;display:flex;flex-direction:column}
+.community-col h3{color:#999;font-size:20px;margin:0 0 20px 0;text-align:center; font-family: 'Poppins'; font-size:40px; font-weight:800;}
+.community-post{border:2px solid #d0d0d0;border-radius:12px;padding:20px;background:#fff;display:flex;flex-direction:column;flex:1}
+.post-header{display:flex;align-items:center;gap:12px;margin-bottom:15px}
+.user-avatar{width:50px;height:50px;border-radius:50%;object-fit:cover}
+.user-name{font-weight:600;color:#000;margin:0;font-size:15px}
+.post-content{display:flex;gap:15px}
+.post-image{width:200px;height:280px;object-fit:cover;border-radius:8px;flex-shrink:0}
+.post-text{font-size:13px;color:#555;line-height:1.6;margin:0}
+.post-actions{display:flex;gap:15px;font-size:24px;margin-top:15px}
+.heart{cursor:pointer}
+.comment{cursor:pointer}
 .discover{margin-top:12px;background:#6b3bff;color:#fff}
 .news{padding:40px 10%}
-.news h3{text-align:center;color:#888}
+.news h3{text-align:center;color:#999; font-family: 'Poppins'; font-size:40px; font-weight:800;}
 .news-box{max-width:800px;margin:20px auto;padding:18px;border-radius:8px;border:1px solid #e6e6e6;background:#fff}
 .news-box .lead{color:#666}
+.badge-news{background:#000;color:#fff;border-radius:6px;padding:8px 16px;font-size:13px;font-weight:600;display:inline-block;margin-top:12px}
 .btn.small{padding:8px 12px}
 
 /* Responsivo básico */
