@@ -1,0 +1,27 @@
+<div class="page-wrap">
+  <a class="back-arrow" title="Volver" (click)="router.navigate(['/']); $event.preventDefault()">←</a>
+
+  <header class="brand">
+    <img src="/assets/LunarisLogo.png" class="brand-icon" width="150" height="150" alt="Lunaris" />
+    <h2 class="title">Recuperar contraseña</h2>
+  </header>
+
+  <main class="card">
+    <form (ngSubmit)="submit()" class="login-form" autocomplete="off">
+      <div class="field">
+        <label class="label">Email</label>
+        <input class="input" [(ngModel)]="email" name="email" type="email" placeholder="Inserte el email" required />
+      </div>
+
+      <p *ngIf="message" class="success">{{ message }}</p>
+      <p *ngIf="error" class="error">{{ error }}</p>
+
+      <button class="submit" type="submit">Cambiar contraseña a través de email</button>
+
+      <div class="links">
+        <a href="javascript:void(0)" (click)="router.navigate(['/login'])">Inicia sesión</a>
+        <a href="javascript:void(0)" (click)="router.navigate(['/register'])">Crear cuenta</a>
+      </div>
+    </form>
+  </main>
+</div>
