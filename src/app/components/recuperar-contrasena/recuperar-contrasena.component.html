@@ -16,7 +16,10 @@
       <p *ngIf="message" class="success">{{ message }}</p>
       <p *ngIf="error" class="error">{{ error }}</p>
 
-      <button class="submit" type="submit">Cambiar contraseña a través de email</button>
+      <button class="submit" type="submit" [disabled]="loading">
+        <span *ngIf="!loading">Cambiar contraseña a través de email</span>
+        <span *ngIf="loading">Enviando...</span>
+      </button>
 
       <div class="links">
         <a href="javascript:void(0)" (click)="router.navigate(['/login'])">Inicia sesión</a>

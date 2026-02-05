@@ -5,12 +5,14 @@ import { InicioComponent } from './components/inicio/inicio.component';
 import { AuthGuard } from './services/auth.guard';
 import { RegisterComponent } from './components/register/register.component';
 import { RecuperarContrasenaComponent } from './components/recuperar-contrasena/recuperar-contrasena.component';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 
 export const routes: Routes = [
 	{ path: '', component: InicioComponent },
 	{ path: 'login', component: LoginComponent },
 	{ path: 'register', component: RegisterComponent },
 	{ path: 'recuperar-contrasena', component: RecuperarContrasenaComponent },
+	{ path: 'reset-password', component: ResetPasswordComponent },
 	{ path: 'search', component: BookSearchComponent, canActivate: [AuthGuard] },
 	{ path: '**', redirectTo: 'login' }
 ];

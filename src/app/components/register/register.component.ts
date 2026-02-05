@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -20,7 +20,7 @@ export class RegisterComponent {
   loading = false;
   showPassword: boolean = false;
 
-  constructor(private auth: AuthService, public router: Router) {}
+  constructor(private auth: AuthService, public router: Router, private cdr: ChangeDetectorRef) {}
 
   submit() {
     this.error = null;
@@ -41,6 +41,7 @@ export class RegisterComponent {
       next: () => {
         this.loading = false;
         this.success = '¡Cuenta creada correctamente! Redirigiendo al login...';
+        this.cdr.detectChanges();
         setTimeout(() => this.router.navigate(['/login']), 2000);
       },
       error: (err) => {
@@ -52,6 +53,7 @@ export class RegisterComponent {
         } else {
           this.error = 'Error al crear la cuenta. Inténtalo de nuevo.';
         }
+        this.cdr.detectChanges();
         console.error(err);
       }
     });
