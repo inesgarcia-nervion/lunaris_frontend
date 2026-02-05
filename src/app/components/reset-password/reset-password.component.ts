@@ -21,6 +21,7 @@ export class ResetPasswordComponent implements OnInit {
   tokenValid = false;
   validating = true;
   showPassword = false;
+  showConfirmPassword = false;
 
   private readonly backendBase = 'http://localhost:8080';
 
@@ -58,6 +59,10 @@ export class ResetPasswordComponent implements OnInit {
 
   togglePassword() {
     this.showPassword = !this.showPassword;
+  }
+
+  toggleConfirmPassword() {
+    this.showConfirmPassword = !this.showConfirmPassword;
   }
 
   submit() {

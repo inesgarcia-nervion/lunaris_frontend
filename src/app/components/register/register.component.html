@@ -7,21 +7,21 @@
   </header>
 
   <main class="card">
-    <form (ngSubmit)="submit()" class="login-form" autocomplete="off">
+    <form (ngSubmit)="submit()" class="login-form">
       <div class="field">
         <label class="label">Usuario</label>
-        <input class="input" [(ngModel)]="username" name="username" placeholder="Inserte el usuario" required />
+        <input class="input" [(ngModel)]="username" name="registro-username" placeholder="Inserce el usuario" autocomplete="off" required />
       </div>
 
       <div class="field">
         <label class="label">Correo electrónico</label>
-        <input class="input" [(ngModel)]="email" name="email" placeholder="Inserte el correo electrónico" required />
+        <input class="input" [(ngModel)]="email" name="registro-email" placeholder="Inserce el correo electrónico" autocomplete="off" required />
       </div>
 
       <div class="field">
         <label class="label">Contraseña</label>
         <div class="password-row">
-          <input class="input" [(ngModel)]="password" name="password" [type]="showPassword ? 'text' : 'password'" placeholder="Inserte la contraseña" required />
+          <input class="input" [(ngModel)]="password" name="registro-password" [type]="showPassword ? 'text' : 'password'" placeholder="Inserce la contraseña" autocomplete="new-password" required />
           <button type="button" class="eye" (click)="togglePassword()" [attr.aria-pressed]="showPassword">
             <!-- Mostrar icono de ojo taclado cuando la contraseña está oculta -->
             <svg *ngIf="!showPassword" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
