@@ -1,20 +1,34 @@
 .page-wrap {
   min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 32px 16px 64px;
   background: #fafafa;
   color: #2b1b1b;
+  overflow: hidden;
 }
 
 .back-arrow {
   position: absolute;
   left: 18px;
   top: 18px;
-  font-size: 28px;
+  font-size: 48px;
   color: #222;
   text-decoration: none;
+  cursor: pointer;
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.back-arrow:hover {
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .brand { text-align: center; margin: 18px 0 8px; }
@@ -23,6 +37,21 @@
 .title { margin: 6px 0 0; font-size: 36px; color: #caa6ff; text-shadow: 0 6px 10px rgba(154,124,255,0.35); font-family: "Poppins", sans-serif;}
 .subtitle { margin: 6px 0 20px; color: #9e88b8; font-weight: 600; font-family: "Poppins", sans-serif;}
 
+.page-wrap {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 64px;
+  background: #fafafa;
+  color: #2b1b1b;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
 .card {
   width: 520px;
   max-width: calc(100% - 40px);
@@ -30,6 +59,8 @@
   border-radius: 8px;
   padding: 28px 36px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .login-form { display: flex; flex-direction: column; }

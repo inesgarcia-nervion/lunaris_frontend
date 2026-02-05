@@ -1,5 +1,5 @@
 <div class="page-wrap">
-  <a class="back-arrow" title="Volver">←</a>
+  <a class="back-arrow" title="Volver" (click)="router.navigate(['/']); $event.preventDefault()">←</a>
 
   <header class="brand">
     <img src="/assets/LunarisLogo.png" class="brand-icon" width="150" height="150" alt="Lunaris" />
@@ -39,7 +39,7 @@
       <button class="submit" type="submit">Crear cuenta</button>
 
       <div class="signup">
-        ¿Ya tienes cuenta? <a href="#" (click)="router.navigate(['/login'])">Inicia sesión</a>
+        ¿Ya tienes cuenta? <a href="javascript:void(0)" (click)="router.navigate(['/login'])">Inicia sesión</a>
       </div>
     </form>
   </main>
