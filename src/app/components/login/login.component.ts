@@ -14,19 +14,36 @@ import { AuthService } from '../../services/auth.service';
 export class LoginComponent {
   username = '';
   password = '';
+  rememberMe = false;
   error: string | null = null;
+  loading = false;
   showPassword: boolean = false;
 
   constructor(private auth: AuthService, public router: Router) {}
 
   submit() {
     this.error = null;
-    this.auth.login(this.username, this.password).subscribe({
+    
+    if (!this.username || !this.password) {
+      this.error = 'Por favor, introduce usuario y contraseña';
+      return;
+    }
+    
+    this.loading = true;
+    this.auth.login(this.username, this.password, this.rememberMe).subscribe({
       next: () => {
+        this.loading = false;
         this.router.navigate(['/search']);
       },
       error: (err) => {
-        this.error = 'Credenciales inválidas';
+        this.loading = false;
+        if (err.status === 401) {
+          this.error = 'Usuario o contraseña incorrectos';
+        } else if (err.status === 0) {
+          this.error = 'No se puede conectar con el servidor';
+        } else {
+          this.error = 'Error al iniciar sesión. Inténtalo de nuevo.';
+        }
         console.error(err);
       }
     });

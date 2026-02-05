@@ -33,14 +33,19 @@
         <a class="forgot" href="javascript:void(0)" (click)="router.navigate(['/recuperar-contrasena'])">¿Olvidaste la contraseña?</a>
       </div>
 
+      <p *ngIf="error" class="error">{{ error }}</p>
+
       <div class="remember-row">
         <label class="remember">
-          <input type="checkbox" name="remember" />
+          <input type="checkbox" name="remember" [(ngModel)]="rememberMe" />
           <span>Recuérdame</span>
         </label>
       </div>
 
-      <button class="submit" type="submit">Inicia sesión</button>
+      <button class="submit" type="submit" [disabled]="loading">
+        <span *ngIf="!loading">Inicia sesión</span>
+        <span *ngIf="loading">Cargando...</span>
+      </button>
 
       <div class="signup">
         ¿No tienes cuenta? <a href="javascript:void(0)" (click)="router.navigate(['/register'])">Crea una</a>

@@ -36,7 +36,13 @@
         </div>
       </div>
 
-      <button class="submit" type="submit">Crear cuenta</button>
+      <p *ngIf="error" class="error">{{ error }}</p>
+      <p *ngIf="success" class="success">{{ success }}</p>
+
+      <button class="submit" type="submit" [disabled]="loading">
+        <span *ngIf="!loading">Crear cuenta</span>
+        <span *ngIf="loading">Creando cuenta...</span>
+      </button>
 
       <div class="signup">
         ¿Ya tienes cuenta? <a href="javascript:void(0)" (click)="router.navigate(['/login'])">Inicia sesión</a>
