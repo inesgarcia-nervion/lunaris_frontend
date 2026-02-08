@@ -75,11 +75,23 @@ export class MenuComponent implements OnInit {
   }
 
   /**
+   * Limpia el mensaje de alerta después de 5 segundos
+   */
+  private clearAlertAfterDelay(): void {
+    setTimeout(() => {
+      this.error = null;
+      this.successMessage = null;
+      this.cdr.markForCheck();
+    }, 5000);
+  }
+
+  /**
    * Realiza la búsqueda de libros
    */
   search(): void {
     if (!this.searchQuery.trim()) {
       this.error = 'Por favor ingresa un término de búsqueda';
+      this.clearAlertAfterDelay();
       return;
     }
 
@@ -102,12 +114,14 @@ export class MenuComponent implements OnInit {
 
         if (this.searchResults.length === 0) {
           this.error = 'No se encontraron libros. Intenta con otra búsqueda.';
+          this.clearAlertAfterDelay();
         }
       },
       error: (error) => {
         console.error('Error buscando libros:', error);
         this.error = 'Error al buscar libros. Por favor intenta más tarde.';
         this.loading = false;
+        this.clearAlertAfterDelay();
         this.cdr.markForCheck();
       }
     });
@@ -119,6 +133,7 @@ export class MenuComponent implements OnInit {
   searchByAuthor(): void {
     if (!this.searchQuery.trim()) {
       this.error = 'Por favor ingresa un autor';
+      this.clearAlertAfterDelay();
       return;
     }
 
@@ -135,12 +150,14 @@ export class MenuComponent implements OnInit {
 
         if (this.searchResults.length === 0) {
           this.error = 'No se encontraron libros de este autor.';
+          this.clearAlertAfterDelay();
         }
       },
       error: (error) => {
         console.error('Error buscando por autor:', error);
         this.error = 'Error al buscar. Por favor intenta más tarde.';
         this.loading = false;
+        this.clearAlertAfterDelay();
         this.cdr.markForCheck();
       }
     });
@@ -158,16 +175,13 @@ export class MenuComponent implements OnInit {
         this.successMessage = `"${book.title}" ha sido importado correctamente!`;
         this.loading = false;
         this.cdr.markForCheck();
-        // Limpiar mensaje de éxito después de 5 segundos
-        setTimeout(() => {
-          this.successMessage = null;
-          this.cdr.markForCheck();
-        }, 5000);
+        this.clearAlertAfterDelay();
       },
       error: (error) => {
         console.error('Error importando libro:', error);
         this.error = 'Error al importar el libro. Intenta nuevamente.';
         this.loading = false;
+        this.clearAlertAfterDelay();
         this.cdr.markForCheck();
       }
     });

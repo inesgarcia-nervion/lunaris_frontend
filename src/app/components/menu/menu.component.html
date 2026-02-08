@@ -1,65 +1,123 @@
 <nav class="navbar">
   <div class="navbar-container">
-    <!-- Logo -->
+    <!-- Logo izquierda -->
     <div class="navbar-logo">
-      <img src="/assets/IconoAplicacion.jpg" class="brand-icon" width="150" height="150" alt="Lunaris" />
+      <img src="/assets/IconoAplicacion.jpg" class="brand-icon" alt="Lunaris" />
     </div>
 
-    <!-- Menú de navegación -->
-    <div class="navbar-menu" [class.active]="isMenuOpen">
-      <a (click)="navigate('/menu')" class="nav-item">Menú</a>
-      <a (click)="navigate('/listas')" class="nav-item">Listas</a>
-      <a (click)="navigate('/ruleta')" class="nav-item">Ruleta</a>
-      <a (click)="navigate('/comunidad')" class="nav-item">Comunidad</a>
-      <a (click)="navigate('/noticias')" class="nav-item">Noticias</a>
-    </div>
+    <!-- Centro: Menú + Búsqueda -->
+    <div class="navbar-center">
+      <!-- Menú de navegación -->
+      <div class="navbar-menu" [class.active]="isMenuOpen">
+        <a (click)="navigate('/menu')" class="nav-item">Menú</a>
+        <a (click)="navigate('/listas')" class="nav-item">Listas</a>
+        <a (click)="navigate('/ruleta')" class="nav-item">Ruleta</a>
+        <a (click)="navigate('/comunidad')" class="nav-item">Comunidad</a>
+        <a (click)="navigate('/noticias')" class="nav-item">Noticias</a>
+      </div>
 
-    <!-- Barra de búsqueda -->
-    <div class="search-bar">
-      <input
-        [(ngModel)]="searchQuery"
-        type="text"
-        placeholder="Buscar libros"
-        (keyup.enter)="search()"
-        class="search-input"
-      />
-      <button (click)="search()" class="search-btn">
-        <span class="search-icon">🔍</span>
-      </button>
-    </div>
-
-    <!-- Menú de usuario -->
-    <div class="user-menu">
-      <button (click)="toggleUserMenu()" class="user-btn">
-        <span class="user-icon">👤</span>
-      </button>
-      
-      <div class="user-dropdown" *ngIf="showUserMenu">
-        <a (click)="navigate('/perfil')" class="dropdown-item">Mi Perfil</a>
-        <a (click)="navigate('/mis-listas')" class="dropdown-item">Mis Listas</a>
-        <hr />
-        <button (click)="logout()" class="dropdown-item logout-btn">
-          Cerrar sesión
+      <!-- Barra de búsqueda -->
+      <div class="search-bar">
+        <input
+          [(ngModel)]="searchQuery"
+          type="text"
+          placeholder="Buscar libros"
+          (keyup.enter)="search()"
+          class="search-input"
+        />
+        <button (click)="search()" class="search-btn">
+          <span class="search-icon">🔍</span>
         </button>
       </div>
     </div>
 
-    <!-- Botón hamburguesa para móviles -->
-    <button (click)="toggleMenu()" class="hamburger">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
+    <!-- Usuario derecha -->
+    <div class="navbar-right">
+      <!-- Menú de usuario -->
+      <div class="user-menu">
+        <button (click)="toggleUserMenu()" class="user-btn">
+          <span class="user-icon">👤</span>
+        </button>
+        
+        <div class="user-dropdown" *ngIf="showUserMenu">
+          <a (click)="navigate('/perfil')" class="dropdown-item">Mi Perfil</a>
+          <a (click)="navigate('/mis-listas')" class="dropdown-item">Mis Listas</a>
+          <hr />
+          <button (click)="logout()" class="dropdown-item logout-btn">
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+
+      <!-- Botón hamburguesa para móviles -->
+      <button (click)="toggleMenu()" class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
   </div>
 </nav>
 
 <!-- Contenido principal -->
 <div class="book-search-container">
-  <div class="search-section">
-    <!-- Mensajes de error y éxito -->
-    <div *ngIf="error" class="alert alert-error">{{ error }}</div>
-    <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+  <!-- Alertas en la parte superior -->
+  <div *ngIf="error" class="alert alert-error alert-top">{{ error }}</div>
+  <div *ngIf="successMessage" class="alert alert-success alert-top">{{ successMessage }}</div>
 
+  <!-- Sección central - Solo cuando no hay búsqueda -->
+  <div *ngIf="!searchQuery && searchResults.length === 0" class="hero-section">
+    <div class="hero-content">
+      <!-- Izquierda: Texto -->
+      <div class="hero-left">
+        <h1 class="hero-title">Descubre tu próxima lectura con Lunaris</h1>
+        <p class="hero-description">Tu aventura para encontrar tu próxima lectura empieza aquí. Explora y almacena tus lecturas para llevar un mejor control de tu librería.</p>
+        
+        <!-- Estadísticas -->
+        <div class="hero-stats">
+          <div class="stat-box">
+            <div class="stat-number">500k+</div>
+            <div class="stat-label">libros diferentes</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number">10k+</div>
+            <div class="stat-label">usuarios registrados</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number">2k+</div>
+            <div class="stat-label">listas creadas por usuarios</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Derecha: Imagen -->
+      <div class="hero-right">
+        <img src="/assets/menu/MenuLibros.jpg" alt="Librería de libros" class="hero-image" />
+      </div>
+    </div>
+
+    <!-- Sección de navegación rápida -->
+    <div class="quick-nav">
+      <div class="nav-card" (click)="navigate('/listas')">
+        <div class="nav-icon">📚</div>
+        <div class="nav-label">Listas</div>
+      </div>
+      <div class="nav-card" (click)="navigate('/ruleta')">
+        <div class="nav-icon">🎡</div>
+        <div class="nav-label">Ruleta</div>
+      </div>
+      <div class="nav-card" (click)="navigate('/comunidad')">
+        <div class="nav-icon">👥</div>
+        <div class="nav-label">Comunidad</div>
+      </div>
+      <div class="nav-card" (click)="navigate('/noticias')">
+        <div class="nav-icon">📰</div>
+        <div class="nav-label">Noticias</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="search-section">
     <!-- Información de resultados -->
     <div *ngIf="totalResults > 0" class="results-info">
       <p>Se encontraron <strong>{{ totalResults }}</strong> libros</p>
