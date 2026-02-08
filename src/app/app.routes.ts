@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { BookSearchComponent } from './components/book-search/book-search.component';
+import { MenuComponent } from './components/menu/menu.component';
 import { LoginComponent } from './components/login/login.component';
 import { InicioComponent } from './components/inicio/inicio.component';
 import { AuthGuard } from './services/auth.guard';
@@ -13,6 +13,6 @@ export const routes: Routes = [
 	{ path: 'register', component: RegisterComponent },
 	{ path: 'recuperar-contrasena', component: RecuperarContrasenaComponent },
 	{ path: 'reset-password', component: ResetPasswordComponent },
-	{ path: 'search', component: BookSearchComponent, canActivate: [AuthGuard] },
+	{ path: 'menu', component: MenuComponent, canActivate: [AuthGuard] },
 	{ path: '**', redirectTo: 'login' }
 ];

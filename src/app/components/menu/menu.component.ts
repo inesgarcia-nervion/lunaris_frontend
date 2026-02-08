@@ -6,13 +6,13 @@ import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-book-search',
+  selector: 'app-menu',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './book-search.component.html',
-  styleUrl: './book-search.component.css'
+  templateUrl: './menu.component.html',
+  styleUrl: './menu.component.css'
 })
-export class BookSearchComponent implements OnInit {
+export class MenuComponent implements OnInit {
   searchQuery: string = '';
   searchResults: OpenLibraryBook[] = [];
   loading: boolean = false;
@@ -21,6 +21,8 @@ export class BookSearchComponent implements OnInit {
   limit: number = 10;
   totalResults: number = 0;
   successMessage: string | null = null;
+  isMenuOpen: boolean = false;
+  showUserMenu: boolean = false;
 
   constructor(
     private bookSearchService: BookSearchService,
@@ -31,6 +33,37 @@ export class BookSearchComponent implements OnInit {
 
   ngOnInit(): void {
     // Inicialización si es necesaria
+  }
+
+  /**
+   * Alterna el menú
+   */
+  toggleMenu(): void {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  /**
+   * Alterna el menú de usuario
+   */
+  toggleUserMenu(): void {
+    this.showUserMenu = !this.showUserMenu;
+  }
+
+  /**
+   * Navega a una sección
+   */
+  navigate(path: string): void {
+    // Si navega al menú, limpiar la búsqueda para mostrar el estado inicial
+    if (path === '/menu') {
+      this.searchQuery = '';
+      this.searchResults = [];
+      this.totalResults = 0;
+      this.error = null;
+      this.successMessage = null;
+      this.currentPage = 1;
+    }
+    this.router.navigate([path]);
+    this.isMenuOpen = false;
   }
 
   /**

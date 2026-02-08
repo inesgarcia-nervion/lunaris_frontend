@@ -34,7 +34,7 @@ export class LoginComponent {
       next: () => {
         this.loading = false;
         this.cdr.detectChanges();
-        this.router.navigate(['/search']);
+        this.router.navigate(['/menu']);
       },
       error: (err) => {
         this.loading = false;

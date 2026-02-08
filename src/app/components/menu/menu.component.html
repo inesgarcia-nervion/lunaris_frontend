@@ -1,39 +1,64 @@
-<div class="book-search-container">
-  <div class="search-section">
-    <div class="header-row">
-      <h2>Buscar Libros</h2>
-      <button (click)="logout()" class="btn btn-logout">Cerrar sesión</button>
+<nav class="navbar">
+  <div class="navbar-container">
+    <!-- Logo -->
+    <div class="navbar-logo">
+      <img src="/assets/IconoAplicacion.jpg" class="brand-icon" width="150" height="150" alt="Lunaris" />
     </div>
-    
-    <!-- Mensajes de error y éxito -->
-    <div *ngIf="error" class="alert alert-error">{{ error }}</div>
-    <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+    <!-- Menú de navegación -->
+    <div class="navbar-menu" [class.active]="isMenuOpen">
+      <a (click)="navigate('/menu')" class="nav-item">Menú</a>
+      <a (click)="navigate('/listas')" class="nav-item">Listas</a>
+      <a (click)="navigate('/ruleta')" class="nav-item">Ruleta</a>
+      <a (click)="navigate('/comunidad')" class="nav-item">Comunidad</a>
+      <a (click)="navigate('/noticias')" class="nav-item">Noticias</a>
+    </div>
 
     <!-- Barra de búsqueda -->
     <div class="search-bar">
       <input
         [(ngModel)]="searchQuery"
         type="text"
-        placeholder="Buscar por título, autor o término..."
+        placeholder="Buscar libros"
         (keyup.enter)="search()"
-        [disabled]="loading"
         class="search-input"
       />
-      <button
-        (click)="search()"
-        [disabled]="loading"
-        class="btn btn-primary"
-      >
-        {{ loading ? 'Buscando...' : 'Buscar' }}
-      </button>
-      <button
-        (click)="searchByAuthor()"
-        [disabled]="loading"
-        class="btn btn-secondary"
-      >
-        Buscar por Autor
+      <button (click)="search()" class="search-btn">
+        <span class="search-icon">🔍</span>
       </button>
     </div>
+
+    <!-- Menú de usuario -->
+    <div class="user-menu">
+      <button (click)="toggleUserMenu()" class="user-btn">
+        <span class="user-icon">👤</span>
+      </button>
+      
+      <div class="user-dropdown" *ngIf="showUserMenu">
+        <a (click)="navigate('/perfil')" class="dropdown-item">Mi Perfil</a>
+        <a (click)="navigate('/mis-listas')" class="dropdown-item">Mis Listas</a>
+        <hr />
+        <button (click)="logout()" class="dropdown-item logout-btn">
+          Cerrar sesión
+        </button>
+      </div>
+    </div>
+
+    <!-- Botón hamburguesa para móviles -->
+    <button (click)="toggleMenu()" class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Contenido principal -->
+<div class="book-search-container">
+  <div class="search-section">
+    <!-- Mensajes de error y éxito -->
+    <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+    <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
 
     <!-- Información de resultados -->
     <div *ngIf="totalResults > 0" class="results-info">
@@ -125,8 +150,4 @@
     <p>Intenta con otros términos o prueba la búsqueda por autor.</p>
   </div>
 
-  <!-- Estado inicial -->
-  <div *ngIf="!loading && searchResults.length === 0 && !searchQuery" class="initial-state">
-    <p>Utiliza la barra de búsqueda para encontrar libros en Open Library.</p>
-  </div>
 </div>
