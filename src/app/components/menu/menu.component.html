@@ -187,7 +187,7 @@
         </div>
       </div>
 
-      <!-- Derecha: Información Superior -->
+      <!-- Centro: Información -->
       <div class="detail-info-right">
         <!-- Título y saga -->
         <h1 class="detail-title">{{ selectedBook.title }}</h1>
@@ -224,25 +224,28 @@
             </span>
           </div>
         </div>
+      </div>
 
-        <!-- Selectores -->
-        <div class="header-selectors">
-          <div class="form-group-inline">
-            <select [(ngModel)]="selectedList" class="form-select-header">
-              <option value="Mis libros favoritos">Mis libros favoritos</option>
-              <option value="Mi lista">Mi lista</option>
-              <option value="Favoritos">Favoritos</option>
-              <option value="Ejemplo2">Ejemplo2</option>
-            </select>
-          </div>
+      <!-- Derecha: Selectores -->
+      <div class="detail-right-selectors">
+        <div class="form-group-inline">
+          <label class="selector-label">Añadir a una lista</label>
+          <select [(ngModel)]="selectedList" class="form-select-header">
+            <option value="">-- Selecciona una lista --</option>
+            <option value="Mis libros favoritos">Mis libros favoritos</option>
+            <option value="Mi lista">Mi lista</option>
+            <option value="Favoritos">Favoritos</option>
+            <option value="Ejemplo2">Ejemplo2</option>
+          </select>
+        </div>
 
-          <div class="form-group-inline">
-            <select [(ngModel)]="selectedStatus" class="form-select-header">
-              <option value="Leído">Leído</option>
-              <option value="En lectura">En lectura</option>
-              <option value="Pendiente">Pendiente</option>
-            </select>
-          </div>
+        <div class="form-group-inline">
+          <label class="selector-label">Estado</label>
+          <select [(ngModel)]="selectedStatus" class="form-select-header">
+            <option value="Leído">Leído</option>
+            <option value="Plan para leer">Plan para leer</option>
+            <option value="Leyendo">Leyendo</option>
+          </select>
         </div>
       </div>
     </div>

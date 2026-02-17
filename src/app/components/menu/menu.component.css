@@ -1327,15 +1327,16 @@
 
 .detail-container {
   display: grid;
-  grid-template-columns: 220px 1fr;
+  grid-template-columns: 220px 1fr 280px;
   gap: 40px;
   background: white;
   padding: 40px;
-  border-radius: 8px;
+  border-radius: 8px 8px 0 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 0;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .detail-left {
@@ -1368,12 +1369,12 @@
   min-height: 100%;
 }
 
-/* Sección con ancho completo - descripción y reviews */
-.detail-content-full-width {
+/* Selectores derecha - posicionados en columna 3 */
+.detail-right-selectors {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  width: 100%;
+  gap: 15px;
+  align-self: start;
 }
 
 /* Separador - NO UTILIZADO (contenido ahora es flujo continuo) */
@@ -1455,33 +1456,52 @@
 .header-selectors {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 15px;
+  margin-top: 15px;
 }
 
 .form-group-inline {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 8px;
+}
+
+.selector-label {
+  font-size: 13px;
+  color: #666;
+  font-weight: 600;
+  text-transform: capitalize;
 }
 
 .form-select-header {
-  padding: 10px 12px;
-  border: 1px solid #ddd;
+  padding: 12px 14px;
+  border: 1px solid #b8a0d1;
   border-radius: 6px;
   background: white;
   color: #333;
-  font-size: 13px;
+  font-size: 14px;
   cursor: pointer;
-  transition: border-color 0.3s;
+  transition: all 0.3s;
   font-weight: 500;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 20px;
+  padding-right: 40px;
 }
 
 .form-select-header:hover,
 .form-select-header:focus {
   border-color: #9d4edd;
   outline: none;
-  background: #fafafa;
+  background-color: #f9f9f9;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239d4edd' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 20px;
 }
 
 /* Separador duplicado - eliminar */
@@ -1522,7 +1542,7 @@
   width: 100%;
   background: white;
   padding: 40px;
-  border-radius: 8px;
+  border-radius: 0 0 8px 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   margin-top: 0;
 }
@@ -1530,6 +1550,8 @@
 /* Descripción */
 .description-section {
   margin: 0;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
 }
 
 .description-section strong {
@@ -1537,6 +1559,7 @@
   margin-bottom: 10px;
   color: #333;
   font-size: 16px;
+  margin-top: 5px;
 }
 
 .description-text {
@@ -1549,10 +1572,11 @@
 /* Review section */
 .review-section {
   margin: 0;
-  padding: 20px;
-  background: #f9f9f9;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  padding: 20px 0;
+  padding-top: 20px;
+  background: transparent;
+  border-radius: 0;
+  border-top: 1px solid #e0e0e0;
 }
 
 .review-section h3 {
@@ -1562,7 +1586,7 @@
 }
 
 .my-review {
-  background: white;
+  background: #f9f9f9;
   padding: 15px;
   border-radius: 6px;
 }
@@ -1659,10 +1683,11 @@
 /* User reviews section */
 .user-reviews-section {
   margin: 0;
-  padding: 20px;
-  background: #f9f9f9;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  padding: 20px 0;
+  padding-top: 20px;
+  background: transparent;
+  border-radius: 0;
+  border-top: 1px solid #e0e0e0;
 }
 
 .user-reviews-section h3 {
@@ -1672,7 +1697,7 @@
 }
 
 .user-review-example {
-  background: white;
+  background: #f9f9f9;
   padding: 15px;
   border-radius: 6px;
   margin-bottom: 15px;
