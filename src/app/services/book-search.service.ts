@@ -25,6 +25,10 @@ export interface OpenLibraryBook {
   description?: string;
   ratingsAverage?: number;
   ratings_average?: number;
+  series?: string[];
+  subject?: string[];
+  subjects?: string[];
+  categories?: string[];
 }
 
 /**

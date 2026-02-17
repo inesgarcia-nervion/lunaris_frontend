@@ -23,6 +23,11 @@ export class MenuComponent implements OnInit {
   successMessage: string | null = null;
   isMenuOpen: boolean = false;
   showUserMenu: boolean = false;
+  selectedBook: OpenLibraryBook | null = null;
+  userRating: number = 0;
+  userReview: string = '';
+  selectedList: string = 'Ejemplo2';
+  selectedStatus: string = 'Leído';
 
   constructor(
     private bookSearchService: BookSearchService,
@@ -241,5 +246,171 @@ export class MenuComponent implements OnInit {
    */
   hasPreviousPage(): boolean {
     return this.currentPage > 1;
+  }
+
+  /**
+   * Selecciona un libro para ver sus detalles
+   */
+  selectBook(book: OpenLibraryBook): void {
+    this.selectedBook = book;
+    this.userRating = 0;
+    this.userReview = '';
+  }
+
+  /**
+   * Vuelve a la vista de búsqueda
+   */
+  backToSearch(): void {
+    this.selectedBook = null;
+  }
+
+  /**
+   * Detecta si el libro es parte de una saga y retorna el nombre de la saga
+   */
+  getSagaName(book: any): string | null {
+    // Palabras clave para detectar sagas
+    const sagaKeywords = ['saga', 'serie', 'trilogy', 'duology', 'cycle', 'series'];
+    const title = (book.title || '').toLowerCase();
+    
+    // 1. Intentar obtener el nombre de la saga desde los datos de la API
+    if (book.series && Array.isArray(book.series) && book.series.length > 0) {
+      return book.series[0];
+    }
+    
+    // 2. Buscar en subject
+    if (book.subject && Array.isArray(book.subject)) {
+      for (const subject of book.subject) {
+        const subjectLower = subject.toLowerCase();
+        // Si el subject contiene palabras de saga, extraerlo
+        if (subjectLower.includes('saga') || subjectLower.includes('series') || 
+            subjectLower.includes('trilogy') || subjectLower.includes('cycle')) {
+          const sagaName = subject.split('--')[0].trim();
+          if (sagaName.length > 0 && sagaName.length < 100) {
+            return sagaName;
+          }
+        }
+      }
+    }
+    
+    // 3. Buscar en el título patrones como (Mistborn #1) o (Saga: Mistborn)
+    const patterns = [
+      /\(([^#\)]*?)\s+#\d+\)/i,  // (Mistborn #1)
+      /\(Saga:\s*([^)]*)\)/i,     // (Saga: Mistborn)
+      /\(([^)]*)\s+Series\)/i,    // (Mistborn Series)
+      /\(Book\s+\d+(?:\s+of\s+|:)?\s*([^)]*)\)/i  // (Book 1 of Mistborn) o (Book 1: Name)
+    ];
+    
+    for (const pattern of patterns) {
+      const match = title.match(pattern);
+      if (match && match[1]) {
+        const sagaName = match[1].trim();
+        if (sagaName.length > 0 && sagaName.length < 100) {
+          return sagaName.charAt(0).toUpperCase() + sagaName.slice(1);
+        }
+      }
+    }
+    
+    // Si no hay datos de saga, retornar null
+    return null;
+  }
+
+  /**
+   * Detecta si el libro es parte de una saga (booleano)
+   */
+  isSaga(book: OpenLibraryBook): boolean {
+    return this.getSagaName(book) !== null;
+  }
+
+  /**
+   * Obtiene el número de ediciones formateado
+   */
+  getEditionCount(book: OpenLibraryBook): string {
+    return book.editionCount?.toString() || book.edition_count?.toString() || '0';
+  }
+
+  /**
+   * Obtiene las categorías del libro (si están disponibles en la API)
+   */
+  getCategories(book: any): string[] {
+    // Intentar obtener categorías de diferentes campos posibles
+    const categories = book.subject || book.subjects || book.categories || [];
+    
+    // Si hay categorías, retornar las primeras 5
+    if (Array.isArray(categories) && categories.length > 0) {
+      return categories.slice(0, 5);
+    }
+    
+    // Si no hay categorías en la API, retornar categorías por defecto basadas en palabras clave
+    const defaultCategories = this.inferCategories(book);
+    return defaultCategories;
+  }
+
+  /**
+   * Infiere categorías basadas en el contenido del libro
+   */
+  private inferCategories(book: any): string[] {
+    const categories: string[] = [];
+    const titleAndDesc = ((book.title || '') + (book.description || '')).toLowerCase();
+    
+    const categoryKeywords: { [key: string]: string[] } = {
+      'Ficción': ['fiction', 'novela', 'novel'],
+      'Fantasía': ['fantasy', 'fantasia', 'magic', 'mágic'],
+      'Ciencia Ficción': ['science fiction', 'sci-fi', 'future'],
+      'Romance': ['romance', 'love', 'amour'],
+      'Misterio': ['mystery', 'detective', 'misterio'],
+      'Thriller': ['thriller', 'suspense', 'suspenseful'],
+      'Aventura': ['adventure', 'aventura', 'quest'],
+      'Histórico': ['historical', 'histórico', 'history']
+    };
+    
+    for (const [category, keywords] of Object.entries(categoryKeywords)) {
+      if (keywords.some(keyword => titleAndDesc.includes(keyword))) {
+        categories.push(category);
+      }
+    }
+    
+    return categories.length > 0 ? categories : ['Ficción'];
+  }
+
+  /**
+   * Genera estrellas para la calificación (incluyendo medias estrellas)
+   * Retorna un array con: 'full', 'half', 'empty'
+   */
+  generateRatingArray(rating: number | undefined): string[] {
+    const stars: string[] = [];
+    const ratingValue = rating || 0;
+    
+    for (let i = 0; i < 5; i++) {
+      if (i < Math.floor(ratingValue)) {
+        // Estrella llena
+        stars.push('full');
+      } else if (i === Math.floor(ratingValue) && ratingValue % 1 !== 0) {
+        // Media estrella
+        stars.push('half');
+      } else {
+        // Estrella vacía
+        stars.push('empty');
+      }
+    }
+    
+    return stars;
+  }
+
+  /**
+   * Añade el libro a una lista
+   */
+  addToList(): void {
+    this.successMessage = `Libro añadido a la lista "${this.selectedList}"`;
+    this.clearAlertAfterDelay();
+  }
+
+  /**
+   * Actualiza el review del usuario
+   */
+  submitReview(): void {
+    if (this.userReview.trim()) {
+      this.successMessage = 'Review enviado correctamente';
+      this.clearAlertAfterDelay();
+    }
   }
 }

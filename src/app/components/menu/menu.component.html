@@ -119,61 +119,29 @@
 
   <div class="search-section">
     <!-- Información de resultados -->
-    <div *ngIf="totalResults > 0" class="results-info">
+    <div *ngIf="totalResults > 0 && !selectedBook" class="results-info">
       <p>Se encontraron <strong>{{ totalResults }}</strong> libros</p>
       <p>Mostrando <strong>{{ searchResults.length }}</strong> resultados por página</p>
     </div>
   </div>
 
-  <!-- Lista de resultados -->
-  <div *ngIf="searchResults.length > 0" class="results-section">
-    <div class="books-grid">
-      <div *ngFor="let book of searchResults" class="book-card">
+  <!-- VISTA DE BÚSQUEDA SIMPLIFICADA -->
+  <div *ngIf="searchResults.length > 0 && !selectedBook" class="results-section">
+    <div class="books-grid-simple">
+      <div *ngFor="let book of searchResults" class="book-card-simple" (click)="selectBook(book)">
         <!-- Portada -->
-        <div class="book-cover">
+        <div class="book-cover-simple">
           <img
             [src]="getCoverUrl(book)"
             [alt]="book.title"
-            class="cover-image"
+            class="cover-image-simple"
           />
         </div>
 
-        <!-- Información del libro -->
-        <div class="book-info">
-          <h3 class="book-title">{{ book.title }}</h3>
-          <p class="book-author">
-            <strong>Autor:</strong> {{ getFirstAuthor(book) }}
-          </p>
-          <p *ngIf="book.firstPublishYear" class="book-year">
-            <strong>Año:</strong> {{ book.firstPublishYear }}
-          </p>
-          <p *ngIf="book.editionCount" class="book-editions">
-            <strong>Ediciones:</strong> {{ book.editionCount }}
-          </p>
-          <p *ngIf="book.ratingsAverage" class="book-rating">
-            <strong>Puntuación:</strong> {{ book.ratingsAverage | number: '1.1-1' }} / 5
-          </p>
-          <p *ngIf="book.description" class="book-description">
-            <strong>Descripción:</strong> {{ book.description | slice: 0: 150 }}{{ book.description && book.description.length > 150 ? '...' : '' }}
-          </p>
-
-          <!-- Acciones -->
-          <div class="book-actions">
-            <button
-              (click)="importBook(book)"
-              [disabled]="loading"
-              class="btn btn-import"
-            >
-              Importar a Mi Biblioteca
-            </button>
-            <a
-              [href]="'https://openlibrary.org' + book.key"
-              target="_blank"
-              class="btn btn-external"
-            >
-              Ver en Open Library
-            </a>
-          </div>
+        <!-- Información mínima -->
+        <div class="book-info-simple">
+          <h3 class="book-title-simple">{{ book.title }}</h3>
+          <p *ngIf="isSaga(book)" class="saga-badge">Saga</p>
         </div>
       </div>
     </div>
@@ -202,8 +170,145 @@
     </div>
   </div>
 
+  <!-- VISTA DE DETALLE DEL LIBRO -->
+  <div *ngIf="selectedBook" class="book-detail-view">
+    <!-- Botón volver -->
+    <button (click)="backToSearch()" class="btn btn-back">← Volver a búsqueda</button>
+
+    <div class="detail-container">
+      <!-- Izquierda: Portada -->
+      <div class="detail-left">
+        <div class="book-cover-detail">
+          <img
+            [src]="getCoverUrl(selectedBook)"
+            [alt]="selectedBook.title"
+            class="cover-image-detail"
+          />
+        </div>
+      </div>
+
+      <!-- Derecha: Información Superior -->
+      <div class="detail-info-right">
+        <!-- Título y saga -->
+        <h1 class="detail-title">{{ selectedBook.title }}</h1>
+        <p class="detail-saga" *ngIf="isSaga(selectedBook)">
+          Saga: {{ getSagaName(selectedBook) }}
+        </p>
+        <!-- Año y autor -->
+        <p class="detail-meta">
+          <span *ngIf="selectedBook.firstPublishYear || selectedBook.first_publish_year">
+            {{ selectedBook.firstPublishYear || selectedBook.first_publish_year }}
+          </span>
+          <span *ngIf="getFirstAuthor(selectedBook)" class="author-name">
+            {{ getFirstAuthor(selectedBook) }}
+          </span>
+        </p>
+        <!-- Rating -->
+        <div *ngIf="selectedBook.ratingsAverage || selectedBook.ratings_average" class="rating-section">
+          <div class="rating-stars">
+            <span *ngFor="let star of generateRatingArray(selectedBook.ratingsAverage || selectedBook.ratings_average)" 
+                  class="star" 
+                  [class.full]="star === 'full'"
+                  [class.half]="star === 'half'"
+                  [class.empty]="star === 'empty'">★</span>
+          </div>
+          <span class="rating-number">{{ (selectedBook.ratingsAverage || selectedBook.ratings_average) | number: '1.1-1' }} / 5</span>
+        </div>
+
+        <!-- Categorías -->
+        <div class="categories-section">
+          <strong>Categorías</strong>
+          <div class="categories-list">
+            <span class="category-badge" *ngFor="let category of getCategories(selectedBook)">
+              {{ category }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Selectores -->
+        <div class="header-selectors">
+          <div class="form-group-inline">
+            <select [(ngModel)]="selectedList" class="form-select-header">
+              <option value="Mis libros favoritos">Mis libros favoritos</option>
+              <option value="Mi lista">Mi lista</option>
+              <option value="Favoritos">Favoritos</option>
+              <option value="Ejemplo2">Ejemplo2</option>
+            </select>
+          </div>
+
+          <div class="form-group-inline">
+            <select [(ngModel)]="selectedStatus" class="form-select-header">
+              <option value="Leído">Leído</option>
+              <option value="En lectura">En lectura</option>
+              <option value="Pendiente">Pendiente</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección inferior con ancho completo -->
+    <div class="detail-content-full-width">
+      <!-- Descripción -->
+      <div *ngIf="selectedBook.description" class="description-section">
+        <strong>Descripción</strong>
+        <p class="description-text">{{ selectedBook.description }}</p>
+      </div>
+
+      <!-- Tu review -->
+      <div class="review-section">
+        <h3>Tu review</h3>
+        <div class="my-review">
+          <div class="review-header">
+            <div class="reviewer-info">
+              <p class="reviewer-name">Usuario</p>
+              <div class="review-rating">
+                <input 
+                  type="number" 
+                  min="0" 
+                  max="5" 
+                  [(ngModel)]="userRating" 
+                  class="rating-input"
+                />
+                <span class="rating-value">{{ userRating }} / 5</span>
+              </div>
+            </div>
+            <div class="review-actions">
+              <button (click)="submitReview()" class="btn btn-edit">Editar reseña</button>
+              <button class="btn btn-delete">Eliminar</button>
+            </div>
+          </div>
+          <textarea 
+            [(ngModel)]="userReview" 
+            placeholder="Escribe tu review aquí..."
+            class="review-textarea"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Reviews de usuarios -->
+      <div class="user-reviews-section">
+        <h3>Reviews de usuarios</h3>
+        <div class="user-review-example">
+          <div class="review-header-example">
+            <p class="reviewer-name-example">viva.Will.Herondale</p>
+            <span class="review-date">13/02/2026</span>
+          </div>
+          <div class="review-rating-example">
+            <span class="star-example filled">★</span>
+            <span class="star-example filled">★</span>
+            <span class="star-example filled">★</span>
+            <span class="star-example filled">★</span>
+            <span class="star-example">★</span>
+          </div>
+          <p class="review-text-example">Amazing</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Estado vacío -->
-  <div *ngIf="!loading && searchResults.length === 0 && searchQuery" class="empty-state">
+  <div *ngIf="!loading && searchResults.length === 0 && searchQuery && !selectedBook" class="empty-state">
     <p>No hay resultados para tu búsqueda.</p>
     <p>Intenta con otros términos o prueba la búsqueda por autor.</p>
   </div>
