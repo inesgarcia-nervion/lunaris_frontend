@@ -1,0 +1,24 @@
+<div class="listas-usuarios-container">
+  <h1 class="listas-title">Listas de usuarios</h1>
+  <div class="listas-actions">
+    <button class="btn-crear-lista" (click)="crearLista()">Crear nueva lista</button>
+    <input
+      type="text"
+      [(ngModel)]="search"
+      (input)="onSearch()"
+      placeholder="Buscar listas"
+      class="input-buscar-lista"
+    />
+  </div>
+
+  <div *ngIf="filteredListas.length === 0" class="listas-vacio">
+    <p>No hay listas creadas todavía.</p>
+  </div>
+
+  <div *ngIf="filteredListas.length > 0" class="listas-grid">
+    <div *ngFor="let lista of filteredListas" class="lista-card">
+      <h2 class="lista-nombre">{{ lista.nombre }}</h2>
+      <!-- Aquí puedes mostrar más info de la lista -->
+    </div>
+  </div>
+</div>
