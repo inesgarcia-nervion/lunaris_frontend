@@ -129,7 +129,7 @@
         <div class="book-cover-detail">
           <img
             [src]="getCoverUrl(selectedBook)"
-            [alt]="selectedBook?.title || ''"
+            [alt]="selectedBook.title || ''"
             class="cover-image-detail"
           />
         </div>
@@ -138,29 +138,29 @@
       <!-- Centro: Información -->
       <div class="detail-info-right">
         <!-- Título y saga -->
-        <h1 class="detail-title">{{ selectedBook?.title }}</h1>
+        <h1 class="detail-title">{{ selectedBook.title }}</h1>
         <p class="detail-saga" *ngIf="isSaga(selectedBook)">
           Saga: {{ getSagaName(selectedBook) }}
         </p>
         <!-- Año y autor -->
         <p class="detail-meta">
-          <span *ngIf="selectedBook?.firstPublishYear || selectedBook?.first_publish_year">
-            {{ selectedBook?.firstPublishYear || selectedBook?.first_publish_year }}
+          <span *ngIf="selectedBook.firstPublishYear || selectedBook.first_publish_year">
+            {{ selectedBook.firstPublishYear || selectedBook.first_publish_year }}
           </span>
           <span *ngIf="getFirstAuthor(selectedBook)" class="author-name">
             {{ getFirstAuthor(selectedBook) }}
           </span>
         </p>
         <!-- Rating -->
-        <div *ngIf="selectedBook?.ratingsAverage || selectedBook?.ratings_average" class="rating-section">
+        <div *ngIf="selectedBook.ratingsAverage || selectedBook.ratings_average" class="rating-section">
           <div class="rating-stars">
-            <span *ngFor="let star of generateRatingArray(selectedBook?.ratingsAverage || selectedBook?.ratings_average)" 
+            <span *ngFor="let star of generateRatingArray(selectedBook.ratingsAverage || selectedBook.ratings_average)" 
                   class="star" 
                   [class.full]="star === 'full'"
                   [class.half]="star === 'half'"
                   [class.empty]="star === 'empty'">★</span>
           </div>
-          <span class="rating-number">{{ (selectedBook?.ratingsAverage || selectedBook?.ratings_average) | number: '1.1-1' }} / 5</span>
+          <span class="rating-number">{{ (selectedBook.ratingsAverage || selectedBook.ratings_average) | number: '1.1-1' }} / 5</span>
         </div>
 
         <!-- Categorías -->
@@ -201,9 +201,9 @@
     <!-- Sección inferior con ancho completo -->
     <div class="detail-content-full-width">
       <!-- Descripción -->
-      <div *ngIf="selectedBook?.description" class="description-section">
+      <div *ngIf="selectedBook.description" class="description-section">
         <strong>Descripción</strong>
-        <p class="description-text">{{ selectedBook?.description }}</p>
+        <p class="description-text">{{ selectedBook.description }}</p>
       </div>
 
       <!-- Tu review -->
