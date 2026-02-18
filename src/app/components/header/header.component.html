@@ -60,7 +60,7 @@
 </nav>
 
 <!-- Contenido principal -->
-<div class="book-search-container">
+<div *ngIf="isMenuRoute" class="book-search-container">
   <!-- Alertas en la parte superior -->
   <div *ngIf="error" class="alert alert-error alert-top">{{ error }}</div>
   <div *ngIf="successMessage" class="alert alert-success alert-top">{{ successMessage }}</div>

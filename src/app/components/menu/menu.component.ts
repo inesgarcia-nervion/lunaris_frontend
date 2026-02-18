@@ -129,6 +129,7 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   // Navegación delegada (usada desde la plantilla)
   navigate(path: string): void {
+    console.log('Menu navigate called:', path);
     this.router.navigateByUrl(path);
   }
 }

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { BookSearchService } from '../../services/book-search.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -14,9 +15,12 @@ export class ListasUsuariosComponent implements OnInit {
   listas: any[] = [];
   filteredListas: any[] = [];
 
+  constructor(private bookSearchService: BookSearchService) {}
+
   ngOnInit(): void {
     // Aquí se cargarán las listas desde el backend en el futuro
     this.filteredListas = this.listas;
+    console.log('ListasUsuariosComponent initialized; current searchQuery:', this.bookSearchService.getSearchQuery());
   }
 
   onSearch(): void {

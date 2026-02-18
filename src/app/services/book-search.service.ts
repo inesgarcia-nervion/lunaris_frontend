@@ -168,6 +168,7 @@ export class BookSearchService {
 
     this.searchBooks(this.currentQuery, limit, offset).subscribe({
       next: (response) => {
+        console.log('searchCurrent response for query:', this.currentQuery, response);
         this.publishResults(response);
         this.setLoading(false);
         if (!response.docs || response.docs.length === 0) {

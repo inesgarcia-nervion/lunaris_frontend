@@ -1,6 +1,6 @@
 
 import { Component, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BookSearchService, OpenLibraryBook, OpenLibrarySearchResponse } from '../../services/book-search.service';
@@ -35,6 +35,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   selectedStatus: string = 'Leído';
   userRating: number = 0;
   userReview: string = '';
+  isMenuRoute: boolean = false;
 
   constructor(
     private bookSearchService: BookSearchService,
@@ -46,6 +47,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private subs: Subscription[] = [];
 
   ngOnInit(): void {
+    // inicializar estado de ruta
+    this.isMenuRoute = this.router.url.startsWith('/menu');
+    this.subs.push(this.router.events.subscribe(e => {
+      if (e instanceof NavigationEnd) {
+        this.isMenuRoute = e.urlAfterRedirects.startsWith('/menu');
+        this.cdr.markForCheck();
+      }
+    }));
     this.subs.push(this.bookSearchService.loading$.subscribe(v => { this.loading = v; this.cdr.markForCheck(); }));
     this.subs.push(this.bookSearchService.error$.subscribe(e => { this.error = e; }));
     this.subs.push(this.bookSearchService.success$.subscribe(s => { this.successMessage = s; }));
@@ -68,14 +77,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   navigate(path: string): void {
     console.log('Header navigate called:', path);
+    // If navigating to menu, ensure any open book detail is cleared so Menu shows hero/search correctly
     if (path === '/menu') {
-      this.searchQuery = '';
-      this.searchResults = [];
-      this.totalResults = 0;
-      this.error = null;
-      this.successMessage = null;
-      this.currentPage = 1;
       this.selectedBook = null;
+      this.bookSearchService.setSelectedBook(null);
+      this.bookSearchService.setSearchQuery('');
+      this.bookSearchService.publishResults(null);
+      this.searchQuery = '';
+      this.bookSearchService.setCurrentPage(1);
+      this.bookSearchService.setError(null);
+      this.bookSearchService.setSuccess(null);
+      this.cdr.markForCheck();
     }
     this.router.navigateByUrl(path);
     this.isMenuOpen = false;
