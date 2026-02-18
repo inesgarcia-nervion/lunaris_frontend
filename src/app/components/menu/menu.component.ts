@@ -58,7 +58,7 @@ export class MenuComponent implements OnInit {
    * Navega a una sección
    */
   navigate(path: string): void {
-    // Si navega al menú, limpiar la búsqueda para mostrar el estado inicial
+    // Si navega al menú, limpiar la búsqueda para mostrar el estado inicial y limpiar el estado global
     if (path === '/menu') {
       this.searchQuery = '';
       this.searchResults = [];
@@ -66,6 +66,7 @@ export class MenuComponent implements OnInit {
       this.error = null;
       this.successMessage = null;
       this.currentPage = 1;
+      this.bookSearchService.clearSearch();
     }
     this.router.navigate([path]);
     this.isMenuOpen = false;
