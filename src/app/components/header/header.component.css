@@ -183,7 +183,7 @@
 /* ===== CONTENIDO PRINCIPAL ===== */
 .book-search-container {
   padding: 20px;
-  max-width: 1200px;
+  max-width: 1400px; /* permitir usar más ancho de pantalla */
   margin: 0 auto;
 }
 
@@ -1189,24 +1189,25 @@
 /* ===== VISTA SIMPLIFICADA DE BÚSQUEDA ===== */
 .books-grid-simple {
   display: grid;
-  grid-template-columns: repeat(4, 180px); /* 4 columnas fijas, estrechas */
-  justify-content: center; /* centra el grid y deja espacio lateral */
-  gap: 20px;
+  grid-template-columns: repeat(4, 4px); /* 4 columnas más estrechas */
+  justify-content: space-around; /* distribuir espacio extra entre columnas */
+  gap: 30px; /* más espacio entre tarjetas para que no parezcan amontonadas */
   margin-bottom: 30px;
+  width: 80%;
 }
 
 .book-card-simple {
   background: white;
   border: 1px solid #e6e6e6;
   border-radius: 8px;
-  padding: 0; /* sin padding para que la portada ocupe la parte superior */
+  padding: 0;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   text-align: center;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
-  width: 180px;
+  width: 220px; /* tarjetas más estrechas */
 }
 
 .book-card-simple:hover {
@@ -1216,7 +1217,7 @@
 
 .book-cover-simple {
   width: 100%;
-  height: 260px; /* portada más alta */
+  height: 340px; /* portada más alta para mejor ajuste vertical */
   overflow: hidden;
   background: transparent;
   border-top-left-radius: 8px;
@@ -1748,12 +1749,25 @@
   }
 
   .books-grid-simple {
-    grid-template-columns: repeat(2, 160px); /* 2 columnas en pantallas medianas */
-    gap: 12px;
+    grid-template-columns: repeat(2, 140px); /* 2 columnas pequeñas en pantallas medianas */
+    gap: 18px;
     justify-content: center;
   }
 
   .detail-bottom-section {
     padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .books-grid-simple {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .book-cover-simple {
+    height: 260px; /* ajustar altura para móvil */
+  }
+  .book-card-simple {
+    width: auto; /* dejar que la columna fluya en móvil */
   }
 }

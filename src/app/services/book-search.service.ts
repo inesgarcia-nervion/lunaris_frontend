@@ -268,7 +268,7 @@ export class BookSearchService {
     if (coverId) {
       return `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`;
     }
-    return 'assets/default-book-cover.png'; // Imagen por defecto
+    return 'assets/default-book-cover.svg'; // Imagen por defecto
   }
 
   getFirstAuthor(book: OpenLibraryBook): string {

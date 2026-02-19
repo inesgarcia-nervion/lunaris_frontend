@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600">
+  <defs>
+    <linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f5f5f5"/>
+      <stop offset="100%" stop-color="#e9e9e9"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#g)" rx="12" ry="12" />
+  <g transform="translate(40,120)" fill="#bdbdbd">
+    <rect x="0" y="0" width="320" height="360" rx="8" ry="8" fill="#ffffff" />
+    <path d="M20 40h280v12H20zM20 72h200v12H20zM20 104h240v12H20z" fill="#e0e0e0" />
+  </g>
+  <text x="200" y="520" font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#888" text-anchor="middle">No cover</text>
+</svg>
