@@ -1,7 +1,24 @@
 <div class="listas-usuarios-container">
-  <h1 class="listas-title">Listas de usuarios</h1>
+  <div class="listas-header">
+    <h1 class="listas-title">Listas de usuarios</h1>
+    <button class="btn-add-circle" (click)="crearLista()" aria-label="Crear nueva lista">+</button>
+  </div>
+  <!-- Input inline para crear nueva lista -->
+  <div *ngIf="showCreateInput" class="create-list-row">
+    <input
+      type="text"
+      [(ngModel)]="newListName"
+      (keyup.enter)="confirmCreate()"
+      (keyup.esc)="cancelCreate()"
+      placeholder="Nombre de la nueva lista"
+      class="input-crear-lista"
+      autofocus
+    />
+    <button class="btn-confirm" (click)="confirmCreate()">Crear</button>
+    <button class="btn-cancel" (click)="cancelCreate()">Cancelar</button>
+  </div>
+
   <div class="listas-actions">
-    <button class="btn-crear-lista" (click)="crearLista()">Crear nueva lista</button>
     <input
       type="text"
       [(ngModel)]="search"
@@ -15,8 +32,13 @@
     <p>No hay listas creadas todavía.</p>
   </div>
 
-  <div *ngIf="filteredListas.length > 0" class="listas-grid">
-    <div *ngFor="let lista of filteredListas" class="lista-card">
+  <!-- Mostrar la lista más reciente en grande arriba, el resto en la rejilla -->
+  <div *ngIf="(filteredListas?.length ?? 0) > 0" class="lista-featured">
+    <h2 class="lista-nombre">{{ filteredListas[0]?.nombre }}</h2>
+  </div>
+
+  <div *ngIf="(filteredListas?.length ?? 0) > 1" class="listas-grid">
+    <div *ngFor="let lista of filteredListas | slice:1" class="lista-card">
       <h2 class="lista-nombre">{{ lista.nombre }}</h2>
       <!-- Aquí puedes mostrar más info de la lista -->
     </div>
