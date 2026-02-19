@@ -69,14 +69,14 @@
     <!-- Información de resultados -->
     <div *ngIf="totalResults > 0 && !selectedBook" class="results-info">
       <p>Se encontraron <strong>{{ totalResults }}</strong> libros</p>
-      <p>Mostrando <strong>{{ searchResults.length }}</strong> resultados por página</p>
+      <p>Mostrando <strong>{{ searchResults.length > limit ? limit : searchResults.length }}</strong> resultados por página</p>
     </div>
   </div>
 
   <!-- VISTA DE BÚSQUEDA SIMPLIFICADA -->
   <div *ngIf="searchResults.length > 0 && !selectedBook" class="results-section">
     <div class="books-grid-simple">
-      <div *ngFor="let book of searchResults" class="book-card-simple" (click)="selectBook(book)">
+      <div *ngFor="let book of searchResults | slice:0:limit" class="book-card-simple" (click)="selectBook(book)">
         <!-- Portada -->
         <div class="book-cover-simple">
           <img

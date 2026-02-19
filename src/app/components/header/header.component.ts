@@ -25,7 +25,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   loading: boolean = false;
   error: string | null = null;
   currentPage: number = 1;
-  limit: number = 10;
+  limit: number = 12;
   totalResults: number = 0;
   successMessage: string | null = null;
   selectedBook: OpenLibraryBook | null = null;
