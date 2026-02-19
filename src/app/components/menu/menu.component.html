@@ -1,8 +1,6 @@
 <!-- Contenido principal -->
 <div class="book-search-container">
-  <!-- Alertas en la parte superior -->
-  <div *ngIf="error" class="alert alert-error alert-top">{{ error }}</div>
-  <div *ngIf="successMessage" class="alert alert-success alert-top">{{ successMessage }}</div>
+  <!-- Alertas gestionadas en el Header (evitar duplicados) -->
 
   <!-- Sección central - Solo cuando no hay búsqueda -->
   <div *ngIf="!searchQuery && searchResults.length === 0" class="hero-section">

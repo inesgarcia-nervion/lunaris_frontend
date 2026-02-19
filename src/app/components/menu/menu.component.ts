@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HeaderComponent } from '../header/header.component';
 import { BookSearchService, OpenLibraryBook, OpenLibrarySearchResponse } from '../../services/book-search.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
@@ -8,7 +7,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [CommonModule, HeaderComponent],
+  imports: [CommonModule],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.css'
 })

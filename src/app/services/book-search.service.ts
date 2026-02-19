@@ -76,6 +76,10 @@ export class BookSearchService {
    */
   private mapBooks(response: any): OpenLibrarySearchResponse {
     console.log('Response recibida:', response);
+    if (!response || !response.docs || !Array.isArray(response.docs)) {
+      console.warn('Respuesta de búsqueda inesperada, devolviendo vacío:', response);
+      return { numFound: 0, start: 0, docs: [] };
+    }
     const mappedDocs = response.docs.map((book: any) => ({
       ...book,
       authorNames: book.author_name || book.authorNames || [],
@@ -177,7 +181,13 @@ export class BookSearchService {
       },
       error: (err) => {
         console.error('Error buscando libros (service):', err);
-        this.setError('Error al buscar libros. Por favor intenta más tarde.');
+        const status = err?.status;
+        const statusText = err?.statusText || err?.message || '';
+        if (status === 401) {
+          this.setError('Debes iniciar sesión para buscar libros.');
+        } else {
+          this.setError(`Error al buscar libros. ${status ? 'Código: ' + status + '. ' : ''}${statusText}`);
+        }
         this.setLoading(false);
       }
     });

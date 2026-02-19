@@ -44,6 +44,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private router: Router
   ) { }
 
+  // Exponer la query actual del servicio para que la plantilla use
+  get serviceQuery(): string {
+    return this.bookSearchService.getSearchQuery();
+  }
+
   private subs: Subscription[] = [];
 
   ngOnInit(): void {
