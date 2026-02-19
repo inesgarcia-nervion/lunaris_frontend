@@ -56,7 +56,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.isMenuRoute = this.router.url.startsWith('/menu');
     this.subs.push(this.router.events.subscribe(e => {
       if (e instanceof NavigationEnd) {
-        this.isMenuRoute = e.urlAfterRedirects.startsWith('/menu');
+        const newIsMenu = e.urlAfterRedirects.startsWith('/menu');
+        // Si el usuario cambia de pestaña a otra que NO sea /menu, limpiar la búsqueda
+        if (!newIsMenu && this.isMenuRoute) {
+          this.searchQuery = '';
+          this.bookSearchService.setSearchQuery('');
+          this.bookSearchService.setSelectedBook(null);
+          this.bookSearchService.publishResults(null);
+          this.bookSearchService.setCurrentPage(1);
+          this.bookSearchService.setError(null);
+          this.bookSearchService.setSuccess(null);
+        }
+        this.isMenuRoute = newIsMenu;
         this.cdr.markForCheck();
       }
     }));
