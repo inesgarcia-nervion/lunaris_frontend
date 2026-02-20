@@ -76,4 +76,13 @@ export class ListasUsuariosComponent implements OnInit {
       return '';
     }
   }
+
+  openBookDetailFromList(book: unknown): void {
+    const b = book as OpenLibraryBook;
+    if (!b) return;
+    // set selected book in shared service and navigate to menu (where detail view lives)
+    this.bookSearchService.setSelectedBook(b);
+    this.bookSearchService.setSearchQuery('');
+    this.router.navigate(['/menu']);
+  }
 }

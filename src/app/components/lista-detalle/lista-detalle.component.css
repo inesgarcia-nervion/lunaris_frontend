@@ -14,19 +14,24 @@
   border-radius: 8px;
 }
 .libros-grid {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
   margin-top: 12px;
 }
 .libro-item {
-  width: 120px;
-  text-align: left;
+  text-align: center;
 }
-.libro-item img {
+.libro-cover {
   width: 100%;
-  border-radius: 4px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: transform 0.12s ease;
 }
+.libro-cover:hover { transform: translateY(-4px); }
 .btn-back {
   background: none;
   border: none;
@@ -34,3 +39,8 @@
   cursor: pointer;
   margin-bottom: 12px;
 }
+
+.libro-title { font-size: 1rem; margin: 8px 0 4px; cursor: pointer; }
+.libro-author { font-size: 0.85rem; color:#666; margin-bottom: 8px; }
+.btn-delete-list { background:#e53935; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; display:inline-block; }
+.btn-delete-list:hover { opacity:0.95 }

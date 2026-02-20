@@ -63,4 +63,27 @@ export class ListasService {
     this.saveToStorage(listas);
     this.listasSubject.next(listas);
   }
+
+  removeBookFromList(listId: string, book: OpenLibraryBook | { key?: string; title?: string }) {
+    const listas = this.getAll().map(l => {
+      if (l.id === listId) {
+        l.libros = (l.libros || []).filter(b => {
+          try {
+            if ((book as any).key) {
+              return (b as any).key !== (book as any).key;
+            }
+            if ((book as any).title) {
+              return b.title !== (book as any).title;
+            }
+            return true;
+          } catch {
+            return true;
+          }
+        });
+      }
+      return l;
+    });
+    this.saveToStorage(listas);
+    this.listasSubject.next(listas);
+  }
 }

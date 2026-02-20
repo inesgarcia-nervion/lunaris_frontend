@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ListasService, ListaItem } from '../../services/listas.service';
 import { Subscription } from 'rxjs';
+import { BookSearchService, OpenLibraryBook } from '../../services/book-search.service';
 
 @Component({
   selector: 'app-lista-detalle',
@@ -16,7 +17,7 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
   private subs: Subscription[] = [];
   private currentId: string = '';
 
-  constructor(private route: ActivatedRoute, private listas: ListasService, private router: Router) {}
+  constructor(private route: ActivatedRoute, private listas: ListasService, private router: Router, private bookSearch: BookSearchService) {}
 
   ngOnInit(): void {
     this.currentId = this.route.snapshot.paramMap.get('id') || '';
@@ -27,11 +28,23 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
     }));
   }
 
+  openFromDetail(book: any): void {
+    const b = book as OpenLibraryBook;
+    if (!b) return;
+    this.bookSearch.setSelectedBook(b);
+    this.router.navigateByUrl('/menu');
+  }
+
   back(): void {
     this.router.navigateByUrl('/listas-usuarios');
   }
 
   ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe());
+  }
+
+  removeFromList(listId: string, book: any, event?: Event): void {
+    if (event) event.stopPropagation();
+    this.listas.removeBookFromList(listId, book as OpenLibraryBook);
   }
 }

@@ -92,6 +92,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.listas = l || [];
       // set default selectedList to first list id if none selected
       if (this.listas.length > 0 && !this.selectedList) this.selectedList = this.listas[0].id;
+      // update selectedList if the currently selectedBook was affected by list changes
+      this.updateSelectedListFromBook(this.selectedBook);
       this.cdr.markForCheck();
     }));
   }
