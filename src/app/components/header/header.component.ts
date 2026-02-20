@@ -226,10 +226,20 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.selectedBook = book;
     this.userRating = 0;
     this.userReview = '';
+    // mark as coming from search/header
+    this.bookSearchService.setNavigationOrigin({ type: 'search' });
     this.bookSearchService.setSelectedBook(book);
   }
 
   backToSearch(): void {
+    const origin = this.bookSearchService.getNavigationOrigin();
+    if (origin && origin.type === 'list' && origin.listId) {
+      // clear selection and navigate back to the originating list
+      this.bookSearchService.setSelectedBook(null);
+      this.bookSearchService.setNavigationOrigin(null);
+      this.router.navigate(['/listas', origin.listId]);
+      return;
+    }
     this.selectedBook = null;
     this.bookSearchService.setSelectedBook(null);
   }

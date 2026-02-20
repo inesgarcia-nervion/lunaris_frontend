@@ -55,6 +55,9 @@ export class BookSearchService {
 
   private selectedBookSubject = new BehaviorSubject<OpenLibraryBook | null>(null);
   selectedBook$ = this.selectedBookSubject.asObservable();
+  // navigation origin: tells where the detail was opened from (search or list)
+  private originSubject = new BehaviorSubject<{ type: 'search' | 'list' | 'other'; listId?: string } | null>(null);
+  origin$ = this.originSubject.asObservable();
 
   private loadingSubject = new BehaviorSubject<boolean>(false);
   loading$ = this.loadingSubject.asObservable();
@@ -126,6 +129,14 @@ export class BookSearchService {
 
   setSelectedBook(book: OpenLibraryBook | null): void {
     this.selectedBookSubject.next(book);
+  }
+
+  setNavigationOrigin(origin: { type: 'search' | 'list' | 'other'; listId?: string } | null): void {
+    this.originSubject.next(origin);
+  }
+
+  getNavigationOrigin(): { type: 'search' | 'list' | 'other'; listId?: string } | null {
+    return this.originSubject.value;
   }
 
   setLoading(flag: boolean): void {

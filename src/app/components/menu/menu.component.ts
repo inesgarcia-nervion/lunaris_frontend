@@ -75,10 +75,20 @@ export class MenuComponent implements OnInit, OnDestroy {
   }
 
   selectBook(book: OpenLibraryBook): void {
+    // mark origin as search because selection occurred from search results
+    this.bookSearchService.setNavigationOrigin({ type: 'search' });
     this.bookSearchService.setSelectedBook(book);
   }
 
   backToSearch(): void {
+    const origin = this.bookSearchService.getNavigationOrigin();
+    if (origin && origin.type === 'list' && origin.listId) {
+      // navigate back to originating list
+      this.bookSearchService.setSelectedBook(null);
+      this.bookSearchService.setNavigationOrigin(null);
+      this.router.navigate(['/listas', origin.listId]);
+      return;
+    }
     this.bookSearchService.setSelectedBook(null);
   }
 

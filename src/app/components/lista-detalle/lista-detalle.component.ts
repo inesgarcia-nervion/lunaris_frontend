@@ -31,6 +31,8 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
   openFromDetail(book: any): void {
     const b = book as OpenLibraryBook;
     if (!b) return;
+    // remember we opened detail from this list so back button can return here
+    this.bookSearch.setNavigationOrigin({ type: 'list', listId: this.currentId });
     this.bookSearch.setSelectedBook(b);
     this.router.navigateByUrl('/menu');
   }
