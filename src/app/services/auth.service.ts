@@ -20,7 +20,18 @@ export class AuthService {
   login(username: string, password: string, rememberMe: boolean = false): Observable<string> {
     return this.http.post<LoginResponse>(`${this.backendBase}/auth/login`, { username, password }).pipe(
       map(res => res.token),
-      tap(token => this.saveToken(token, rememberMe))
+      tap(token => {
+        this.saveToken(token, rememberMe);
+        try {
+          if (rememberMe) {
+            localStorage.setItem('lunaris_current_user', username);
+          } else {
+            sessionStorage.setItem('lunaris_current_user', username);
+          }
+        } catch (e) {
+          console.error('Unable to save current user', e);
+        }
+      })
     );
   }
 
@@ -52,5 +63,11 @@ export class AuthService {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.REMEMBER_KEY);
     sessionStorage.removeItem(this.TOKEN_KEY);
+    try {
+      localStorage.removeItem('lunaris_current_user');
+      sessionStorage.removeItem('lunaris_current_user');
+    } catch (e) {
+      console.error('Unable to remove current user', e);
+    }
   }
 }

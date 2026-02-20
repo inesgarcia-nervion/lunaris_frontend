@@ -34,7 +34,10 @@
 
   <!-- Mostrar la lista más reciente en grande arriba, el resto en la rejilla -->
   <div *ngIf="(filteredListas?.length ?? 0) > 0" class="lista-featured">
-    <h2 class="lista-nombre">{{ filteredListas[0]?.nombre }}</h2>
+    <div class="lista-header">
+      <h2 class="lista-nombre">{{ filteredListas[0]?.nombre }}</h2>
+      <div *ngIf="filteredListas[0]?.owner && filteredListas[0]?.owner === currentUser" class="lista-actions-featured"></div>
+    </div>
     <div *ngIf="filteredListas[0].libros.length > 0" class="previews">
       <img *ngFor="let book of filteredListas[0].libros | slice:0:5" [src]="getCoverForTemplate(book)" class="preview-img" [alt]="getTitleForTemplate(book)" />
       <div *ngIf="filteredListas[0].libros.length > 5" class="more-badge">+{{ filteredListas[0].libros.length - 5 }}</div>
@@ -44,7 +47,10 @@
 
   <div *ngIf="(filteredListas?.length ?? 0) > 1" class="listas-grid">
     <div *ngFor="let lista of filteredListas | slice:1" class="lista-card">
-      <h2 class="lista-nombre">{{ lista.nombre }}</h2>
+      <div class="lista-header">
+        <h2 class="lista-nombre">{{ lista.nombre }}</h2>
+        <div *ngIf="lista.owner && lista.owner === currentUser" class="lista-actions-card"></div>
+      </div>
       <div *ngIf="lista.libros.length > 0" class="previews">
         <img *ngFor="let book of lista.libros | slice:0:5" [src]="getCoverForTemplate(book)" class="preview-img" [alt]="getTitleForTemplate(book)" />
         <div *ngIf="lista.libros.length > 5" class="more-badge">+{{ lista.libros.length - 5 }}</div>

@@ -3,6 +3,7 @@ import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { HeaderComponent } from './components/header/header.component';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
+import { ListasService } from './services/listas.service';
 
 @Component({
   selector: 'app-root',
@@ -16,9 +17,16 @@ export class App implements OnInit, OnDestroy {
   private subs: Subscription[] = [];
   private publicFirstSegments = new Set(['', 'login', 'register', 'recuperar-contrasena', 'reset-password']);
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private listasService: ListasService) {}
 
   ngOnInit(): void {
+    // If user already logged in, assign ownership to any lists created before owner support
+    try {
+      const current = this.listasService.getCurrentUser();
+      if (current) this.listasService.assignUnownedListsToCurrentUser(current);
+    } catch (e) {
+      console.error('Error assigning ownership on app init', e);
+    }
     this.showHeader = this.computeShowHeader(this.router.url);
     this.subs.push(this.router.events.subscribe(e => {
       if (e instanceof NavigationEnd) {

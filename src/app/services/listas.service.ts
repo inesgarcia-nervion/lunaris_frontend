@@ -6,6 +6,8 @@ export interface ListaItem {
   id: string;
   nombre: string;
   libros: OpenLibraryBook[];
+  // optional owner identifier (e.g. username)
+  owner?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -40,11 +42,53 @@ export class ListasService {
   }
 
   addList(nombre: string): ListaItem {
-    const nueva: ListaItem = { id: Date.now().toString(), nombre, libros: [] };
+    const nueva: ListaItem = { id: Date.now().toString(), nombre, libros: [], owner: this.getCurrentUser() };
     const listas = [nueva, ...this.getAll()];
     this.saveToStorage(listas);
     this.listasSubject.next(listas);
     return nueva;
+  }
+
+  deleteList(id: string) {
+    const listas = this.getAll().filter(l => l.id !== id);
+    this.saveToStorage(listas);
+    this.listasSubject.next(listas);
+  }
+
+  updateListName(id: string, newName: string) {
+    const listas = this.getAll().map(l => {
+      if (l.id === id) {
+        return { ...l, nombre: newName };
+      }
+      return l;
+    });
+    this.saveToStorage(listas);
+    this.listasSubject.next(listas);
+  }
+
+  /**
+   * Assign currentUser as owner to any lists that currently have no owner.
+   * This migration is safe to run after login to recover ownership for lists
+   * created while the app lacked owner support.
+   */
+  assignUnownedListsToCurrentUser(username: string) {
+    if (!username) return;
+    const listas = this.getAll().map(l => {
+      if (!l.owner) {
+        return { ...l, owner: username };
+      }
+      return l;
+    });
+    this.saveToStorage(listas);
+    this.listasSubject.next(listas);
+  }
+
+  /**
+   * Read the current user identifier from localStorage/sessionStorage.
+   * This expects the application to store a key `lunaris_current_user` when the user logs in.
+   */
+  getCurrentUser(): string | null {
+    return localStorage.getItem('lunaris_current_user') || sessionStorage.getItem('lunaris_current_user') || null;
   }
 
   getById(id: string): ListaItem | undefined {

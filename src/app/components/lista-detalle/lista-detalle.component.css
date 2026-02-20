@@ -5,8 +5,31 @@
 }
 .lista-title {
   font-size: 1.6rem;
+  margin: 0;
+  line-height: 1.2;
+}
+.lista-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 12px;
 }
+.lista-actions {
+  display: flex;
+  gap: 8px;
+}
+.btn-edit-list, .btn-delete-list {
+  font-size: 0.9rem;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.btn-edit-list { background:#fff; color:#333; border-color:#e6e6e6 }
+.btn-edit-list:hover { background:#f7f7f7 }
+.btn-delete-list { background:#ffeded; color:#b71c1c; border-color:#f3c6c6 }
+.btn-delete-list:hover { background:#ffdede }
 .lista-empty {
   color: #666;
   padding: 24px;

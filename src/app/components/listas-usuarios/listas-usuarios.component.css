@@ -111,6 +111,53 @@
   margin-bottom: 8px;
 }
 
+.lista-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lista-actions-card button,
+.lista-actions-featured button,
+.lista-actions {
+  margin-left: 8px;
+}
+
+.lista-actions-card {
+  display: flex;
+  gap: 8px;
+}
+
+.lista-actions-featured {
+  position: absolute;
+  right: 72px; /* leave space for the circular go button */
+  top: 18px;
+  display: flex;
+  gap: 8px;
+}
+
+/* Action buttons (Edit / Delete) */
+.btn-edit-list, .btn-delete-list {
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.btn-edit-list {
+  background: #fff;
+  color: #333;
+  border-color: #dcdcdc;
+}
+.btn-edit-list:hover { background:#f5f5f5 }
+.btn-delete-list {
+  background: #ffebe9;
+  color: #c62828;
+  border-color: #f5c6c6;
+}
+.btn-delete-list:hover { background:#ffdede }
+
 /* restore original alignment and remove large cover style */
 
 /* Bloque destacado para la última lista (pone la más reciente arriba) */

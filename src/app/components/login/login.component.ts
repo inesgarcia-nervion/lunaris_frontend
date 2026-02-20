@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ListasService } from '../../services/listas.service';
 
 @Component({
   selector: 'app-login',
@@ -19,7 +20,7 @@ export class LoginComponent {
   loading = false;
   showPassword: boolean = false;
 
-  constructor(private auth: AuthService, public router: Router, private cdr: ChangeDetectorRef) {}
+  constructor(private auth: AuthService, public router: Router, private cdr: ChangeDetectorRef, private listasService: ListasService) {}
 
   submit() {
     this.error = null;
@@ -32,6 +33,12 @@ export class LoginComponent {
     this.loading = true;
     this.auth.login(this.username, this.password, this.rememberMe).subscribe({
       next: () => {
+        // assign ownership for any lists created earlier without owner
+        try {
+          this.listasService.assignUnownedListsToCurrentUser(this.username);
+        } catch (e) {
+          console.error('Error assigning list ownership', e);
+        }
         this.loading = false;
         this.cdr.detectChanges();
         this.router.navigate(['/menu']);

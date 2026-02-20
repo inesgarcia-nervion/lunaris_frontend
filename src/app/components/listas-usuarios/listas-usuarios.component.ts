@@ -18,6 +18,7 @@ export class ListasUsuariosComponent implements OnInit {
   filteredListas: any[] = [];
   showCreateInput: boolean = false;
   newListName: string = '';
+  currentUser: string | null = null;
 
   constructor(
     public bookSearchService: BookSearchService,
@@ -30,8 +31,29 @@ export class ListasUsuariosComponent implements OnInit {
     // Cargar listas desde servicio (localStorage por ahora)
     this.listas = this.listasService.getAll();
     this.filteredListas = this.listas;
+    this.currentUser = this.listasService.getCurrentUser();
     this.listasService.listas$.subscribe(l => { this.listas = l; this.filteredListas = l; this.cdr.markForCheck(); });
     console.log('ListasUsuariosComponent initialized; current searchQuery:', this.bookSearchService.getSearchQuery());
+  }
+
+  editList(listId: string): void {
+    const lista = this.listasService.getById(listId);
+    if (!lista) return;
+    if (!lista.owner || lista.owner !== this.currentUser) return;
+    const nuevo = prompt('Nuevo nombre de la lista', lista.nombre);
+    if (!nuevo) return;
+    const nombre = nuevo.trim();
+    if (!nombre) return;
+    this.listasService.updateListName(listId, nombre);
+  }
+
+  deleteList(listId: string): void {
+    const lista = this.listasService.getById(listId);
+    if (!lista) return;
+    if (!lista.owner || lista.owner !== this.currentUser) return;
+    const ok = confirm(`¿Estás seguro de eliminar la lista "${lista.nombre}"?`);
+    if (!ok) return;
+    this.listasService.deleteList(listId);
   }
 
   onSearch(): void {
@@ -50,6 +72,7 @@ export class ListasUsuariosComponent implements OnInit {
     if (!name) {
       return;
     }
+    // create list with current user as owner (ListasService handles owner assignment)
     const nueva = this.listasService.addList(name);
     // filteredListas se actualizará por suscripción
     this.router.navigate(['/listas', nueva.id]);

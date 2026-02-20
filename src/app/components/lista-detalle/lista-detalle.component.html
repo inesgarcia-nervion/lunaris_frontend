@@ -2,7 +2,14 @@
   <button class="btn-back" (click)="back()">← Volver a listas</button>
 
   <div *ngIf="lista; else notFound" class="lista-content">
-    <h1 class="lista-title">{{ lista.nombre }}</h1>
+    <!-- Header: title + owner actions -->
+    <div class="lista-header">
+      <h1 class="lista-title">{{ lista.nombre }}</h1>
+      <div *ngIf="lista.owner && lista.owner === currentUser" class="lista-actions">
+        <button class="btn-edit-list" (click)="editListName()">Editar</button>
+        <button class="btn-delete-list" (click)="confirmAndDeleteList()">Eliminar lista</button>
+      </div>
+    </div>
     <div *ngIf="lista.libros.length === 0" class="lista-empty">
       <p>Esta lista está vacía. Añade libros desde la búsqueda.</p>
     </div>
