@@ -9,10 +9,12 @@
 
     <div *ngIf="lista.libros.length > 0" class="libros-grid">
       <div *ngFor="let book of lista.libros" class="libro-item">
-        <img class="libro-cover" [src]="book.cover_i ? 'https://covers.openlibrary.org/b/id/'+book.cover_i+'-M.jpg' : '/assets/placeholder.png'" alt="portada" (click)="openFromDetail(book)" />
-        <h3 class="libro-title" (click)="openFromDetail(book)">{{ book.title }}</h3>
-        <p class="libro-author" *ngIf="book.author_name">{{ book.author_name[0] }}</p>
-        <button class="btn-delete-list" (click)="removeFromList(lista.id, book, $event)">Eliminar</button>
+        <div class="libro-card-box" (click)="openFromDetail(book)">
+          <img class="libro-cover" [src]="book.cover_i ? 'https://covers.openlibrary.org/b/id/'+book.cover_i+'-M.jpg' : '/assets/placeholder.png'" alt="portada" />
+          <h3 class="libro-title">{{ book.title }}</h3>
+          <p class="libro-author" *ngIf="book.author_name">{{ book.author_name[0] }}</p>
+          <button class="btn-delete-list" (click)="removeFromList(lista.id, book, $event)">Eliminar</button>
+        </div>
       </div>
     </div>
   </div>
