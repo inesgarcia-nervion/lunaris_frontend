@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { BookSearchService } from '../../services/book-search.service';
+import { BookSearchService, OpenLibraryBook } from '../../services/book-search.service';
 import { ListasService } from '../../services/listas.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -20,7 +20,7 @@ export class ListasUsuariosComponent implements OnInit {
   newListName: string = '';
 
   constructor(
-    private bookSearchService: BookSearchService,
+    public bookSearchService: BookSearchService,
     private cdr: ChangeDetectorRef,
     private listasService: ListasService,
     public router: Router
@@ -63,5 +63,17 @@ export class ListasUsuariosComponent implements OnInit {
   cancelCreate(): void {
     this.newListName = '';
     this.showCreateInput = false;
+  }
+
+  // Template helper: accept unknown (from localStorage) and return cover URL
+  getCoverForTemplate(book: unknown): string {
+    return this.bookSearchService.getCoverUrl(book as OpenLibraryBook);
+  }
+  getTitleForTemplate(book: unknown): string {
+    try {
+      return (book as OpenLibraryBook).title || '';
+    } catch {
+      return '';
+    }
   }
 }

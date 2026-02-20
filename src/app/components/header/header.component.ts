@@ -83,7 +83,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();
     }));
     this.subs.push(this.bookSearchService.currentPage$.subscribe(p => this.currentPage = p));
-    this.subs.push(this.bookSearchService.selectedBook$.subscribe(b => this.selectedBook = b));
+    this.subs.push(this.bookSearchService.selectedBook$.subscribe(b => {
+      this.selectedBook = b;
+      this.updateSelectedListFromBook(b);
+    }));
     // listas disponibles para añadir
     this.subs.push(this.listasService.listas$.subscribe(l => {
       this.listas = l || [];
@@ -328,6 +331,28 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.listasService.addBookToList(this.selectedList, this.selectedBook);
     this.successMessage = `Libro añadido a la lista`;
     this.clearAlertAfterDelay();
+  }
+
+  private updateSelectedListFromBook(book: OpenLibraryBook | null): void {
+    if (!book) {
+      this.selectedList = '';
+      return;
+    }
+    const listas = this.listasService.getAll();
+    const matches = listas.filter(l => Array.isArray(l.libros) && l.libros.some((b: any) => {
+      try {
+        return (b as any).key && (book as any).key ? (b as any).key === (book as any).key : (b as any).title === book.title;
+      } catch {
+        return false;
+      }
+    }));
+    if (matches.length > 0) {
+      this.selectedList = matches[0].id;
+      this.successMessage = null;
+    } else {
+      this.selectedList = '';
+    }
+    this.cdr.markForCheck();
   }
 
   addBookFromCard(book: OpenLibraryBook, listId: string) {

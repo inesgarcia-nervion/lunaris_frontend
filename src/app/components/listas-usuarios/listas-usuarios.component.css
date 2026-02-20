@@ -143,3 +143,27 @@
 .lista-card {
   position: relative;
 }
+
+.previews {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+  overflow: hidden;
+}
+.preview-img {
+  width: 64px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+.more-badge {
+  margin-left: 8px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}

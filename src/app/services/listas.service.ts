@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { OpenLibraryBook } from './book-search.service';
 
 export interface ListaItem {
   id: string;
   nombre: string;
-  libros: any[];
+  libros: OpenLibraryBook[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -50,11 +51,11 @@ export class ListasService {
     return this.getAll().find(l => l.id === id);
   }
 
-  addBookToList(listId: string, book: any) {
+  addBookToList(listId: string, book: OpenLibraryBook) {
     const listas = this.getAll().map(l => {
       if (l.id === listId) {
         // Avoid duplicates by key (e.g., key or title)
-        const exists = l.libros.some(b => b.key === book.key || b.title === book.title);
+        const exists = l.libros.some(b => (b as any).key === (book as any).key || b.title === book.title);
         if (!exists) l.libros = [...l.libros, book];
       }
       return l;
