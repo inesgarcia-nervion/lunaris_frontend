@@ -1,5 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { BookSearchService } from '../../services/book-search.service';
+import { ListasService } from '../../services/listas.service';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -17,11 +19,18 @@ export class ListasUsuariosComponent implements OnInit {
   showCreateInput: boolean = false;
   newListName: string = '';
 
-  constructor(private bookSearchService: BookSearchService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private bookSearchService: BookSearchService,
+    private cdr: ChangeDetectorRef,
+    private listasService: ListasService,
+    public router: Router
+  ) {}
 
   ngOnInit(): void {
-    // Aquí se cargarán las listas desde el backend en el futuro
+    // Cargar listas desde servicio (localStorage por ahora)
+    this.listas = this.listasService.getAll();
     this.filteredListas = this.listas;
+    this.listasService.listas$.subscribe(l => { this.listas = l; this.filteredListas = l; this.cdr.markForCheck(); });
     console.log('ListasUsuariosComponent initialized; current searchQuery:', this.bookSearchService.getSearchQuery());
   }
 
@@ -41,10 +50,9 @@ export class ListasUsuariosComponent implements OnInit {
     if (!name) {
       return;
     }
-    const nueva = { nombre: name, libros: [] };
-    // Insertar al principio (colocar la nueva lista arriba)
-    this.listas.unshift(nueva);
-    this.filteredListas = this.listas;
+    const nueva = this.listasService.addList(name);
+    // filteredListas se actualizará por suscripción
+    this.router.navigate(['/listas', nueva.id]);
     // force change detection to ensure template updates (handles edge cases)
     this.cdr.detectChanges();
     // limpiar estado del input

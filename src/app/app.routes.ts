@@ -8,6 +8,7 @@ import { RegisterComponent } from './components/register/register.component';
 import { RecuperarContrasenaComponent } from './components/recuperar-contrasena/recuperar-contrasena.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { ListasUsuariosComponent } from './components/listas-usuarios/listas-usuarios.component';
+import { ListaDetalleComponent } from './components/lista-detalle/lista-detalle.component';
 
 export const routes: Routes = [
 	{ path: '', component: InicioComponent },
@@ -17,5 +18,6 @@ export const routes: Routes = [
 	{ path: 'reset-password', component: ResetPasswordComponent },
 	{ path: 'menu', component: MenuComponent, canActivate: [AuthGuard] },
 	{ path: 'listas-usuarios', component: ListasUsuariosComponent, canActivate: [AuthGuard] },
+	{ path: 'listas/:id', component: ListaDetalleComponent, canActivate: [AuthGuard] },
 	{ path: '**', redirectTo: 'login' }
 ];

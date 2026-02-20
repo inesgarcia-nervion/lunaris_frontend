@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { BookSearchService, OpenLibraryBook, OpenLibrarySearchResponse } from '../../services/book-search.service';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { ListasService } from '../../services/listas.service';
 
 @Component({
   selector: 'app-header',
@@ -29,6 +30,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   totalResults: number = 0;
   successMessage: string | null = null;
   selectedBook: OpenLibraryBook | null = null;
+  listas: any[] = [];
 
   // Selectores de detalle
   selectedList: string = 'Ejemplo2';
@@ -42,6 +44,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private auth: AuthService,
     private router: Router
+    , private listasService: ListasService
   ) { }
 
   // Exponer la query actual del servicio para que la plantilla use
@@ -81,6 +84,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }));
     this.subs.push(this.bookSearchService.currentPage$.subscribe(p => this.currentPage = p));
     this.subs.push(this.bookSearchService.selectedBook$.subscribe(b => this.selectedBook = b));
+    // listas disponibles para añadir
+    this.subs.push(this.listasService.listas$.subscribe(l => {
+      this.listas = l || [];
+      // set default selectedList to first list id if none selected
+      if (this.listas.length > 0 && !this.selectedList) this.selectedList = this.listas[0].id;
+      this.cdr.markForCheck();
+    }));
   }
 
   toggleMenu(): void {
@@ -309,7 +319,21 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   addToList(): void {
-    this.successMessage = `Libro añadido a la lista "${this.selectedList}"`;
+    if (!this.selectedBook) return;
+    if (!this.selectedList) {
+      this.error = 'Selecciona una lista primero';
+      this.clearAlertAfterDelay();
+      return;
+    }
+    this.listasService.addBookToList(this.selectedList, this.selectedBook);
+    this.successMessage = `Libro añadido a la lista`;
+    this.clearAlertAfterDelay();
+  }
+
+  addBookFromCard(book: OpenLibraryBook, listId: string) {
+    if (!listId) { this.error = 'Selecciona una lista'; this.clearAlertAfterDelay(); return; }
+    this.listasService.addBookToList(listId, book);
+    this.successMessage = `Libro añadido a la lista`;
     this.clearAlertAfterDelay();
   }
 

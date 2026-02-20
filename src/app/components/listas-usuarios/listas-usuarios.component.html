@@ -35,11 +35,13 @@
   <!-- Mostrar la lista más reciente en grande arriba, el resto en la rejilla -->
   <div *ngIf="(filteredListas?.length ?? 0) > 0" class="lista-featured">
     <h2 class="lista-nombre">{{ filteredListas[0]?.nombre }}</h2>
+    <button class="btn-go-list" (click)="router.navigate(['/listas', filteredListas[0].id])" aria-label="Ver lista">→</button>
   </div>
 
   <div *ngIf="(filteredListas?.length ?? 0) > 1" class="listas-grid">
     <div *ngFor="let lista of filteredListas | slice:1" class="lista-card">
       <h2 class="lista-nombre">{{ lista.nombre }}</h2>
+      <button class="btn-go-list" (click)="router.navigate(['/listas', lista.id])" aria-label="Ver lista">→</button>
       <!-- Aquí puedes mostrar más info de la lista -->
     </div>
   </div>

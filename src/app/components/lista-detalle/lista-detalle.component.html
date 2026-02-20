@@ -1,0 +1,24 @@
+<div class="lista-detalle-container">
+  <button class="btn-back" (click)="back()">← Volver a listas</button>
+
+  <div *ngIf="lista; else notFound" class="lista-content">
+    <h1 class="lista-title">{{ lista.nombre }}</h1>
+    <div *ngIf="lista.libros.length === 0" class="lista-empty">
+      <p>Esta lista está vacía. Añade libros desde la búsqueda.</p>
+    </div>
+
+    <div *ngIf="lista.libros.length > 0" class="libros-grid">
+      <div *ngFor="let book of lista.libros" class="libro-item">
+        <img [src]="book.cover_i ? 'https://covers.openlibrary.org/b/id/'+book.cover_i+'-M.jpg' : '/assets/placeholder.png'" alt="portada" />
+        <div class="libro-info">
+          <h3>{{ book.title }}</h3>
+          <p *ngIf="book.author_name">{{ book.author_name[0] }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #notFound>
+    <p>Lista no encontrada.</p>
+  </ng-template>
+</div>

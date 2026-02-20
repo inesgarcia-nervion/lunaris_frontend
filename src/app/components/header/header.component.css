@@ -1771,3 +1771,23 @@
     width: auto; /* dejar que la columna fluya en móvil */
   }
 }
+
+.form-select-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-add-list {
+  background: #6c63ff;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn-add-list[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

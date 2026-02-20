@@ -178,13 +178,13 @@
       <div class="detail-right-selectors">
         <div class="form-group-inline">
           <label class="selector-label">Añadir a una lista</label>
-          <select [(ngModel)]="selectedList" class="form-select-header">
-            <option value="">-- Selecciona una lista --</option>
-            <option value="Mis libros favoritos">Mis libros favoritos</option>
-            <option value="Mi lista">Mi lista</option>
-            <option value="Favoritos">Favoritos</option>
-            <option value="Ejemplo2">Ejemplo2</option>
-          </select>
+          <div class="form-select-row">
+            <select [(ngModel)]="selectedList" class="form-select-header">
+              <option value="">-- Selecciona una lista --</option>
+              <option *ngFor="let l of listas" [value]="l.id">{{ l.nombre }}</option>
+            </select>
+            <button class="btn-add-list" (click)="addToList()" [disabled]="!selectedList || !selectedBook">Añadir</button>
+          </div>
         </div>
 
         <div class="form-group-inline">

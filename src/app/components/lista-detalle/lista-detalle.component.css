@@ -1,0 +1,36 @@
+.lista-detalle-container {
+  max-width: 900px;
+  margin: 24px auto;
+  padding: 20px;
+}
+.lista-title {
+  font-size: 1.6rem;
+  margin-bottom: 12px;
+}
+.lista-empty {
+  color: #666;
+  padding: 24px;
+  background: #fbfbfb;
+  border-radius: 8px;
+}
+.libros-grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.libro-item {
+  width: 120px;
+  text-align: left;
+}
+.libro-item img {
+  width: 100%;
+  border-radius: 4px;
+}
+.btn-back {
+  background: none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
