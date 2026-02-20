@@ -94,8 +94,8 @@
 }
 .listas-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 24px;
+  grid-template-columns: 1fr; /* single column so each lista-card sits alone */
+  gap: 16px;
 }
 .lista-card {
   background: #f9f7f4;
