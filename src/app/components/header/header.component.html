@@ -121,7 +121,7 @@
   <!-- VISTA DE DETALLE DEL LIBRO -->
   <div *ngIf="selectedBook" class="book-detail-view">
     <!-- Botón volver -->
-    <button (click)="backToSearch()" class="btn btn-back">← Volver a búsqueda</button>
+    <button (click)="backToSearch()" class="btn btn-back">{{ backButtonLabel }}</button>
 
     <div class="detail-container">
       <!-- Izquierda: Portada -->

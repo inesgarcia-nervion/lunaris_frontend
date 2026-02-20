@@ -3,7 +3,7 @@
   <!-- Alertas gestionadas en el Header (evitar duplicados) -->
 
   <!-- Sección central - Solo cuando no hay búsqueda -->
-  <div *ngIf="!searchQuery && searchResults.length === 0" class="hero-section">
+  <div *ngIf="showHero()" class="hero-section">
     <div class="hero-content">
       <!-- Izquierda: Texto -->
       <div class="hero-left">

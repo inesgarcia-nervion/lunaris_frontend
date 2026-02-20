@@ -52,6 +52,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return this.bookSearchService.getSearchQuery();
   }
 
+  get backButtonLabel(): string {
+    const origin = this.bookSearchService.getNavigationOrigin();
+    if (origin && origin.type === 'list') {
+      return '← Volver a la lista';
+    }
+    return '← Volver a la búsqueda';
+  }
+
   private subs: Subscription[] = [];
 
   ngOnInit(): void {

@@ -136,6 +136,19 @@ export class MenuComponent implements OnInit, OnDestroy {
     return this.bookSearchService.getSearchQuery();
   }
 
+  /**
+   * Decide si mostrar la sección hero en la página de menú.
+   * Oculta la hero cuando se está mostrando el detalle de un libro
+   * que proviene de una lista.
+   */
+  showHero(): boolean {
+    const origin = this.bookSearchService.getNavigationOrigin();
+    if (this.selectedBook && origin && origin.type === 'list') {
+      return false;
+    }
+    return !this.searchQuery && this.searchResults.length === 0;
+  }
+
   // Navegación delegada (usada desde la plantilla)
   navigate(path: string): void {
     console.log('Menu navigate called:', path);
