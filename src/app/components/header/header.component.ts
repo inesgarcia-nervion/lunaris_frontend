@@ -31,6 +31,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   successMessage: string | null = null;
   selectedBook: OpenLibraryBook | null = null;
   listas: any[] = [];
+  avatar: string | null = null;
 
   // Return only the user's custom lists (exclude reserved profile lists)
   get customLists(): any[] {
@@ -116,6 +117,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.selectedBook = b;
       this.updateSelectedListFromBook(b);
     }));
+    // subscribe to avatar changes so header shows the current avatar immediately
+    this.subs.push(this.auth.avatar$.subscribe(a => { this.avatar = a; this.cdr.markForCheck(); }));
     // listas disponibles para añadir
     this.subs.push(this.listasService.listas$.subscribe(l => {
       this.listas = l || [];

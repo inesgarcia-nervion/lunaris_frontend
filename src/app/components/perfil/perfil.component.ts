@@ -14,6 +14,7 @@ import { BookSearchService } from '../../services/book-search.service';
 })
 export class PerfilComponent implements OnInit {
   username: string | null = null;
+  avatar: string | null = null;
 
   // Profile fixed sections
   leyendo: any[] = [];
@@ -36,6 +37,13 @@ export class PerfilComponent implements OnInit {
 
   ngOnInit(): void {
     this.username = this.authService.getCurrentUsername();
+    // subscribe to avatar changes so perfil updates immediately
+    try {
+      this.avatar = localStorage.getItem('lunaris_avatar');
+      this.authService.avatar$.subscribe(a => this.avatar = a);
+    } catch (e) {
+      console.warn('Unable to read avatar', e);
+    }
     // Ensure the 3 mandatory sections exist for this user
     this.listasService.ensureProfileSections(this.username);
     this.loadLists();

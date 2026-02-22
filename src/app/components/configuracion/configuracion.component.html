@@ -1,0 +1,44 @@
+<div class="config-container">
+  <h1>Configuración</h1>
+
+  <section class="section">
+    <h2>Cambiar nombre de usuario</h2>
+    <div class="row">
+      <input [(ngModel)]="newUsername" placeholder="Nuevo nombre de usuario" />
+      <button (click)="submitChanges()" [disabled]="isSaving">{{ isSaving ? 'Guardando...' : 'Cambiar nombre' }}</button>
+    </div>
+    <p class="hint">Al cambiar de nombre, se te pedirá que inicies sesión de nuevo.</p>
+  </section>
+
+  <section class="section">
+    <h2>Foto de perfil</h2>
+    <div class="row">
+      <input [(ngModel)]="avatarUrl" placeholder="Pegar URL de imagen" />
+      <button (click)="setAvatarFromUrl()" [disabled]="isSaving">Vista previa</button>
+      <button (click)="applyAvatar()" [disabled]="!avatarPreview || isSaving">Aplicar imagen</button>
+    </div>
+    <div class="row">
+      <label class="file-drop">
+        <input type="file" (change)="onFileChange($event)" />
+        <span>Arrastra o selecciona una imagen</span>
+      </label>
+      <button (click)="applyAvatar()" [disabled]="!avatarPreview || isSaving">Aplicar imagen</button>
+    </div>
+    <div *ngIf="avatarPreview" class="preview">
+      <p>Previsualización:</p>
+      <img [src]="avatarPreview" alt="avatar preview" />
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Apariencia</h2>
+    <div class="row">
+      <label>
+        <input type="checkbox" [checked]="theme==='dark'" (change)="toggleTheme()" /> Modo oscuro
+      </label>
+    </div>
+  </section>
+
+  <div *ngIf="error" class="alert error">{{ error }}</div>
+  <div *ngIf="success" class="alert success">{{ success }}</div>
+</div>

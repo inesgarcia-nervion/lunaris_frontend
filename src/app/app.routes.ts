@@ -10,6 +10,7 @@ import { ResetPasswordComponent } from './components/reset-password/reset-passwo
 import { ListasUsuariosComponent } from './components/listas-usuarios/listas-usuarios.component';
 import { ListaDetalleComponent } from './components/lista-detalle/lista-detalle.component';
 import { PerfilComponent } from './components/perfil/perfil.component';
+import { ConfiguracionComponent } from './components/configuracion/configuracion.component';
 
 export const routes: Routes = [
 	{ path: '', component: InicioComponent },
@@ -21,5 +22,6 @@ export const routes: Routes = [
 	{ path: 'listas-usuarios', component: ListasUsuariosComponent, canActivate: [AuthGuard] },
 	{ path: 'listas/:id', component: ListaDetalleComponent, canActivate: [AuthGuard] },
 	{ path: 'perfil', component: PerfilComponent, canActivate: [AuthGuard] },
+	{ path: 'configuracion', component: ConfiguracionComponent, canActivate: [AuthGuard] },
 	{ path: '**', redirectTo: 'login' }
 ];

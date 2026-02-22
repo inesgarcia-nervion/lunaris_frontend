@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { tap, map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 
 interface LoginResponse {
   token: string;
@@ -67,6 +67,20 @@ export class AuthService {
     return localStorage.getItem('lunaris_current_user') || sessionStorage.getItem('lunaris_current_user') || null;
   }
 
+  // Avatar observable: emits current avatar data (data URL or URL) and updates when changed
+  private avatarSubject = new BehaviorSubject<string | null>(localStorage.getItem('lunaris_avatar') || null);
+  public avatar$ = this.avatarSubject.asObservable();
+
+  setLocalAvatar(avatar: string | null) {
+    try {
+      if (avatar) localStorage.setItem('lunaris_avatar', avatar);
+      else localStorage.removeItem('lunaris_avatar');
+    } catch (e) {
+      console.error('Unable to set local avatar', e);
+    }
+    this.avatarSubject.next(avatar);
+  }
+
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.REMEMBER_KEY);
@@ -77,5 +91,13 @@ export class AuthService {
     } catch (e) {
       console.error('Unable to remove current user', e);
     }
+  }
+
+  /** Update user profile (username, avatar). Returns observable. */
+  updateUser(currentUsername: string, payload: any) {
+    const token = this.getToken();
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    if (token) headers = headers.set('Authorization', `Bearer ${token}`);
+    return this.http.put(`${this.backendBase}/users/username/${encodeURIComponent(currentUsername)}`, payload, { headers });
   }
 }
