@@ -393,11 +393,21 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     // Prefer the status-specific message when a status was added
-    if (addedToStatus) {
-      this.successMessage = 'Estado agregado correctamente';
-    } else if (addedToCustom) {
-      this.successMessage = 'Libro añadido correctamente';
+    // Prefer the "lista" message when a custom list was involved (user expects list message)
+    if (addedToCustom) {
+      // include the list name when available
+      const list = this.listasService.getById(this.selectedList || '');
+      const name = list?.nombre || '';
+      this.successMessage = name ? `Libro añadido a la lista "${name}" correctamente` : 'Libro añadido a la lista correctamente';
+    } else if (addedToStatus) {
+      this.successMessage = 'Estado añadido';
     }
+
+    // Debug logging to help trace UI update issues
+    // eslint-disable-next-line no-console
+    console.debug('[Header] addToList result:', { addedToCustom, addedToStatus, selectedList: this.selectedList, selectedStatus: this.selectedStatus, currentUser });
+    // eslint-disable-next-line no-console
+    console.debug('[Header] listas after add:', this.listasService.getAll());
     // Reflect the updated lists immediately in the UI and keep the selected status
     this.updateSelectedListFromBook(this.selectedBook);
     this.updatingStatusOrList = false;
@@ -424,8 +434,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
       }
     }));
     if (matches.length > 0) {
-      this.selectedList = matches[0].id;
-      this.successMessage = null;
+      // Prefer a custom/user-created list match (not a reserved profile list) so the select shows correctly
+      const currentUser = this.auth.getCurrentUsername() || this.listasService.getCurrentUser();
+      const customMatch = matches.find(m => !this.listasService.isProfileListName(m.nombre) && m.owner === currentUser);
+      if (customMatch) {
+        this.selectedList = customMatch.id;
+      } else {
+        this.selectedList = matches[0].id;
+      }
+      // Do not clear `successMessage` here: keep any recently-set success message
     } else {
       this.selectedList = '';
     }
@@ -448,8 +465,48 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   addBookFromCard(book: OpenLibraryBook, listId: string) {
     if (!listId) { this.error = 'Selecciona una lista'; this.clearAlertAfterDelay(); return; }
-    this.listasService.addBookToList(listId, book);
-    this.successMessage = `Libro añadido a la lista`;
+
+    const currentUser = this.auth.getCurrentUsername() || this.listasService.getCurrentUser();
+    this.updatingStatusOrList = true;
+    this.listasService.ensureProfileSections(currentUser);
+
+    const listasAll = this.listasService.getAll();
+    const target = listasAll.find(l => l.id === listId);
+    let addedToStatus = false;
+    let addedToCustom = false;
+
+    if (target) {
+      // If the target is a profile list for this user, treat it as a status change
+      if (target.owner === currentUser && this.listasService.isProfileListName(target.nombre)) {
+        // add to target profile list
+        this.listasService.addBookToList(target.id, book);
+        // remove from other profile lists
+        const profileNames = ['Leyendo', 'Leído', 'Plan para leer'];
+        const otherProfileNames = profileNames.filter(n => n !== target.nombre);
+        for (const otherName of otherProfileNames) {
+          const other = listasAll.find(l => l.owner === currentUser && l.nombre === otherName);
+          if (other) this.listasService.removeBookFromList(other.id, book);
+        }
+        addedToStatus = true;
+        this.selectedStatus = target.nombre;
+      } else {
+        // custom list
+        this.listasService.addBookToList(listId, book);
+        addedToCustom = true;
+      }
+    }
+
+    if (addedToStatus) {
+      this.successMessage = 'Estado añadido';
+    } else if (addedToCustom) {
+      const list = this.listasService.getById(listId);
+      const name = list?.nombre || '';
+      this.successMessage = name ? `Libro añadido a la lista "${name}" correctamente` : 'Libro añadido correctamente';
+    }
+
+    // Refresh UI state
+    this.updateSelectedListFromBook(book);
+    this.updatingStatusOrList = false;
     this.clearAlertAfterDelay();
   }
 
