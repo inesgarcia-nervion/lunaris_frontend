@@ -1,5 +1,5 @@
 
-import { Component, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit, OnDestroy, ElementRef, HostListener } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -50,8 +50,22 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private auth: AuthService,
     private router: Router
-    , private listasService: ListasService
+    , private listasService: ListasService,
+    private elementRef: ElementRef
   ) { }
+
+  onUserButtonClick(event: Event) {
+    event.stopPropagation();
+    this.toggleUserMenu();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event) {
+    if (this.showUserMenu && !this.elementRef.nativeElement.contains(event.target)) {
+      this.showUserMenu = false;
+      this.cdr.markForCheck();
+    }
+  }
 
   // Exponer la query actual del servicio para que la plantilla use
   get serviceQuery(): string {
@@ -138,7 +152,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.router.navigate([path]);
   }
 
+  navigateAndClose(path: string): void {
+    this.showUserMenu = false;
+    this.navigate(path);
+  }
+
   logout(): void {
+    this.showUserMenu = false;
     this.auth.logout();
     this.router.navigate(['/login']);
   }

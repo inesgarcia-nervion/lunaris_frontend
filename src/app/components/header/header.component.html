@@ -35,13 +35,13 @@
     <div class="navbar-right">
       <!-- Menú de usuario -->
       <div class="user-menu">
-        <button (click)="toggleUserMenu()" class="user-btn">
+        <button (click)="onUserButtonClick($event)" class="user-btn">
           <span class="user-icon">👤</span>
         </button>
         
-        <div class="user-dropdown" *ngIf="showUserMenu">
-          <a (click)="navigate('/perfil')" class="dropdown-item">Mi Perfil</a>
-          <a (click)="navigate('/configuracion')" class="dropdown-item">Configuración</a>
+        <div class="user-dropdown" *ngIf="showUserMenu" (click)="$event.stopPropagation()">
+          <a (click)="navigateAndClose('/perfil')" class="dropdown-item">Mi Perfil</a>
+          <a (click)="navigateAndClose('/configuracion')" class="dropdown-item">Configuración</a>
           <hr />
           <button (click)="logout()" class="dropdown-item logout-btn">
             Cerrar sesión
