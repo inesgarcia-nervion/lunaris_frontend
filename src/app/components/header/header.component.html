@@ -180,20 +180,24 @@
           <label class="selector-label">Añadir a una lista</label>
           <div class="form-select-row">
             <select [(ngModel)]="selectedList" class="form-select-header">
-              <option value="">-- Selecciona una lista --</option>
-              <option *ngFor="let l of listas" [value]="l.id">{{ l.nombre }}</option>
+              <option value="">Seleccione una lista</option>
+              <option *ngFor="let l of customLists" [value]="l.id">{{ l.nombre }}</option>
             </select>
-            <button class="btn-add-list" (click)="addToList()" [disabled]="!selectedList || !selectedBook">Añadir</button>
+            <button class="btn-add-list" (click)="addToList()" [disabled]="!selectedBook || (!selectedList && !selectedStatus)">Añadir</button>
           </div>
         </div>
 
         <div class="form-group-inline">
           <label class="selector-label">Estado</label>
-          <select [(ngModel)]="selectedStatus" class="form-select-header">
-            <option value="Leído">Leído</option>
-            <option value="Plan para leer">Plan para leer</option>
-            <option value="Leyendo">Leyendo</option>
-          </select>
+          <div class="form-select-row">
+            <select [(ngModel)]="selectedStatus" class="form-select-header">
+              <option value="">Seleccione un estado</option>
+              <option value="Leído">Leído</option>
+              <option value="Plan para leer">Plan para leer</option>
+              <option value="Leyendo">Leyendo</option>
+            </select>
+            <button class="btn-add-list" (click)="addStatus()" [disabled]="!selectedBook || !selectedStatus">Añadir</button>
+          </div>
         </div>
       </div>
     </div>

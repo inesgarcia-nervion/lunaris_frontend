@@ -44,8 +44,11 @@
   margin-left:auto;
   background:#222;
   color:#fff;
-  width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px
+  width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px;
+  cursor: pointer;
+  transition: transform 140ms ease, box-shadow 140ms ease;
 }
+.more-btn:hover, .more-btn:focus{ transform: translateY(-4px); box-shadow: 0 8px 18px rgba(0,0,0,0.12); }
 .your-lists{ margin-top:18px }
 .lists-row{ display:flex; gap:12px; flex-wrap:wrap }
 .list-card{ width:220px; border:1px solid #ddd; padding:10px; border-radius:6px; display:flex; flex-direction:column; align-items:center }

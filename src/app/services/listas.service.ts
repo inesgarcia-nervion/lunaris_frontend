@@ -95,6 +95,13 @@ export class ListasService {
     return this.getAll().find(l => l.id === id);
   }
 
+  /** Returns true if the given list name is one of the reserved profile lists. */
+  isProfileListName(nombre: string | null | undefined): boolean {
+    if (!nombre) return false;
+    const n = nombre.toString().toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+    return ['leyendo', 'leido', 'leido', 'plan para leer'].includes(n);
+  }
+
   /** Return lists owned by a given username (owner). */
   getByOwner(owner: string | null): ListaItem[] {
     if (!owner) return [];

@@ -32,9 +32,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
   selectedBook: OpenLibraryBook | null = null;
   listas: any[] = [];
 
+  // Return only the user's custom lists (exclude reserved profile lists)
+  get customLists(): any[] {
+    const user = this.auth.getCurrentUsername() || this.listasService.getCurrentUser();
+    return (this.listas || []).filter(l => l.owner === user && !this.listasService.isProfileListName(l.nombre));
+  }
+
   // Selectores de detalle
-  selectedList: string = 'Ejemplo2';
-  selectedStatus: string = 'Leído';
+  selectedList: string = '';
+  selectedStatus: string = '';
   userRating: number = 0;
   userReview: string = '';
   isMenuRoute: boolean = false;
@@ -61,6 +67,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   private subs: Subscription[] = [];
+  private updatingStatusOrList = false;
 
   ngOnInit(): void {
     // inicializar estado de ruta
@@ -98,10 +105,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
     // listas disponibles para añadir
     this.subs.push(this.listasService.listas$.subscribe(l => {
       this.listas = l || [];
-      // set default selectedList to first list id if none selected
-      if (this.listas.length > 0 && !this.selectedList) this.selectedList = this.listas[0].id;
-      // update selectedList if the currently selectedBook was affected by list changes
-      this.updateSelectedListFromBook(this.selectedBook);
+      // Do not auto-select the first list. Keep `selectedList` empty so the placeholder shows
+      // If the selected book is already in a list, updateSelectedListFromBook will set it.
+      // Avoid overwriting UI state while we're actively adding a book to lists/statuses.
+      if (!this.updatingStatusOrList) {
+        this.updateSelectedListFromBook(this.selectedBook);
+      }
       this.cdr.markForCheck();
     }));
   }
@@ -113,7 +122,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   toggleUserMenu(): void {
     this.showUserMenu = !this.showUserMenu;
   }
-
   navigate(path: string): void {
     console.log('Header navigate called:', path);
     // If navigating to menu, ensure any open book detail is cleared so Menu shows hero/search correctly
@@ -126,10 +134,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.bookSearchService.setCurrentPage(1);
       this.bookSearchService.setError(null);
       this.bookSearchService.setSuccess(null);
-      this.cdr.markForCheck();
     }
-    this.router.navigateByUrl(path);
-    this.isMenuOpen = false;
+    this.router.navigate([path]);
   }
 
   logout(): void {
@@ -343,19 +349,70 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   addToList(): void {
     if (!this.selectedBook) return;
-    if (!this.selectedList) {
-      this.error = 'Selecciona una lista primero';
+
+    const currentUser = this.auth.getCurrentUsername() || this.listasService.getCurrentUser();
+    // Ensure profile lists exist for the user (safe to call)
+    this.updatingStatusOrList = true;
+    this.listasService.ensureProfileSections(currentUser);
+
+    let addedToCustom = false;
+    let addedToStatus = false;
+
+    // If a custom list is selected, add to it
+    if (this.selectedList) {
+      this.listasService.addBookToList(this.selectedList, this.selectedBook);
+      addedToCustom = true;
+    }
+
+    // If a status is selected and corresponds to a profile list, add to that special list as well
+    const status = (this.selectedStatus || '').toString().trim();
+    const profileNames = ['Leyendo', 'Leído', 'Plan para leer'];
+    if (status && profileNames.includes(status)) {
+      const profileList = this.listasService.getAll().find(l => l.owner === currentUser && l.nombre === status);
+      if (profileList) {
+        this.listasService.addBookToList(profileList.id, this.selectedBook);
+        // Remove the book from other profile lists so a book has only one profile status
+        const otherProfileNames = profileNames.filter(n => n !== status);
+        for (const otherName of otherProfileNames) {
+          const otherList = this.listasService.getAll().find(l => l.owner === currentUser && l.nombre === otherName);
+          if (otherList) {
+            this.listasService.removeBookFromList(otherList.id, this.selectedBook);
+          }
+        }
+        addedToStatus = true;
+        // ensure UI reflects the new status immediately
+        this.selectedStatus = status;
+      }
+    }
+
+    if (!addedToCustom && !addedToStatus) {
+      this.error = 'Selecciona una lista o un estado para guardar el libro';
+      this.updatingStatusOrList = false;
       this.clearAlertAfterDelay();
       return;
     }
-    this.listasService.addBookToList(this.selectedList, this.selectedBook);
-    this.successMessage = `Libro añadido a la lista`;
+
+    // Prefer the status-specific message when a status was added
+    if (addedToStatus) {
+      this.successMessage = 'Estado agregado correctamente';
+    } else if (addedToCustom) {
+      this.successMessage = 'Libro añadido correctamente';
+    }
+    // Reflect the updated lists immediately in the UI and keep the selected status
+    this.updateSelectedListFromBook(this.selectedBook);
+    this.updatingStatusOrList = false;
     this.clearAlertAfterDelay();
+  }
+
+  addStatus(): void {
+    // Shortcut to add the selected book to the selected status (profile list)
+    this.addToList();
   }
 
   private updateSelectedListFromBook(book: OpenLibraryBook | null): void {
     if (!book) {
       this.selectedList = '';
+      this.selectedStatus = '';
       return;
     }
     const listas = this.listasService.getAll();
@@ -372,6 +429,20 @@ export class HeaderComponent implements OnInit, OnDestroy {
     } else {
       this.selectedList = '';
     }
+    // Also detect if the book is present in one of the reserved profile lists for the current user
+    const currentUser = this.auth.getCurrentUsername() || this.listasService.getCurrentUser();
+    const profileNames = ['Leyendo', 'Leído', 'Plan para leer'];
+    let foundStatus = '';
+    for (const name of profileNames) {
+      const pl = listas.find(l => l.owner === currentUser && l.nombre === name);
+      if (pl && Array.isArray(pl.libros) && pl.libros.some((b: any) => {
+        try { return (b as any).key && (book as any).key ? (b as any).key === (book as any).key : (b as any).title === book.title; } catch { return false; }
+      })) {
+        foundStatus = name;
+        break;
+      }
+    }
+    this.selectedStatus = foundStatus;
     this.cdr.markForCheck();
   }
 

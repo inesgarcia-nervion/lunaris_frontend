@@ -5,7 +5,7 @@
     <!-- Header: title + owner actions -->
     <div class="lista-header">
       <h1 class="lista-title">{{ lista.nombre }}</h1>
-      <div *ngIf="lista.owner && lista.owner === currentUser" class="lista-actions">
+      <div *ngIf="lista.owner && lista.owner === currentUser && !isProfileList(lista.nombre)" class="lista-actions">
         <button class="btn-edit-list" (click)="editListName()">Editar</button>
         <button class="btn-delete-list" (click)="confirmAndDeleteList()">Eliminar lista</button>
       </div>

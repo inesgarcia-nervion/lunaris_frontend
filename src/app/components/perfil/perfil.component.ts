@@ -19,6 +19,10 @@ export class PerfilComponent implements OnInit {
   leyendo: any[] = [];
   leido: any[] = [];
   planParaLeer: any[] = [];
+  // ids for the special lists so we can navigate to them
+  leyendoId: string | null = null;
+  leidoId: string | null = null;
+  planParaLeerId: string | null = null;
 
   // Other lists created by user
   userLists: ListaItem[] = [];
@@ -41,10 +45,16 @@ export class PerfilComponent implements OnInit {
 
   loadLists() {
     const all = this.listasService.getByOwner(this.username);
-    // find the special lists by name
-    this.leyendo = (all.find(l => l.nombre === 'Leyendo')?.libros || []).slice(0, 6);
-    this.leido = (all.find(l => l.nombre === 'Leído')?.libros || []).slice(0, 6);
-    this.planParaLeer = (all.find(l => l.nombre === 'Plan para leer')?.libros || []).slice(0, 6);
+    // find the special lists by name and record ids
+    const lLeyendo = all.find(l => l.nombre === 'Leyendo');
+    const lLeido = all.find(l => l.nombre === 'Leído');
+    const lPlan = all.find(l => l.nombre === 'Plan para leer');
+    this.leyendo = (lLeyendo?.libros || []).slice(0, 6);
+    this.leido = (lLeido?.libros || []).slice(0, 6);
+    this.planParaLeer = (lPlan?.libros || []).slice(0, 6);
+    this.leyendoId = lLeyendo?.id || null;
+    this.leidoId = lLeido?.id || null;
+    this.planParaLeerId = lPlan?.id || null;
 
     // other lists are those owned by user but not the three special ones
     this.userLists = all.filter(l => !['Leyendo', 'Leído', 'Plan para leer'].includes(l.nombre));
@@ -54,7 +64,7 @@ export class PerfilComponent implements OnInit {
   getCoverUrl(book: any): string { return this.bookSearchService.getCoverUrl(book); }
   navigate(path: string) { this.router.navigateByUrl(path); }
 
-  navigateToList(id: string) {
+  navigateToList(id: string | null) {
     if (!id) return;
     // mark navigation origin so ListaDetalle can return to profile when user hits back
     this.bookSearchService.setNavigationOrigin({ type: 'profile', listId: id });

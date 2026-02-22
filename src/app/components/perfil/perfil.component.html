@@ -11,7 +11,7 @@
         <div *ngFor="let b of leyendo" class="mini-book">
           <img [src]="getCoverUrl(b)" [alt]="b.title" />
         </div>
-        <div class="more-btn">→</div>
+        <div class="more-btn" role="button" tabindex="0" (click)="navigateToList(leyendoId)" (keydown.enter)="navigateToList(leyendoId)">→</div>
       </div>
     </div>
 
@@ -21,7 +21,7 @@
         <div *ngFor="let b of leido" class="mini-book">
           <img [src]="getCoverUrl(b)" [alt]="b.title" />
         </div>
-        <div class="more-btn">→</div>
+        <div class="more-btn" role="button" tabindex="0" (click)="navigateToList(leidoId)" (keydown.enter)="navigateToList(leidoId)">→</div>
       </div>
     </div>
 
@@ -31,7 +31,7 @@
         <div *ngFor="let b of planParaLeer" class="mini-book">
           <img [src]="getCoverUrl(b)" [alt]="b.title" />
         </div>
-        <div class="more-btn">→</div>
+        <div class="more-btn" role="button" tabindex="0" (click)="navigateToList(planParaLeerId)" (keydown.enter)="navigateToList(planParaLeerId)">→</div>
       </div>
     </div>
   </div>

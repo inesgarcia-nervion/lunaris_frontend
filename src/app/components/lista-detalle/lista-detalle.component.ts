@@ -54,6 +54,10 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
     this.subs.forEach(s => s.unsubscribe());
   }
 
+  isProfileList(name: string | undefined | null): boolean {
+    return this.listas.isProfileListName(name || undefined);
+  }
+
   removeFromList(listId: string, book: any, event?: Event): void {
     if (event) event.stopPropagation();
     this.listas.removeBookFromList(listId, book as OpenLibraryBook);
@@ -61,6 +65,10 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
 
   confirmAndDeleteList(): void {
     if (!this.lista) return;
+    if (this.isProfileList(this.lista.nombre)) {
+      alert('Esta lista del perfil no puede eliminarse.');
+      return;
+    }
     const ok = confirm(`¿Estás seguro de que quieres eliminar la lista "${this.lista.nombre}"? Esta acción no se puede deshacer.`);
     if (!ok) return;
     this.listas.deleteList(this.lista.id);
@@ -70,6 +78,10 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
   editListName(): void {
     if (!this.lista) return;
     if (!this.lista.owner || this.lista.owner !== this.currentUser) return;
+    if (this.isProfileList(this.lista.nombre)) {
+      alert('El nombre de esta lista no se puede editar.');
+      return;
+    }
     const nuevo = prompt('Nuevo nombre de la lista', this.lista.nombre);
     if (!nuevo) return;
     const nombre = nuevo.trim();

@@ -40,6 +40,10 @@ export class ListasUsuariosComponent implements OnInit {
     const lista = this.listasService.getById(listId);
     if (!lista) return;
     if (!lista.owner || lista.owner !== this.currentUser) return;
+    if (this.listasService.isProfileListName(lista.nombre)) {
+      alert('Las listas del perfil (Leyendo, Leído, Plan para leer) no se pueden renombrar.');
+      return;
+    }
     const nuevo = prompt('Nuevo nombre de la lista', lista.nombre);
     if (!nuevo) return;
     const nombre = nuevo.trim();
@@ -51,6 +55,10 @@ export class ListasUsuariosComponent implements OnInit {
     const lista = this.listasService.getById(listId);
     if (!lista) return;
     if (!lista.owner || lista.owner !== this.currentUser) return;
+    if (this.listasService.isProfileListName(lista.nombre)) {
+      alert('Las listas del perfil no se pueden eliminar.');
+      return;
+    }
     const ok = confirm(`¿Estás seguro de eliminar la lista "${lista.nombre}"?`);
     if (!ok) return;
     this.listasService.deleteList(listId);
