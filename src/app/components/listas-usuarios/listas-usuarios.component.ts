@@ -29,10 +29,10 @@ export class ListasUsuariosComponent implements OnInit {
 
   ngOnInit(): void {
     // Cargar listas desde servicio (localStorage por ahora)
-    this.listas = this.listasService.getAll();
+    this.listas = this.filterOutProfileLists(this.listasService.getAll());
     this.filteredListas = this.listas;
     this.currentUser = this.listasService.getCurrentUser();
-    this.listasService.listas$.subscribe(l => { this.listas = l; this.filteredListas = l; this.cdr.markForCheck(); });
+    this.listasService.listas$.subscribe(l => { this.listas = this.filterOutProfileLists(l || []); this.filteredListas = this.listas; this.cdr.markForCheck(); });
     console.log('ListasUsuariosComponent initialized; current searchQuery:', this.bookSearchService.getSearchQuery());
   }
 
@@ -59,6 +59,19 @@ export class ListasUsuariosComponent implements OnInit {
   onSearch(): void {
     const term = this.search.toLowerCase();
     this.filteredListas = this.listas.filter(l => l.nombre.toLowerCase().includes(term));
+  }
+
+  private filterOutProfileLists(listas: any[]): any[] {
+    if (!Array.isArray(listas)) return [];
+    const skip = new Set(['leyendo', 'leído', 'leido', 'plan para leer']);
+    return listas.filter(l => {
+      try {
+        const nombre = (l.nombre || '').toString().toLowerCase();
+        return !skip.has(nombre);
+      } catch {
+        return true;
+      }
+    });
   }
 
   crearLista(): void {

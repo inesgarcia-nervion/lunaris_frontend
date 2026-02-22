@@ -40,6 +40,13 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
   }
 
   back(): void {
+    const origin = this.bookSearch.getNavigationOrigin();
+    // If we came from a profile, return to the profile view instead of the general lists
+    if (origin && origin.type === 'profile') {
+      this.bookSearch.setNavigationOrigin(null);
+      this.router.navigateByUrl('/perfil');
+      return;
+    }
     this.router.navigateByUrl('/listas-usuarios');
   }
 

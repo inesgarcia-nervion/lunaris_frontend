@@ -1,0 +1,54 @@
+<div class="perfil-container">
+  <div class="perfil-header">
+    <div class="avatar">👤</div>
+    <h1 class="username">{{ username || 'Usuario' }}</h1>
+  </div>
+
+  <div class="sections">
+    <div class="section-card">
+      <h3>Leyendo</h3>
+      <div class="books-row">
+        <div *ngFor="let b of leyendo" class="mini-book">
+          <img [src]="getCoverUrl(b)" [alt]="b.title" />
+        </div>
+        <div class="more-btn">→</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h3>Leído</h3>
+      <div class="books-row">
+        <div *ngFor="let b of leido" class="mini-book">
+          <img [src]="getCoverUrl(b)" [alt]="b.title" />
+        </div>
+        <div class="more-btn">→</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h3>Plan para leer</h3>
+      <div class="books-row">
+        <div *ngFor="let b of planParaLeer" class="mini-book">
+          <img [src]="getCoverUrl(b)" [alt]="b.title" />
+        </div>
+        <div class="more-btn">→</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="your-lists">
+    <h3>Tus listas</h3>
+    <div class="lists-row">
+      <div *ngFor="let l of userLists" class="list-card" (click)="navigateToList(l.id)" role="button" tabindex="0">
+        <div class="list-covers">
+          <div *ngFor="let b of l.libros | slice:0:4" class="list-cover">
+            <img [src]="getCoverUrl(b)" [alt]="b.title" />
+          </div>
+        </div>
+        <div class="list-name">{{ l.nombre }}</div>
+        <button type="button" class="btn-discover" (click)="navigateToList(l.id)" (click)="$event.stopPropagation()">Descúbrela</button>
+      </div>
+      <div *ngIf="userLists.length === 0" class="empty-lists">Aún no tienes listas creadas.</div>
+    </div>
+  </div>
+</div>

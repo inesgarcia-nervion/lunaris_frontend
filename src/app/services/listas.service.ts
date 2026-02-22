@@ -95,6 +95,36 @@ export class ListasService {
     return this.getAll().find(l => l.id === id);
   }
 
+  /** Return lists owned by a given username (owner). */
+  getByOwner(owner: string | null): ListaItem[] {
+    if (!owner) return [];
+    return this.getAll().filter(l => l.owner === owner);
+  }
+
+  /**
+   * Ensure that the three mandatory profile sections exist for the user.
+   * If any is missing, create it with the current user as owner.
+   */
+  ensureProfileSections(username: string | null) {
+    if (!username) return;
+    const required = ['Leyendo', 'Leído', 'Plan para leer'];
+    const listas = this.getAll();
+    let changed = false;
+
+    required.forEach(name => {
+      const exists = listas.some(l => l.owner === username && l.nombre === name);
+      if (!exists) {
+        listas.unshift({ id: Date.now().toString() + Math.random().toString(36).slice(2,8), nombre: name, libros: [], owner: username });
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      this.saveToStorage(listas);
+      this.listasSubject.next(listas);
+    }
+  }
+
   addBookToList(listId: string, book: OpenLibraryBook) {
     const listas = this.getAll().map(l => {
       if (l.id === listId) {

@@ -59,6 +59,14 @@ export class AuthService {
     return !!this.getToken();
   }
 
+  /**
+   * Returns the username of the currently logged in user (if any).
+   * The app stores this value on login under the key `lunaris_current_user`.
+   */
+  getCurrentUsername(): string | null {
+    return localStorage.getItem('lunaris_current_user') || sessionStorage.getItem('lunaris_current_user') || null;
+  }
+
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.REMEMBER_KEY);

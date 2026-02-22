@@ -9,6 +9,7 @@ import { RecuperarContrasenaComponent } from './components/recuperar-contrasena/
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { ListasUsuariosComponent } from './components/listas-usuarios/listas-usuarios.component';
 import { ListaDetalleComponent } from './components/lista-detalle/lista-detalle.component';
+import { PerfilComponent } from './components/perfil/perfil.component';
 
 export const routes: Routes = [
 	{ path: '', component: InicioComponent },
@@ -19,5 +20,6 @@ export const routes: Routes = [
 	{ path: 'menu', component: MenuComponent, canActivate: [AuthGuard] },
 	{ path: 'listas-usuarios', component: ListasUsuariosComponent, canActivate: [AuthGuard] },
 	{ path: 'listas/:id', component: ListaDetalleComponent, canActivate: [AuthGuard] },
+	{ path: 'perfil', component: PerfilComponent, canActivate: [AuthGuard] },
 	{ path: '**', redirectTo: 'login' }
 ];
