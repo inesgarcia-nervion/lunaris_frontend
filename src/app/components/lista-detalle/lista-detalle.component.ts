@@ -34,7 +34,14 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
     const b = book as OpenLibraryBook;
     if (!b) return;
     // remember we opened detail from this list so back button can return here
-    this.bookSearch.setNavigationOrigin({ type: 'list', listId: this.currentId });
+    // preserve any previous origin (e.g., came from profile -> list -> book)
+    const prev = this.bookSearch.getNavigationOrigin();
+    const origin: any = { type: 'list', listId: this.currentId };
+    if (prev && prev.type === 'profile') {
+      origin.parentType = prev.type;
+      origin.parentListId = prev.listId;
+    }
+    this.bookSearch.setNavigationOrigin(origin);
     this.bookSearch.setSelectedBook(b);
     this.router.navigateByUrl('/menu');
   }
@@ -42,10 +49,18 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
   back(): void {
     const origin = this.bookSearch.getNavigationOrigin();
     // If we came from a profile, return to the profile view instead of the general lists
-    if (origin && origin.type === 'profile') {
-      this.bookSearch.setNavigationOrigin(null);
-      this.router.navigateByUrl('/perfil');
-      return;
+    if (origin) {
+      if (origin.type === 'profile') {
+        this.bookSearch.setNavigationOrigin(null);
+        this.router.navigateByUrl('/perfil');
+        return;
+      }
+      // if origin indicates it had a parent profile, go back to profile
+      if ((origin as any).parentType === 'profile') {
+        this.bookSearch.setNavigationOrigin(null);
+        this.router.navigateByUrl('/perfil');
+        return;
+      }
     }
     this.router.navigateByUrl('/listas-usuarios');
   }

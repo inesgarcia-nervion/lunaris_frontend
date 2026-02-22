@@ -267,12 +267,28 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   backToSearch(): void {
     const origin = this.bookSearchService.getNavigationOrigin();
-    if (origin && origin.type === 'list' && origin.listId) {
-      // clear selection and navigate back to the originating list
-      this.bookSearchService.setSelectedBook(null);
-      this.bookSearchService.setNavigationOrigin(null);
-      this.router.navigate(['/listas', origin.listId]);
-      return;
+    if (origin) {
+      if (origin.type === 'list' && origin.listId) {
+        // clear selection and navigate back to the originating list
+        this.bookSearchService.setSelectedBook(null);
+        // if the origin has a parent (e.g., came from profile -> list -> book), restore parent as origin
+        const parentType = (origin as any).parentType;
+        const parentListId = (origin as any).parentListId;
+        if (parentType) {
+          this.bookSearchService.setNavigationOrigin({ type: parentType as any, listId: parentListId });
+        } else {
+          this.bookSearchService.setNavigationOrigin(null);
+        }
+        this.router.navigate(['/listas', origin.listId]);
+        return;
+      }
+      if (origin.type === 'profile') {
+        // opened from profile -> return to profile view
+        this.bookSearchService.setSelectedBook(null);
+        this.bookSearchService.setNavigationOrigin(null);
+        this.router.navigate(['/perfil']);
+        return;
+      }
     }
     this.selectedBook = null;
     this.bookSearchService.setSelectedBook(null);
