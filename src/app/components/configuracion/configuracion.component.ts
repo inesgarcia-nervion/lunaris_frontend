@@ -156,12 +156,16 @@ export class ConfiguracionComponent implements OnInit {
     const current = this.username || '';
     const newName = (this.newUsername || '').trim();
     if (!newName) { this.error = 'El nombre de usuario no puede estar vacío'; return; }
-    if (!this.isNameChanged) { this.error = 'No hay cambios en el nombre para guardar'; return; }
+    if (newName === current && !this.useFile && !this.avatarPreview) { this.error = 'No hay cambios para guardar'; return; }
 
     const ok = confirm(`¿Estás seguro de cambiar tu usuario a "${newName}"?`);
     if (!ok) return;
-    // prepare payload (username only). Avatar changes are applied separately.
+    // prepare payload
     const payload: any = { username: newName };
+    // If avatarPreview is a URL, include it in the payload so backend can persist it
+    if (this.avatarPreview && /^https?:\/\//i.test(this.avatarPreview)) {
+      payload.avatarUrl = this.avatarPreview;
+    }
 
     this.isSaving = true;
     this.auth.updateUser(current, payload).subscribe({
