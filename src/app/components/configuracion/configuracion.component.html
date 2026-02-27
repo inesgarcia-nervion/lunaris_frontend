@@ -5,7 +5,7 @@
     <h2>Cambiar nombre de usuario</h2>
     <div class="row">
       <input [(ngModel)]="newUsername" placeholder="Nuevo nombre de usuario" />
-      <button (click)="submitChanges()" [disabled]="isSaving">{{ isSaving ? 'Guardando...' : 'Cambiar nombre' }}</button>
+      <button (click)="submitChanges()" [disabled]="isSaving || !hasChanges">{{ isSaving ? 'Guardando...' : 'Cambiar nombre' }}</button>
     </div>
     <p class="hint">Al cambiar de nombre, se te pedirá que inicies sesión de nuevo.</p>
   </section>

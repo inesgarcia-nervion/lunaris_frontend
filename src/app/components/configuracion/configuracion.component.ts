@@ -16,6 +16,9 @@ export class ConfiguracionComponent implements OnInit {
   newUsername: string = '';
   avatarUrl: string = '';
   avatarPreview: string | null = null;
+  // snapshots of initial state to detect real changes
+  private initialUsername: string = '';
+  private initialAvatar: string | null = null;
   useFile: File | null = null;
   theme: 'light' | 'dark' = (localStorage.getItem('lunaris_theme') as 'light' | 'dark') || 'light';
   error: string | null = null;
@@ -25,10 +28,15 @@ export class ConfiguracionComponent implements OnInit {
   constructor(private auth: AuthService, private router: Router) {}
 
   ngOnInit(): void {
-    this.username = this.auth.getCurrentUsername();
+    const stored = this.auth.getCurrentUsername() || '';
+    // normalize stored username to avoid whitespace/case mismatches
+    this.username = stored ? stored.trim() : null;
     this.newUsername = this.username || '';
     const storedAvatar = localStorage.getItem('lunaris_avatar');
     if (storedAvatar) this.avatarPreview = storedAvatar;
+    // store snapshots for comparison later
+    this.initialUsername = this.username || '';
+    this.initialAvatar = this.avatarPreview || null;
     // Apply theme immediately on init so the UI matches stored preference
     try {
       document.body.classList.toggle('theme-dark', this.theme === 'dark');
@@ -78,6 +86,13 @@ export class ConfiguracionComponent implements OnInit {
     try { this.auth.setLocalAvatar(this.avatarPreview); } catch (e) { console.warn(e); }
     this.success = 'Avatar aplicado correctamente';
     setTimeout(() => this.success = null, 2500);
+  }
+
+  get hasChanges(): boolean {
+    const newName = (this.newUsername || '').trim();
+    const nameChanged = newName.length > 0 && newName.toLowerCase() !== (this.initialUsername || '').toLowerCase();
+    const avatarChanged = (this.useFile != null) || (this.avatarPreview || null) !== (this.initialAvatar || null);
+    return nameChanged || avatarChanged;
   }
 
   async submitChanges() {
