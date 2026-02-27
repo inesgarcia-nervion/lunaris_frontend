@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -16,6 +16,9 @@ export class ConfiguracionComponent implements OnInit {
   newUsername: string = '';
   avatarUrl: string = '';
   avatarPreview: string | null = null;
+  // preview data url for an uploaded file (not applied until user clicks)
+  filePreviewDataUrl: string | null = null;
+  @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
   // snapshots of initial state to detect real changes
   private initialUsername: string = '';
   private initialAvatar: string | null = null;
@@ -33,10 +36,9 @@ export class ConfiguracionComponent implements OnInit {
     this.username = stored ? stored.trim() : null;
     this.newUsername = this.username || '';
     const storedAvatar = localStorage.getItem('lunaris_avatar');
-    if (storedAvatar) this.avatarPreview = storedAvatar;
-    // store snapshots for comparison later
+    // do not show existing avatar as a preview on load; only use it as the initial snapshot
     this.initialUsername = this.username || '';
-    this.initialAvatar = this.avatarPreview || null;
+    this.initialAvatar = storedAvatar || null;
     // Apply theme immediately on init so the UI matches stored preference
     try {
       document.body.classList.toggle('theme-dark', this.theme === 'dark');
@@ -51,16 +53,34 @@ export class ConfiguracionComponent implements OnInit {
     const f = input.files[0];
     this.useFile = f;
     const reader = new FileReader();
-    reader.onload = () => { this.avatarPreview = reader.result as string; };
+    reader.onload = () => { this.filePreviewDataUrl = reader.result as string; };
     reader.readAsDataURL(f);
   }
 
   setAvatarFromUrl() {
     if (!this.avatarUrl) return;
-    this.avatarPreview = this.avatarUrl;
-    this.useFile = null;
-    this.success = 'Vista previa actualizada';
-    setTimeout(() => this.success = null, 3000);
+    // toggle preview for the URL: if already showing this URL, clear it
+    if (this.avatarPreview === this.avatarUrl) {
+      this.avatarPreview = null;
+    } else {
+      this.avatarPreview = this.avatarUrl;
+      // clear any file selection when previewing a URL
+      this.useFile = null;
+      this.filePreviewDataUrl = null;
+    }
+    this.success = this.avatarPreview ? 'Vista previa actualizada' : null;
+    if (this.success) setTimeout(() => this.success = null, 3000);
+  }
+
+  toggleFilePreview() {
+    if (!this.useFile || !this.filePreviewDataUrl) return;
+    if (this.avatarPreview === this.filePreviewDataUrl) {
+      this.avatarPreview = null;
+    } else {
+      this.avatarPreview = this.filePreviewDataUrl;
+      // clear URL when previewing file
+      this.avatarUrl = '';
+    }
   }
 
   toggleTheme() {
@@ -74,16 +94,47 @@ export class ConfiguracionComponent implements OnInit {
     }
   }
 
+  /** Generic apply kept for backward compatibility but not used in template */
   applyAvatar() {
-    if (!this.avatarPreview) return;
+    const toApply = this.avatarPreview || this.filePreviewDataUrl || (this.avatarUrl || null);
+    if (!toApply) return;
+    this.saveAppliedAvatar(toApply);
+  }
+
+  /** Apply only the URL input as avatar; clears the URL input when done */
+  applyUrlAvatar() {
+    const toApply = (this.avatarUrl || '').trim();
+    if (!toApply) return;
+    this.saveAppliedAvatar(toApply);
+    // clear URL input after applying
+    this.avatarUrl = '';
+    // clear visible preview after applying (user requested)
+    this.avatarPreview = null;
+    this.filePreviewDataUrl = null;
+    this.initialAvatar = toApply;
+  }
+
+  /** Apply only the currently selected file as avatar; clears file input when done */
+  applyFileAvatar() {
+    const toApply = this.filePreviewDataUrl || this.avatarPreview || null;
+    if (!toApply) return;
+    this.saveAppliedAvatar(toApply);
+    // clear file selection inputs
+    this.useFile = null;
+    this.filePreviewDataUrl = null;
+    if (this.fileInput && this.fileInput.nativeElement) this.fileInput.nativeElement.value = '';
+    // clear visible preview after applying (user requested)
+    this.avatarPreview = null;
+    this.initialAvatar = toApply;
+  }
+
+  private saveAppliedAvatar(toApply: string) {
     try {
-      // persist locally and notify AuthService so other components update
-      localStorage.setItem('lunaris_avatar', this.avatarPreview);
+      localStorage.setItem('lunaris_avatar', toApply);
     } catch (e) {
       console.warn('Unable to save avatar to localStorage', e);
     }
-    // notify auth service
-    try { this.auth.setLocalAvatar(this.avatarPreview); } catch (e) { console.warn(e); }
+    try { this.auth.setLocalAvatar(toApply); } catch (e) { console.warn(e); }
     this.success = 'Avatar aplicado correctamente';
     setTimeout(() => this.success = null, 2500);
   }
@@ -95,24 +146,22 @@ export class ConfiguracionComponent implements OnInit {
     return nameChanged || avatarChanged;
   }
 
+  get isNameChanged(): boolean {
+    const newName = (this.newUsername || '').trim();
+    return newName.length > 0 && newName.toLowerCase() !== (this.initialUsername || '').toLowerCase();
+  }
+
   async submitChanges() {
     this.error = null; this.success = null;
     const current = this.username || '';
     const newName = (this.newUsername || '').trim();
     if (!newName) { this.error = 'El nombre de usuario no puede estar vacío'; return; }
-    if (newName === current && !this.useFile && !this.avatarPreview) { this.error = 'No hay cambios para guardar'; return; }
+    if (!this.isNameChanged) { this.error = 'No hay cambios en el nombre para guardar'; return; }
 
     const ok = confirm(`¿Estás seguro de cambiar tu usuario a "${newName}"?`);
     if (!ok) return;
-    // prepare payload
+    // prepare payload (username only). Avatar changes are applied separately.
     const payload: any = { username: newName };
-    // Avoid sending large base64 payloads to the backend (DB may have varchar limits).
-    // If the user provided a URL (starts with http/https), send it. If they uploaded
-    // a file (base64), persist locally and notify the user to re-login — backend
-    // should handle file uploads separately.
-    if (this.avatarPreview && /^https?:\/\//i.test(this.avatarPreview)) {
-      payload.avatarUrl = this.avatarPreview;
-    }
 
     this.isSaving = true;
     this.auth.updateUser(current, payload).subscribe({
