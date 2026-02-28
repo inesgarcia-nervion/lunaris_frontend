@@ -1,8 +1,34 @@
 
-.ruleta-container { padding: 16px; }
-.card { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
-.big-box { height: 320px; border: 2px dashed var(--accent-color, #888); display:flex; align-items:center; justify-content:center; background: var(--panel-bg, #111); color:var(--text-color, #fff); position:relative; }
+.ruleta-container { padding: 32px 16px 16px; }
+.card { max-width: 720px; margin: 48px auto 0; display: flex; flex-direction: column; gap: 16px; }
+.big-box { min-height: 360px; display:flex; align-items:center; justify-content:center; background: transparent; color:var(--text-color, #000); position:relative; margin-bottom: 8px; }
 .placeholder { font-size: 24px; opacity:0.9; }
+
+/* Wheel specific styles */
+.wheel-wrap { position: relative; display:flex; align-items:center; justify-content:center; }
+.wheel { border-radius: 50%; background: #fff; box-shadow: 0 18px 40px rgba(0,0,0,0.18), inset 0 8px 20px rgba(0,0,0,0.06); position: relative; display:block; overflow: visible; border: 10px solid #000; }
+.wheel.spinning { will-change: transform; }
+.wheel-item { position: absolute; left: 50%; top: 50%; transform-origin: 0 0; }
+.wheel-item-label { display:block; white-space: normal; font-size: 13px; padding:6px 10px; background: transparent; color: #111; font-weight:700; transform-origin: center; border-radius: 4px; text-shadow: 0 1px 0 rgba(255,255,255,0.18); text-align:center; overflow:hidden; }
+.wheel-item-label { display:block; }
+/* clamp to two lines so long titles don't overflow their sector */
+.wheel-item-label { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-clamp: 2; }
+.wheel-item-label.selected { background: rgba(0,0,0,0.08); padding:8px 12px; border-radius:6px; box-shadow: 0 10px 26px rgba(0,0,0,0.36); font-weight:900; transform: translateY(-4px); }
+.pointer { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 22px; color: #c0392b; pointer-events: none; text-shadow: 0 1px 0 #fff; }
+.wheel-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; border-radius:50%; background: rgba(255,255,255,0.6); }
+.wheel-center { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:96px; height:96px; border-radius:50%; background:#111; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+
+/* Large centered label when wheel has a single slice */
+.wheel-center-label { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: 64%; text-align: center; font-size: 22px; font-weight:800; line-height:1.1; padding: 8px 12px; border-radius: 8px; background: rgba(255,255,255,0.02); }
+
+/* Add a visible outer ring to separate wheel from background */
+.wheel { box-shadow: 0 12px 30px rgba(0,0,0,0.16), inset 0 8px 20px rgba(0,0,0,0.06); }
+.wheel::after { content: ''; position: absolute; inset: 6px; border-radius: 50%; box-shadow: inset 0 0 0 2px rgba(0,0,0,0.06); pointer-events: none; }
+/* Ensure wheel scales nicely on smaller screens */
+@media (max-width: 720px) {
+	.wheel { width: 320px !important; height: 320px !important; border-width:8px; border-color: #000; }
+}
+
 .result-title { font-size: 28px; font-weight:700; text-align:center; margin-bottom:8px; }
 .result-cover { max-height:240px; max-width:240px; display:block; margin: 8px auto 0; }
 .controls { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
@@ -18,17 +44,34 @@ button { padding:8px 12px; }
 
 /* Result card styling */
 .result-card { display:flex; align-items:center; gap:16px; padding:12px; border-radius:8px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.03)); box-shadow: 0 10px 30px rgba(0,0,0,0.35); max-width: 680px; margin: 0 auto; animation: popIn 300ms ease both; }
-.result-cover { width: 160px; height: 240px; object-fit: cover; border-radius:6px; box-shadow: 0 12px 30px rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.03); }
-.result-info { display:flex; flex-direction:column; gap:6px; color: var(--text-color, #fff); }
-.result-title { font-size: 22px; font-weight: 800; line-height:1.1; color: var(--text-color, #fff); }
-.result-author { font-size: 14px; color: var(--muted-color, #cfcfcf); }
-.result-meta { font-size: 12px; color: var(--muted-color, #bdbdbd); }
+.cover-wrap { flex: 0 0 auto; width: 170px; height: 255px; display:flex; align-items:center; justify-content:center; border-radius:8px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.05)); box-shadow: 0 8px 22px rgba(0,0,0,0.45); }
+.result-cover { width: 150px; height: 225px; object-fit: cover; border-radius:6px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.03); transform: translateY(0); transition: transform 320ms cubic-bezier(.2,.9,.2,1); }
+.result-info { display:flex; flex-direction:column; gap:12px; color: var(--text-color, #fff); flex:1 1 auto; }
+.title-row { display:flex; align-items:flex-start; gap:12px; }
+.accent-bar { width:6px; height:44px; border-radius:4px; background: linear-gradient(180deg, var(--accent-color,#6ea8fe), #4b86ff); box-shadow: 0 4px 14px rgba(78,132,255,0.18); }
+.titles { display:flex; flex-direction:column; gap:4px; }
+.result-title { font-size: 20px; font-weight: 800; line-height:1.05; color: var(--text-color, #fff); max-height: 48px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.result-author { font-size: 13px; color: var(--muted-color, #cfcfcf); }
+.result-meta-row { display:flex; gap:8px; align-items:center; }
+.chip { background: rgba(255,255,255,0.03); padding:6px 8px; border-radius:999px; font-size:12px; color: var(--muted-color,#cfcfcf); border:1px solid rgba(255,255,255,0.02); }
+.result-actions { margin-top:6px; }
+.result-actions button { padding:8px 10px; border-radius:6px; border:none; background: rgba(255,255,255,0.03); color:var(--text-color,#fff); cursor:pointer; }
+
+/* subtle hover / entry */
+.result-card:hover .result-cover { transform: translateY(-6px) scale(1.01); }
+
+@media (max-width: 720px) {
+	.result-card { flex-direction:column; align-items:center; padding:16px; }
+	.cover-wrap { width: 190px; height: 285px; }
+	.result-cover { width: 170px; height: 255px; }
+	.title-row { align-items:center; }
+}
 
 @keyframes popIn { from { transform: translateY(8px) scale(.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
 @media (max-width: 720px) {
-	.big-box { height: 380px; }
+	.big-box { height: 420px; }
 	.result-cover { max-height: 220px; max-width:220px; }
 }

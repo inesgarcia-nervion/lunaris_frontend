@@ -3,24 +3,58 @@
 
   <div class="card">
     <div class="big-box">
-      <ng-container *ngIf="!loading && !resultBook">
-        <div class="placeholder">Ruleta aleatoria</div>
-      </ng-container>
+      <ng-container *ngIf="spinning || !resultBook">
+        <div class="wheel-wrap">
+          <div class="wheel" [class.spinning]="spinning" [style.width.px]="wheelSize" [style.height.px]="wheelSize"
+               [style.background]="wheelBackground" [style.transform]="'rotate(' + rotationDeg + 'deg)'"
+               [style.transition]="spinning ? ('transform ' + spinDurationMs + 'ms cubic-bezier(.2,.9,.2,1)') : 'none'">
+            <!-- show large central label when only one slice (e.g. 'Ruleta aleatoria' or 'Vacía') -->
+            <div *ngIf="titles.length === 1" class="wheel-center-label" [ngStyle]="{ color: labelColors[0] }">{{ titles[0] }}</div>
 
-      <ng-container *ngIf="loading">
-        <div class="loading-state">
-          <div class="spinner" aria-hidden="true"></div>
-          <div class="loading-text">Cargando...</div>
+            <!-- peripheral labels for multi-slice wheels -->
+            <ng-container *ngIf="titles.length > 1">
+              <div *ngFor="let t of titles; let i = index" class="wheel-item" [style.transform]="'rotate(' + (i * anglePer) + 'deg) translateY(-' + labelOffset + 'px)'">
+                   <div class="wheel-item-label" [class.selected]="i === selectedIndex"
+                     [style.transform]="'rotate(' + (-i * anglePer) + 'deg)'"
+                     [style.width.px]="radius"
+                     [style.maxWidth.px]="radius"
+                     [style.marginLeft.px]="-halfRadius"
+                     [style.fontSize.px]="labelFontSize"
+                     [ngStyle]="{ color: labelColors[i] }" title="{{ t }}">{{ t }}</div>
+              </div>
+            </ng-container>
+          </div>
+
+          <div class="pointer" aria-hidden="true">▼</div>
+
+          <!-- no loading spinner: wheel spins visually while selection is already loaded -->
         </div>
       </ng-container>
 
-      <ng-container *ngIf="!loading && resultBook">
+      <!-- Result card remains unchanged when selection made -->
+      <ng-container *ngIf="!spinning && resultBook">
         <div class="result-card">
-          <img class="result-cover" [src]="getCover(resultBook)" alt="Portada" />
+          <div class="cover-wrap">
+            <img class="result-cover" [src]="getCover(resultBook)" alt="Portada" />
+          </div>
+
           <div class="result-info">
-            <div class="result-title">{{ resultBook.title }}</div>
-            <div class="result-author">{{ bookService.getFirstAuthor(resultBook) }}</div>
-            <div class="result-meta">{{ resultBook.firstPublishYear ? ('Primera edición: ' + resultBook.firstPublishYear) : '' }}</div>
+            <div class="title-row">
+              <div class="accent-bar" aria-hidden="true"></div>
+              <div class="titles">
+                <div class="result-title">{{ resultBook.title }}</div>
+                <div class="result-author">{{ bookService.getFirstAuthor(resultBook) }}</div>
+              </div>
+            </div>
+
+            <div class="result-meta-row">
+              <span class="chip" *ngIf="resultBook.firstPublishYear">{{ resultBook.firstPublishYear }}</span>
+              <span class="chip">{{ (resultBook.editionCount || resultBook.edition_count) ? (resultBook.editionCount || resultBook.edition_count) + ' ed.' : '' }}</span>
+            </div>
+
+            <div class="result-actions">
+              <button (click)="quitarLibro()" [disabled]="!resultBook || spinning">Quitar de la lista</button>
+            </div>
           </div>
         </div>
       </ng-container>
@@ -34,8 +68,8 @@
       </select>
 
       <div class="buttons">
-        <button (click)="comenzarRuleta()" [disabled]="loading || !selectedListId">Comenzar</button>
-        <button (click)="quitarLibro()" [disabled]="!resultBook">Quitar libro de la lista</button>
+        <button (click)="comenzarRuleta()" [disabled]="spinning || !selectedListId">Comenzar</button>
+        <button (click)="quitarLibro()" [disabled]="!resultBook || spinning">Quitar libro de la lista</button>
       </div>
     </div>
   </div>
