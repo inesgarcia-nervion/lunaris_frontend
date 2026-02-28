@@ -29,22 +29,24 @@ export class RuletaComponent implements OnInit {
     this.listasService.listas$.subscribe(l => this.updateAvailableLists(l || []));
   }
 
-  private updateAvailableLists(all: ListaItem[]) {
-    const ownerLists = this.listasService.getByOwner(this.currentUser);
-    // find the "Plan para leer" list even if its owner is missing for some reason
-    const normalize = (s: string) => s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
-    const profilePlan = all.find(li => {
+  private updateAvailableLists(_all: ListaItem[]) {
+    // Only include lists owned by the current user, but exclude the
+    // profile lists 'Leyendo' and 'Leído'. Keep 'Plan para leer'.
+    const ownerLists = this.listasService.getByOwner(this.currentUser) || [];
+    const normalized = (s: string) => s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+
+    this.listas = ownerLists.filter(l => {
       try {
-        const n = normalize(li.nombre || '');
-        return n.includes('plan para leer') || n === 'planparaleer' || n === 'plan para leer';
+        const name = normalized(l.nombre || '');
+        // allow plan para leer
+        if (name.includes('plan para leer') || name === 'planparaleer') return true;
+        // exclude leyendo / leido / leído
+        if (name === 'leyendo' || name === 'leido' || name === 'leído') return false;
+        return true;
       } catch {
-        return false;
+        return true;
       }
     });
-
-    const combined = [...ownerLists];
-    if (profilePlan && !combined.some(x => x.id === profilePlan.id)) combined.push(profilePlan);
-    this.listas = combined;
   }
 
   onSelectList(): void {

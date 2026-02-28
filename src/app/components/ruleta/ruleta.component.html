@@ -8,20 +8,29 @@
       </ng-container>
 
       <ng-container *ngIf="loading">
-        <div class="placeholder">Cargando...</div>
+        <div class="loading-state">
+          <div class="spinner" aria-hidden="true"></div>
+          <div class="loading-text">Cargando...</div>
+        </div>
       </ng-container>
 
       <ng-container *ngIf="!loading && resultBook">
-        <div class="result-title">{{ resultBook.title }}</div>
-        <img class="result-cover" [src]="getCover(resultBook)" alt="Portada" />
+        <div class="result-card">
+          <img class="result-cover" [src]="getCover(resultBook)" alt="Portada" />
+          <div class="result-info">
+            <div class="result-title">{{ resultBook.title }}</div>
+            <div class="result-author">{{ bookService.getFirstAuthor(resultBook) }}</div>
+            <div class="result-meta">{{ resultBook.firstPublishYear ? ('Primera edición: ' + resultBook.firstPublishYear) : '' }}</div>
+          </div>
+        </div>
       </ng-container>
     </div>
 
     <div class="controls">
       <label>Elegir lista:</label>
       <select [(ngModel)]="selectedListId" (change)="onSelectList()">
-        <option [value]="null">-- Seleccionar --</option>
-        <option *ngFor="let l of listas" [value]="l.id">{{ l.nombre }} ({{ l.libros?.length || 0 }})</option>
+        <option [ngValue]="null">-- Seleccionar --</option>
+        <option *ngFor="let l of listas" [ngValue]="l.id">{{ l.nombre }} ({{ l.libros?.length || 0 }})</option>
       </select>
 
       <div class="buttons">

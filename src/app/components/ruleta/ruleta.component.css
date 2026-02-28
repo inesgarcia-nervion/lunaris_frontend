@@ -1,3 +1,4 @@
+
 .ruleta-container { padding: 16px; }
 .card { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 .big-box { height: 320px; border: 2px dashed var(--accent-color, #888); display:flex; align-items:center; justify-content:center; background: var(--panel-bg, #111); color:var(--text-color, #fff); position:relative; }
@@ -8,3 +9,26 @@
 .buttons { display:flex; gap:8px; margin-left: auto; }
 select { padding:6px; }
 button { padding:8px 12px; }
+
+.loading-state { display:flex; flex-direction:column; align-items:center; gap:8px; }
+.spinner { width:48px; height:48px; border-radius:50%; border:6px solid rgba(255,255,255,0.06); border-top-color: var(--accent-color, #6ea8fe); animation: spin 1s linear infinite; }
+.loading-text { color: var(--muted-color, #ddd); font-weight:600; }
+
+.result { text-align:center; }
+
+/* Result card styling */
+.result-card { display:flex; align-items:center; gap:16px; padding:12px; border-radius:8px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.03)); box-shadow: 0 10px 30px rgba(0,0,0,0.35); max-width: 680px; margin: 0 auto; animation: popIn 300ms ease both; }
+.result-cover { width: 160px; height: 240px; object-fit: cover; border-radius:6px; box-shadow: 0 12px 30px rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.03); }
+.result-info { display:flex; flex-direction:column; gap:6px; color: var(--text-color, #fff); }
+.result-title { font-size: 22px; font-weight: 800; line-height:1.1; color: var(--text-color, #fff); }
+.result-author { font-size: 14px; color: var(--muted-color, #cfcfcf); }
+.result-meta { font-size: 12px; color: var(--muted-color, #bdbdbd); }
+
+@keyframes popIn { from { transform: translateY(8px) scale(.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 720px) {
+	.big-box { height: 380px; }
+	.result-cover { max-height: 220px; max-width:220px; }
+}
