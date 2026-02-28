@@ -1,0 +1,33 @@
+<div class="ruleta-container">
+  <h1>Ruleta aleatoria</h1>
+
+  <div class="card">
+    <div class="big-box">
+      <ng-container *ngIf="!loading && !resultBook">
+        <div class="placeholder">Ruleta aleatoria</div>
+      </ng-container>
+
+      <ng-container *ngIf="loading">
+        <div class="placeholder">Cargando...</div>
+      </ng-container>
+
+      <ng-container *ngIf="!loading && resultBook">
+        <div class="result-title">{{ resultBook.title }}</div>
+        <img class="result-cover" [src]="getCover(resultBook)" alt="Portada" />
+      </ng-container>
+    </div>
+
+    <div class="controls">
+      <label>Elegir lista:</label>
+      <select [(ngModel)]="selectedListId" (change)="onSelectList()">
+        <option [value]="null">-- Seleccionar --</option>
+        <option *ngFor="let l of listas" [value]="l.id">{{ l.nombre }} ({{ l.libros?.length || 0 }})</option>
+      </select>
+
+      <div class="buttons">
+        <button (click)="comenzarRuleta()" [disabled]="loading || !selectedListId">Comenzar</button>
+        <button (click)="quitarLibro()" [disabled]="!resultBook">Quitar libro de la lista</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -28,7 +28,7 @@ export class ConfiguracionComponent implements OnInit {
   success: string | null = null;
   isSaving: boolean = false;
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, private router: Router, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     const stored = this.auth.getCurrentUsername() || '';
@@ -156,7 +156,16 @@ export class ConfiguracionComponent implements OnInit {
     const current = this.username || '';
     const newName = (this.newUsername || '').trim();
     if (!newName) { this.error = 'El nombre de usuario no puede estar vacío'; return; }
-    if (newName === current && !this.useFile && !this.avatarPreview) { this.error = 'No hay cambios para guardar'; return; }
+    if (newName === current && !this.useFile && !this.avatarPreview) {
+      this.error = 'No hay cambios para guardar';
+      setTimeout(() => {
+        if (this.error === 'No hay cambios para guardar') {
+          this.error = null;
+          try { this.cdr.detectChanges(); } catch (e) { /* ignore */ }
+        }
+      }, 5000);
+      return;
+    }
 
     const ok = confirm(`¿Estás seguro de cambiar tu usuario a "${newName}"?`);
     if (!ok) return;

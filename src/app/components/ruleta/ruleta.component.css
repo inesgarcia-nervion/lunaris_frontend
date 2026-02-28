@@ -1,0 +1,10 @@
+.ruleta-container { padding: 16px; }
+.card { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+.big-box { height: 320px; border: 2px dashed var(--accent-color, #888); display:flex; align-items:center; justify-content:center; background: var(--panel-bg, #111); color:var(--text-color, #fff); position:relative; }
+.placeholder { font-size: 24px; opacity:0.9; }
+.result-title { font-size: 28px; font-weight:700; text-align:center; margin-bottom:8px; }
+.result-cover { max-height:240px; max-width:240px; display:block; margin: 8px auto 0; }
+.controls { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+.buttons { display:flex; gap:8px; margin-left: auto; }
+select { padding:6px; }
+button { padding:8px 12px; }
