@@ -5,33 +5,57 @@
     <div class="big-box">
       <ng-container *ngIf="spinning || !resultBook">
         <div class="wheel-wrap">
-          <div class="wheel" [class.spinning]="spinning" [style.width.px]="wheelSize" [style.height.px]="wheelSize"
-               [style.background]="wheelBackground" [style.transform]="'rotate(' + rotationDeg + 'deg)'"
+          <div class="wheel"
+               [class.spinning]="spinning"
+               [style.width.px]="wheelSize"
+               [style.height.px]="wheelSize"
+               [style.background]="wheelBackground"
+               [style.transform]="'rotate(' + rotationDeg + 'deg)'"
                [style.transition]="spinning ? ('transform ' + spinDurationMs + 'ms cubic-bezier(.2,.9,.2,1)') : 'none'">
-            <!-- show large central label when only one slice (e.g. 'Ruleta aleatoria' or 'Vacía') -->
-            <div *ngIf="titles.length === 1" class="wheel-center-label" [ngStyle]="{ color: labelColors[0] }">{{ titles[0] }}</div>
 
-            <!-- peripheral labels for multi-slice wheels -->
+            <!-- SVG separator lines between slices -->
+            <svg *ngIf="titles.length > 1"
+                 [attr.width]="wheelSize"
+                 [attr.height]="wheelSize"
+                 style="position:absolute;top:0;left:0;pointer-events:none;border-radius:50%;overflow:hidden;z-index:1;">
+              <line *ngFor="let line of sliceLines"
+                    [attr.x1]="wheelSize / 2"
+                    [attr.y1]="wheelSize / 2"
+                    [attr.x2]="line.x2"
+                    [attr.y2]="line.y2"
+                    stroke="#000"
+                    stroke-width="2" />
+            </svg>
+
+            <!-- Single-slice central label -->
+              <div *ngIf="titles.length === 1"
+                class="wheel-center-label"
+                [ngStyle]="{ color: '#000' }">{{ titles[0] }}</div>
+
+            <!-- Multi-slice labels -->
             <ng-container *ngIf="titles.length > 1">
-              <div *ngFor="let t of titles; let i = index" class="wheel-item" [style.transform]="'rotate(' + (i * anglePer + anglePer/2) + 'deg) translateY(-' + labelOffset + 'px)'">
-                   <div class="wheel-item-label" [class.selected]="i === selectedIndex"
-                     [style.transform]="labelTransform(i)"
-                     [style.width.px]="radius"
-                     [style.maxWidth.px]="radius"
-                     [style.marginLeft.px]="-halfRadius"
-                     [style.fontSize.px]="labelFontSize"
-                     [ngStyle]="{ color: '#111' }" title="{{ t }}">{{ t }}</div>
+              <div *ngFor="let t of titles; let i = index"
+                   class="wheel-item"
+                   [style.transform]="'rotate(' + (i * anglePer + anglePer/2) + 'deg) translateY(-' + labelOffset + 'px)'"
+                   style="z-index:2;">
+                 <div class="wheel-item-label"
+                   [class.selected]="i === selectedIndex"
+                   [style.transform]="labelTransform(i)"
+                   [style.width.px]="radius"
+                   [style.maxWidth.px]="radius"
+                   [style.marginLeft.px]="-halfRadius"
+                   [style.fontSize.px]="labelFontSize"
+                   [ngStyle]="{ color: '#000' }"
+                   title="{{ t }}">{{ truncateTitle(t) }}</div>
               </div>
             </ng-container>
+
           </div>
 
           <div class="pointer" aria-hidden="true">▼</div>
-
-          <!-- no loading spinner: wheel spins visually while selection is already loaded -->
         </div>
       </ng-container>
 
-      <!-- Result card remains unchanged when selection made -->
       <ng-container *ngIf="!spinning && resultBook">
         <div class="result-card">
           <div class="cover-wrap">
@@ -49,7 +73,6 @@
 
             <div class="result-meta-row">
               <span class="chip" *ngIf="resultBook.firstPublishYear">{{ resultBook.firstPublishYear }}</span>
-              <span class="chip">{{ (resultBook.editionCount || resultBook.edition_count) ? (resultBook.editionCount || resultBook.edition_count) + ' ed.' : '' }}</span>
             </div>
 
             <div class="result-actions">
@@ -69,7 +92,6 @@
 
       <div class="buttons">
         <button (click)="comenzarRuleta()" [disabled]="spinning || !selectedListId">Comenzar</button>
-        <button (click)="quitarLibro()" [disabled]="!resultBook || spinning">Quitar libro de la lista</button>
       </div>
     </div>
   </div>
