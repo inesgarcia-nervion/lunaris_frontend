@@ -13,14 +13,14 @@
 
             <!-- peripheral labels for multi-slice wheels -->
             <ng-container *ngIf="titles.length > 1">
-              <div *ngFor="let t of titles; let i = index" class="wheel-item" [style.transform]="'rotate(' + (i * anglePer) + 'deg) translateY(-' + labelOffset + 'px)'">
+              <div *ngFor="let t of titles; let i = index" class="wheel-item" [style.transform]="'rotate(' + (i * anglePer + anglePer/2) + 'deg) translateY(-' + labelOffset + 'px)'">
                    <div class="wheel-item-label" [class.selected]="i === selectedIndex"
-                     [style.transform]="'rotate(' + (-i * anglePer) + 'deg)'"
+                     [style.transform]="labelTransform(i)"
                      [style.width.px]="radius"
                      [style.maxWidth.px]="radius"
                      [style.marginLeft.px]="-halfRadius"
                      [style.fontSize.px]="labelFontSize"
-                     [ngStyle]="{ color: labelColors[i] }" title="{{ t }}">{{ t }}</div>
+                     [ngStyle]="{ color: '#111' }" title="{{ t }}">{{ t }}</div>
               </div>
             </ng-container>
           </div>

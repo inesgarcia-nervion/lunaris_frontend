@@ -41,6 +41,16 @@ export class RuletaComponent implements OnInit {
   // helper used by template to avoid referencing global Math
   get halfRadius(): number { return Math.floor(this.radius / 2); }
 
+  // Compute label transform so text appears vertical along the slice.
+  // Labels are placed on the slice bisector; for slices on the lower half
+  // we invert the vertical orientation so text remains readable (not upside-down).
+  labelTransform(i: number): string {
+    const center = (i * this.anglePer + this.anglePer / 2) % 360;
+    // on top half use 90deg, on bottom half -90deg to keep text upright
+    const rot = (center > 90 && center < 270) ? -90 : 90;
+    return `rotate(${rot}deg)`;
+  }
+
   constructor(private listasService: ListasService, public bookService: BookSearchService, private cdr: ChangeDetectorRef, private ngZone: NgZone) {}
 
   ngOnInit(): void {
@@ -53,10 +63,20 @@ export class RuletaComponent implements OnInit {
     this.titles = ['Ruleta aleatoria'];
     this.anglePer = 360 / this.titles.length;
     this.wheelBackground = this.buildWheelBackground(this.titles);
-    this.labelOffset = Math.max(60, Math.floor(this.wheelSize / 2) - 18);
+    this.computeLabelOffset();
     // capture the initial size so we can preserve it across selections
     this.initialWheelSize = this.wheelSize;
     this.listasService.listas$.subscribe(l => this.updateAvailableLists(l || []));
+  }
+
+  private computeLabelOffset(): void {
+    // move labels closer to the center of each slice (fraction of radius)
+    try {
+      // radius is distance from center where labels are positioned; use ~62% towards center
+      this.labelOffset = Math.max(48, Math.floor(this.radius * 0.62));
+    } catch {
+      this.labelOffset = Math.max(48, Math.floor(this.wheelSize / 2) - 40);
+    }
   }
 
   private updateAvailableLists(_all: ListaItem[]) {
@@ -93,7 +113,7 @@ export class RuletaComponent implements OnInit {
       this.wheelSize = this.initialWheelSize;
       this.radius = Math.floor(this.wheelSize / 2) - 40;
       this.wheelBackground = this.buildWheelBackground(this.titles);
-      this.labelOffset = Math.max(60, this.radius - 18);
+      this.computeLabelOffset();
       return;
     }
     const lista = this.listasService.getById(this.selectedListId);
@@ -105,10 +125,10 @@ export class RuletaComponent implements OnInit {
       this.wheelSize = this.initialWheelSize;
       this.radius = Math.floor(this.wheelSize / 2) - 40;
       this.wheelBackground = this.buildWheelBackground(this.titles);
-      this.labelOffset = Math.max(60, this.radius - 18);
+      this.computeLabelOffset();
       return;
     }
-    this.titles = lista.libros.map(b => b.title || '—');
+    this.titles = lista.libros.map(b => (b.title || '').toString().trim() || '—');
     const n = this.titles.length || 1;
     this.anglePer = 360 / n;
     // compute wheel size and radius - allow a larger maximum so titles fit,
@@ -117,14 +137,14 @@ export class RuletaComponent implements OnInit {
     this.wheelSize = Math.max(this.initialWheelSize, computed);
     this.radius = Math.floor(this.wheelSize / 2) - 40;
     this.wheelBackground = this.buildWheelBackground(this.titles);
-    this.labelOffset = Math.max(60, this.radius - 18);
+    this.computeLabelOffset();
   }
 
   // dynamic font size for labels so long titles remain readable and fit
   get labelFontSize(): number {
-    // base font grows with wheel size but clamp to [11,18]
-    const v = Math.floor(this.wheelSize / 40);
-    return Math.max(11, Math.min(18, v));
+    // make labels bigger and responsive; clamp to [14,28]
+    const v = Math.floor(this.wheelSize / 32);
+    return Math.max(14, Math.min(28, v));
   }
 
   private buildWheelBackground(titles: string[]): string {
@@ -186,13 +206,50 @@ export class RuletaComponent implements OnInit {
       alert('La lista seleccionada no contiene libros.');
       return;
     }
-    // Pick random index and assign result immediately. Do not animate rotation.
-    const idx = Math.floor(Math.random() * lista.libros.length);
-    this.selectedIndex = idx;
-    this.resultBook = lista.libros[idx];
-    this.spinning = false;
-    this.rotationDeg = 0;
-    try { this.cdr.detectChanges(); } catch (e) { /* ignore */ }
+    if (this.spinning) return;
+
+    const n = lista.libros.length;
+    const idx = Math.floor(Math.random() * n);
+
+    // compute final rotation so the chosen slice center aligns with the top pointer
+    // slice center (in degrees, relative to conic-gradient starting at -90deg) = i*anglePer + anglePer/2
+    // to bring that center to top we rotate by -(i*anglePer + anglePer/2)
+    const spins = Math.floor(Math.random() * 3) + 4; // 4..6 full spins for nice animation
+    const offset = - (idx * this.anglePer + this.anglePer / 2);
+    const finalRotation = spins * 360 + offset;
+
+    this.spinning = true;
+    // clear previous selection while spinning
+    this.selectedIndex = null;
+    this.resultBook = null;
+
+    // trigger CSS transition by updating rotationDeg
+    // run inside Angular zone so template updates
+    this.ngZone.run(() => {
+      this.rotationDeg = finalRotation;
+      // ensure change detection picks this up
+      try { this.cdr.detectChanges(); } catch (e) { /* ignore */ }
+    });
+
+    // when animation ends, stop the spinning, leave wheel stationary,
+    // then after a 2s pause reveal the selected book
+    setTimeout(() => {
+      this.ngZone.run(() => {
+        this.spinning = false;
+        // normalize rotationDeg to small value to avoid huge numbers later
+        this.rotationDeg = ((finalRotation % 360) + 360) % 360;
+        try { this.cdr.detectChanges(); } catch (e) { /* ignore */ }
+
+        // 2s pause while the wheel is stationary
+        setTimeout(() => {
+          this.ngZone.run(() => {
+            this.selectedIndex = idx;
+            this.resultBook = lista.libros[idx];
+            try { this.cdr.detectChanges(); } catch (e) { /* ignore */ }
+          });
+        }, 2000);
+      });
+    }, this.spinDurationMs + 50);
   }
 
   quitarLibro(): void {
