@@ -1,1 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Prevent page scrolling when `no-scroll` class is applied to body */
+.no-scroll {
+	overflow: hidden !important;
+	height: 100%;
+}

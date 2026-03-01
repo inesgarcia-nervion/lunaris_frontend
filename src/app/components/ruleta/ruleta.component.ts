@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ListasService, ListaItem } from '../../services/listas.service';
@@ -87,6 +87,7 @@ export class RuletaComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    try { document.body.classList.add('no-scroll'); } catch (e) { /* ignore */ }
     this.currentUser = this.listasService.getCurrentUser();
     this.listasService.ensureProfileSections(this.currentUser);
     this.updateAvailableLists(this.listasService.getAll() || []);
@@ -98,12 +99,17 @@ export class RuletaComponent implements OnInit {
     this.listasService.listas$.subscribe(l => this.updateAvailableLists(l || []));
   }
 
+  ngOnDestroy(): void {
+    try { document.body.classList.remove('no-scroll'); } catch (e) { /* ignore */ }
+  }
+
   private computeLabelOffset(): void {
     try {
-      // 60% of radius keeps labels well inside the wheel for any slice count
-      this.labelOffset = Math.max(30, Math.floor(this.radius * 0.60));
+      // Move labels closer to the rim: use a larger fraction of radius
+      // 82% keeps labels near the edge while avoiding separator lines in most cases
+      this.labelOffset = Math.max(40, Math.floor(this.radius * 0.82));
     } catch {
-      this.labelOffset = Math.max(30, Math.floor(this.wheelSize / 2) - 80);
+      this.labelOffset = Math.max(40, Math.floor(this.wheelSize / 2) - 40);
     }
   }
 
