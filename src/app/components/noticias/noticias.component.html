@@ -15,7 +15,7 @@
 
 
   <div class="news-list">
-    <div *ngFor="let n of news" class="news-card">
+    <div *ngFor="let n of news" class="news-card" (click)="openDetail(n.id)" role="button" tabindex="0">
       <div class="news-meta">
         <h2>{{ n.title }}</h2>
         <span class="news-date">{{ n.date | date:'long' }}</span>
@@ -23,9 +23,9 @@
       <div *ngIf="n.image" class="news-image">
         <img [src]="n.image" alt="imagen noticia" />
       </div>
-      <p class="news-text">{{ n.text }}</p>
+      <!-- Preview text removed: open detail page to see full content -->
       <div *ngIf="isAdmin" class="news-actions">
-        <button (click)="remove(n.id)">Eliminar</button>
+        <button (click)="$event.stopPropagation(); remove(n.id)">Eliminar</button>
       </div>
     </div>
   </div>

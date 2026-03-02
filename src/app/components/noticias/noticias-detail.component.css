@@ -1,0 +1,5 @@
+.noticia-detail { padding:16px; max-width:900px; }
+.noticia-detail .image img { max-width:100%; height:auto; border-radius:6px; margin:12px 0; }
+.noticia-detail .meta { color:#666; margin-bottom:8px; }
+.back { background:none; border:0; color:#007bff; cursor:pointer; margin-bottom:8px; }
+.not-found { color:#999; padding:16px; }

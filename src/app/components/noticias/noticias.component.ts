@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NewsService, NewsItem } from '../../services/news.service';
 import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -20,7 +21,7 @@ export class NoticiasComponent implements OnInit {
   isAdmin = false;
 
 
-  constructor(private newsService: NewsService, private auth: AuthService) {}
+  
 
 
   ngOnInit(): void {
@@ -28,6 +29,12 @@ export class NoticiasComponent implements OnInit {
     this.newsService.news$.subscribe(n => this.news = n || []);
     this.isAdmin = this.auth.isAdmin();
     this.auth.isAdmin$.subscribe(v => this.isAdmin = v);
+  }
+
+  constructor(private newsService: NewsService, private auth: AuthService, private router: Router) {}
+
+  openDetail(id: string) {
+    this.router.navigate(['noticias', id]);
   }
 
 

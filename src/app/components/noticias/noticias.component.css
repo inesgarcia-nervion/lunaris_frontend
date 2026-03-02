@@ -2,7 +2,7 @@
 .admin-news-form { margin-bottom: 20px; display:flex; flex-direction:column; gap:8px; max-width:600px; }
 .admin-news-form input, .admin-news-form textarea { padding:8px; font-size:14px; }
 .news-list { display:flex; flex-direction:column; gap:12px; }
-.news-card { border:1px solid #ddd; padding:12px; border-radius:6px; max-width:800px; }
+.news-card { border:1px solid #ddd; padding:12px; border-radius:6px; max-width:800px; cursor: pointer; }
 .news-image img { max-width:100%; height:auto; border-radius:4px; }
 .news-meta { display:flex; justify-content:space-between; align-items:center; }
 .news-text { margin-top:8px; }

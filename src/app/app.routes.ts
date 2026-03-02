@@ -13,6 +13,7 @@ import { PerfilComponent } from './components/perfil/perfil.component';
 import { ConfiguracionComponent } from './components/configuracion/configuracion.component';
 import { RuletaComponent } from './components/ruleta/ruleta.component';
 import { NoticiasComponent } from './components/noticias/noticias.component';
+import { NoticiasDetailComponent } from './components/noticias/noticias-detail.component';
 
 export const routes: Routes = [
 	{ path: '', component: InicioComponent },
@@ -26,6 +27,7 @@ export const routes: Routes = [
 	{ path: 'perfil', component: PerfilComponent, canActivate: [AuthGuard] },
 	{ path: 'configuracion', component: ConfiguracionComponent, canActivate: [AuthGuard] },
 	{ path: 'ruleta', component: RuletaComponent, canActivate: [AuthGuard] },
+	{ path: 'noticias/:id', component: NoticiasDetailComponent, canActivate: [AuthGuard] },
 	{ path: 'noticias', component: NoticiasComponent, canActivate: [AuthGuard] },
 	{ path: '**', redirectTo: 'login' }
 ];
