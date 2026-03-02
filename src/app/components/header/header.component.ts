@@ -32,6 +32,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   selectedBook: OpenLibraryBook | null = null;
   listas: any[] = [];
   avatar: string | null = null;
+  isAdmin: boolean = false;
 
   // Return only the user's custom lists (exclude reserved profile lists)
   get customLists(): any[] {
@@ -85,6 +86,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private updatingStatusOrList = false;
 
   ngOnInit(): void {
+    // reflect current admin state immediately
+    this.isAdmin = this.auth.isAdmin();
+    this.subs.push(this.auth.isAdmin$.subscribe(v => { this.isAdmin = v; this.cdr.markForCheck(); }));
     // inicializar estado de ruta
     this.isMenuRoute = this.router.url.startsWith('/menu');
     this.subs.push(this.router.events.subscribe(e => {

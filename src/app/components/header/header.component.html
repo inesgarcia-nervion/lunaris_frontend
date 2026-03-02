@@ -5,6 +5,7 @@
       <img src="/assets/IconoAplicacion.jpg" class="brand-icon" alt="Lunaris" />
     </div>
 
+
     <!-- Centro: Menú + Búsqueda -->
     <div class="navbar-center">
       <!-- Menú de navegación -->
@@ -15,6 +16,7 @@
         <a (click)="navigate('/comunidad')" class="nav-item">Comunidad</a>
         <a (click)="navigate('/noticias')" class="nav-item">Noticias</a>
       </div>
+
 
       <!-- Barra de búsqueda -->
       <div class="search-bar">
@@ -31,6 +33,7 @@
       </div>
     </div>
 
+
     <!-- Usuario derecha -->
     <div class="navbar-right">
       <!-- Menú de usuario -->
@@ -39,16 +42,18 @@
           <img *ngIf="avatar; else noAvatar" [src]="avatar" class="user-avatar" alt="avatar" />
           <ng-template #noAvatar><span class="user-icon">👤</span></ng-template>
         </button>
-        
+       
         <div class="user-dropdown" *ngIf="showUserMenu" (click)="$event.stopPropagation()">
           <a (click)="navigateAndClose('/perfil')" class="dropdown-item">Mi Perfil</a>
           <a (click)="navigateAndClose('/configuracion')" class="dropdown-item">Configuración</a>
+          <a *ngIf="isAdmin" (click)="navigateAndClose('/noticias')" class="dropdown-item">Gestionar noticias</a>
           <hr />
           <button (click)="logout()" class="dropdown-item logout-btn">
             Cerrar sesión
           </button>
         </div>
       </div>
+
 
       <!-- Botón hamburguesa para móviles -->
       <button (click)="toggleMenu()" class="hamburger">
@@ -60,11 +65,13 @@
   </div>
 </nav>
 
+
 <!-- Contenido principal -->
 <div *ngIf="isMenuRoute" class="book-search-container">
   <!-- Alertas en la parte superior -->
   <div *ngIf="error" class="alert alert-error alert-top">{{ error }}</div>
   <div *ngIf="successMessage" class="alert alert-success alert-top">{{ successMessage }}</div>
+
 
   <div class="search-section">
     <!-- Información de resultados -->
@@ -73,6 +80,7 @@
       <p>Mostrando <strong>{{ searchResults.length > limit ? limit : searchResults.length }}</strong> resultados por página</p>
     </div>
   </div>
+
 
   <!-- VISTA DE BÚSQUEDA SIMPLIFICADA -->
   <div *ngIf="searchResults.length > 0 && !selectedBook" class="results-section">
@@ -87,13 +95,16 @@
           />
         </div>
 
+
         <!-- Información mínima -->
         <div class="book-info-simple">
           <h3 class="book-title-simple">{{ book.title }}</h3>
           <p *ngIf="isSaga(book)" class="saga-badge">Saga</p>
+          <button *ngIf="isAdmin" class="admin-import-btn" (click)="importBook(book); $event.stopPropagation()">Añadir a BD</button>
         </div>
       </div>
     </div>
+
 
     <!-- Paginación -->
     <div class="pagination">
@@ -105,9 +116,11 @@
         ← Anterior
       </button>
 
+
       <div class="page-info">
         Página <strong>{{ currentPage }}</strong> de <strong>{{ getTotalPages() }}</strong>
       </div>
+
 
       <button
         (click)="nextPage()"
@@ -119,10 +132,14 @@
     </div>
   </div>
 
+
   <!-- VISTA DE DETALLE DEL LIBRO -->
   <div *ngIf="selectedBook" class="book-detail-view">
     <!-- Botón volver -->
-    <button (click)="backToSearch()" class="btn btn-back">{{ backButtonLabel }}</button>
+    <div class="detail-top-actions">
+      <button (click)="backToSearch()" class="btn btn-back">{{ backButtonLabel }}</button>
+      <button *ngIf="isAdmin" (click)="importBook(selectedBook)" class="btn btn-import">Importar a BD</button>
+    </div>
 
     <div class="detail-container">
       <!-- Izquierda: Portada -->
@@ -135,6 +152,7 @@
           />
         </div>
       </div>
+
 
       <!-- Centro: Información -->
       <div class="detail-info-right">
@@ -155,14 +173,15 @@
         <!-- Rating -->
         <div *ngIf="selectedBook.ratingsAverage || selectedBook.ratings_average" class="rating-section">
           <div class="rating-stars">
-            <span *ngFor="let star of generateRatingArray(selectedBook.ratingsAverage || selectedBook.ratings_average)" 
-                  class="star" 
+            <span *ngFor="let star of generateRatingArray(selectedBook.ratingsAverage || selectedBook.ratings_average)"
+                  class="star"
                   [class.full]="star === 'full'"
                   [class.half]="star === 'half'"
                   [class.empty]="star === 'empty'">★</span>
           </div>
           <span class="rating-number">{{ (selectedBook.ratingsAverage || selectedBook.ratings_average) | number: '1.1-1' }} / 5</span>
         </div>
+
 
         <!-- Categorías -->
         <div class="categories-section">
@@ -174,6 +193,7 @@
           </div>
         </div>
       </div>
+
 
       <!-- Derecha: Selectores -->
       <div class="detail-right-selectors">
@@ -187,6 +207,7 @@
             <button class="btn-add-list" (click)="addToList()" [disabled]="!selectedBook || (!selectedList && !selectedStatus)">Añadir</button>
           </div>
         </div>
+
 
         <div class="form-group-inline">
           <label class="selector-label">Estado</label>
@@ -203,6 +224,7 @@
       </div>
     </div>
 
+
     <!-- Sección inferior con ancho completo -->
     <div class="detail-content-full-width">
       <!-- Descripción -->
@@ -210,6 +232,7 @@
         <strong>Descripción</strong>
         <p class="description-text">{{ selectedBook.description }}</p>
       </div>
+
 
       <!-- Tu review -->
       <div class="review-section">
@@ -219,11 +242,11 @@
             <div class="reviewer-info">
               <p class="reviewer-name">Usuario</p>
               <div class="review-rating">
-                <input 
-                  type="number" 
-                  min="0" 
-                  max="5" 
-                  [(ngModel)]="userRating" 
+                <input
+                  type="number"
+                  min="0"
+                  max="5"
+                  [(ngModel)]="userRating"
                   class="rating-input"
                 />
                 <span class="rating-value">{{ userRating }} / 5</span>
@@ -234,13 +257,14 @@
               <button class="btn btn-delete">Eliminar</button>
             </div>
           </div>
-          <textarea 
-            [(ngModel)]="userReview" 
+          <textarea
+            [(ngModel)]="userReview"
             placeholder="Escribe tu review aquí..."
             class="review-textarea"
           ></textarea>
         </div>
       </div>
+
 
       <!-- Reviews de usuarios -->
       <div class="user-reviews-section">
@@ -263,10 +287,12 @@
     </div>
   </div>
 
+
   <!-- Estado vacío -->
   <div *ngIf="!loading && searchResults.length === 0 && serviceQuery && !selectedBook" class="empty-state">
     <p>No hay resultados para tu búsqueda.</p>
     <p>Intenta con otros términos o prueba la búsqueda por autor.</p>
   </div>
+
 
 </div>

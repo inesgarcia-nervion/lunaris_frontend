@@ -20,17 +20,33 @@ export class LoginComponent {
   loading = false;
   showPassword: boolean = false;
 
+
   constructor(private auth: AuthService, public router: Router, private cdr: ChangeDetectorRef, private listasService: ListasService) {}
+
 
   submit() {
     this.error = null;
-    
+   
     if (!this.username || !this.password) {
       this.error = 'Por favor, introduce usuario y contraseña';
       return;
     }
-    
+   
     this.loading = true;
+    // Development bypass: accept admin/admin locally without contacting backend
+    if (this.username === 'admin' && this.password === 'admin') {
+      this.auth.devAdminLogin(this.rememberMe).subscribe({
+        next: () => {
+          try { this.listasService.assignUnownedListsToCurrentUser(this.username); } catch (e) { console.error('Error assigning list ownership', e); }
+          this.loading = false;
+          this.cdr.detectChanges();
+          this.router.navigate(['/menu']);
+        }
+      });
+      return;
+    }
+
+
     this.auth.login(this.username, this.password, this.rememberMe).subscribe({
       next: () => {
         // assign ownership for any lists created earlier without owner

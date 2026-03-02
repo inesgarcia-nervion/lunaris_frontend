@@ -1,0 +1,32 @@
+<div class="noticias-container">
+  <h1>Noticias</h1>
+
+
+  <div *ngIf="isAdmin" class="admin-news-form">
+    <h3>Crear noticia</h3>
+    <input [(ngModel)]="title" placeholder="Título" />
+    <textarea [(ngModel)]="text" placeholder="Texto"></textarea>
+    <input type="file" (change)="onFileChange($event)" accept="image/*" />
+    <button (click)="addNews()">Crear</button>
+  </div>
+
+
+  <div *ngIf="news.length === 0" class="empty-news">No hay noticias aún.</div>
+
+
+  <div class="news-list">
+    <div *ngFor="let n of news" class="news-card">
+      <div class="news-meta">
+        <h2>{{ n.title }}</h2>
+        <span class="news-date">{{ n.date | date:'long' }}</span>
+      </div>
+      <div *ngIf="n.image" class="news-image">
+        <img [src]="n.image" alt="imagen noticia" />
+      </div>
+      <p class="news-text">{{ n.text }}</p>
+      <div *ngIf="isAdmin" class="news-actions">
+        <button (click)="remove(n.id)">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
