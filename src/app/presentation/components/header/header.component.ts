@@ -270,6 +270,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     // mark as coming from search/header
     this.bookSearchService.setNavigationOrigin({ type: 'search' });
     this.bookSearchService.setSelectedBook(book);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   backToSearch(): void {

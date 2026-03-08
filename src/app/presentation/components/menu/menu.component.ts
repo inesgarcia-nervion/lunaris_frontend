@@ -86,6 +86,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     // mark origin as search because selection occurred from search results
     this.bookSearchService.setNavigationOrigin({ type: 'search' });
     this.bookSearchService.setSelectedBook(book);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   backToSearch(): void {
