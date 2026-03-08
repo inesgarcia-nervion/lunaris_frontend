@@ -157,6 +157,30 @@ export class BookSearchService {
 
   setSelectedBook(book: OpenLibraryBook | null): void {
     this.selectedBookSubject.next(book);
+    if (book) {
+      this.syncBookGenres(book);
+    }
+  }
+
+  /**
+   * Sincroniza las categorías del libro con la tabla de géneros del backend.
+   * Crea únicamente los géneros que todavía no existen (el backend es idempotente).
+   */
+  private syncBookGenres(book: OpenLibraryBook): void {
+    const categories = this.getCategories(book);
+    if (categories.length === 0) return;
+
+    this.getGenres().pipe(
+      catchError(() => of([] as { id: number; name: string }[]))
+    ).subscribe(existing => {
+      const existingNames = new Set(existing.map(g => g.name.toLowerCase()));
+      const toCreate = categories.filter(c => !existingNames.has(c.toLowerCase()));
+      toCreate.forEach(name => {
+        this.http.post(`${this.apiUrl}/genres`, { name })
+          .pipe(catchError(() => of(null)))
+          .subscribe();
+      });
+    });
   }
 
   setNavigationOrigin(origin: { type: 'search' | 'list' | 'other' | 'profile'; listId?: string } | null): void {
@@ -395,6 +419,7 @@ export class BookSearchService {
   }
 
   getCategories(book: any): string[] {
+    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
     // Primero usar los géneros guardados en la BD (objetos con id y name)
     if (Array.isArray(book.genres) && book.genres.length > 0) {
       const seen = new Set<string>();
@@ -405,7 +430,7 @@ export class BookSearchService {
         const parts = name.split(',').map((p: string) => p.trim()).filter(Boolean);
         for (const part of parts) {
           const key = part.toLowerCase();
-          if (!seen.has(key)) { seen.add(key); result.push(part); }
+          if (!seen.has(key)) { seen.add(key); result.push(capitalize(part)); }
           if (result.length >= 5) break;
         }
         if (result.length >= 5) break;
@@ -423,7 +448,7 @@ export class BookSearchService {
         const parts = s.split(',').map((p: string) => p.trim()).filter(Boolean);
         for (const part of parts) {
           const key = part.toLowerCase();
-          if (!seen.has(key)) { seen.add(key); result.push(part); }
+          if (!seen.has(key)) { seen.add(key); result.push(capitalize(part)); }
           if (result.length >= 5) break;
         }
         if (result.length >= 5) break;

@@ -358,6 +358,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   getCategories(book: any): string[] {
+    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
     const raw: any[] = book.subject || book.subjects || book.categories || [];
     if (Array.isArray(raw) && raw.length > 0) {
       const seen = new Set<string>();
@@ -370,7 +371,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
           const key = part.toLowerCase();
           if (!seen.has(key)) {
             seen.add(key);
-            result.push(part);
+            result.push(capitalize(part));
           }
           if (result.length >= 5) break;
         }
