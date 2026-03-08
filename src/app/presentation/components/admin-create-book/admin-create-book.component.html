@@ -1,0 +1,155 @@
+<div class="admin-create-book-container">
+  <div class="form-wrapper">
+    <h2>Crear Nuevo Libro</h2>
+    
+    <!-- Mensajes de error/éxito -->
+    <div *ngIf="error" class="alert alert-error">
+      {{ error }}
+    </div>
+    
+    <div *ngIf="success" class="alert alert-success">
+      {{ success }}
+    </div>
+
+    <form (ngSubmit)="submit()" *ngIf="isAdmin">
+      <!-- Título -->
+      <div class="form-group">
+        <label for="title">Título *</label>
+        <input
+          type="text"
+          id="title"
+          [(ngModel)]="title"
+          name="title"
+          placeholder="Título del libro"
+          required
+          [disabled]="loading"
+        />
+      </div>
+
+      <!-- Autor -->
+      <div class="form-group">
+        <label for="author">Autor *</label>
+        <input
+          type="text"
+          id="author"
+          [(ngModel)]="author"
+          name="author"
+          placeholder="Nombre del autor"
+          required
+          [disabled]="loading"
+        />
+      </div>
+
+      <!-- Descripción -->
+      <div class="form-group">
+        <label for="description">Descripción</label>
+        <textarea
+          id="description"
+          [(ngModel)]="description"
+          name="description"
+          placeholder="Descripción del libro (opcional)"
+          rows="4"
+          [disabled]="loading"
+        ></textarea>
+      </div>
+
+      <!-- Año de lanzamiento -->
+      <div class="form-group">
+        <label for="releaseYear">Año de Lanzamiento</label>
+        <input
+          type="number"
+          id="releaseYear"
+          [(ngModel)]="releaseYear"
+          name="releaseYear"
+          placeholder="Ej: 2023"
+          [disabled]="loading"
+        />
+      </div>
+
+      <!-- Puntuación -->
+      <div class="form-group">
+        <label for="score">Puntuación (0-5)</label>
+        <input
+          type="number"
+          id="score"
+          [(ngModel)]="score"
+          name="score"
+          placeholder="Ej: 4.5"
+          min="0"
+          max="5"
+          step="0.1"
+          [disabled]="loading"
+        />
+      </div>
+
+      <!-- Portada -->
+      <div class="form-group">
+        <label for="coverImage">Portada (URL o imagen)</label>
+        <div class="cover-input-group">
+          <input
+            type="text"
+            id="coverImage"
+            [(ngModel)]="coverImage"
+            name="coverImage"
+            placeholder="URL de la portada o carga una imagen"
+            [disabled]="loading"
+          />
+          <button
+            type="button"
+            (click)="fileInput.click()"
+            class="btn-upload"
+            [disabled]="loading"
+          >
+            Subir Imagen
+          </button>
+        </div>
+        <input
+          hidden
+          type="file"
+          accept="image/*"
+          #fileInput
+          (change)="onFileChange($event)"
+        />
+      </div>
+
+      <!-- Vista previa de la portada -->
+      <div class="form-group" *ngIf="filePreview">
+        <label>Vista previa de la portada</label>
+        <div class="cover-preview">
+          <img [src]="filePreview" alt="Vista previa de portada" />
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="button-group">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="loading"
+        >
+          {{ loading ? 'Creando...' : 'Crear Libro' }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="clearForm()"
+          [disabled]="loading"
+        >
+          Limpiar
+        </button>
+        <button
+          type="button"
+          class="btn btn-cancel"
+          (click)="router.navigate(['/menu'])"
+          [disabled]="loading"
+        >
+          Cancelar
+        </button>
+      </div>
+    </form>
+
+    <div *ngIf="!isAdmin" class="no-permission">
+      <p>No tienes permisos para acceder a esta página</p>
+    </div>
+  </div>
+</div>

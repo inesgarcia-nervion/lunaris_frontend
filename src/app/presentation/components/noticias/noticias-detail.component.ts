@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NewsService, NewsItem } from '../../services/news.service';
+import { NewsService, NewsItem } from '../../../domain/services/news.service';
 
 @Component({
   selector: 'app-noticia-detail',

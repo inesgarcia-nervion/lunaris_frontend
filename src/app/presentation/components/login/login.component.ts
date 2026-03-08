@@ -2,8 +2,8 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
-import { ListasService } from '../../services/listas.service';
+import { AuthService } from '../../../domain/services/auth.service';
+import { ListasService } from '../../../domain/services/listas.service';
 
 @Component({
   selector: 'app-login',
@@ -33,19 +33,6 @@ export class LoginComponent {
     }
    
     this.loading = true;
-    // Development bypass: accept admin/admin locally without contacting backend
-    if (this.username === 'admin' && this.password === 'admin') {
-      this.auth.devAdminLogin(this.rememberMe).subscribe({
-        next: () => {
-          try { this.listasService.assignUnownedListsToCurrentUser(this.username); } catch (e) { console.error('Error assigning list ownership', e); }
-          this.loading = false;
-          this.cdr.detectChanges();
-          this.router.navigate(['/menu']);
-        }
-      });
-      return;
-    }
-
 
     this.auth.login(this.username, this.password, this.rememberMe).subscribe({
       next: () => {

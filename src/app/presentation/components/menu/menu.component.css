@@ -322,7 +322,7 @@
 /* Sección de navegación rápida */
 .quick-nav {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 2rem;
   padding: 3rem;
   background: white;
@@ -878,5 +878,45 @@
 
   .nav-label {
     font-size: 0.95rem;
+  }
+}
+
+/* Estilo especial para el botón admin */
+.nav-card.admin-badge {
+  border: 2px solid #ffc107;
+  background: linear-gradient(135deg, #fff9e6 0%, #fffbf0 100%);
+  position: relative;
+}
+
+.nav-card.admin-badge::before {
+  content: '✨ ADMIN';
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.nav-card.admin-badge:hover {
+  border-color: #ff9800;
+  background: linear-gradient(135deg, #ffe082 0%, #ffd54f 100%);
+  box-shadow: 0 6px 16px rgba(255, 152, 0, 0.3);
+}
+
+.nav-card.admin-badge .nav-icon {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
   }
 }

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NewsService, NewsItem } from '../../services/news.service';
-import { AuthService } from '../../services/auth.service';
+import { NewsService, NewsItem } from '../../../domain/services/news.service';
+import { AuthService } from '../../../domain/services/auth.service';
 import { Router } from '@angular/router';
 
 

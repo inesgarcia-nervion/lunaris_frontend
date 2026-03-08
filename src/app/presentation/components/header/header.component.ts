@@ -3,10 +3,10 @@ import { Component, ChangeDetectorRef, OnInit, OnDestroy, ElementRef, HostListen
 import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BookSearchService, OpenLibraryBook, OpenLibrarySearchResponse } from '../../services/book-search.service';
+import { BookSearchService, OpenLibraryBook, OpenLibrarySearchResponse } from '../../../domain/services/book-search.service';
 import { Subscription } from 'rxjs';
-import { AuthService } from '../../services/auth.service';
-import { ListasService } from '../../services/listas.service';
+import { AuthService } from '../../../domain/services/auth.service';
+import { ListasService } from '../../../domain/services/listas.service';
 
 @Component({
   selector: 'app-header',

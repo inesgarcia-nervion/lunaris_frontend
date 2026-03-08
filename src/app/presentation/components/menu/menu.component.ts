@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BookSearchService, OpenLibraryBook, OpenLibrarySearchResponse } from '../../services/book-search.service';
+import { BookSearchService, OpenLibraryBook, OpenLibrarySearchResponse } from '../../../domain/services/book-search.service';
+import { AuthService } from '../../../domain/services/auth.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 
@@ -19,6 +20,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   error: string | null = null;
   successMessage: string | null = null;
   currentPage: number = 1;
+  isAdmin: boolean = false;
 
   // Local UI state for review/list selectors
   userRating: number = 0;
@@ -28,9 +30,15 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   private subs: Subscription[] = [];
 
-  constructor(public bookSearchService: BookSearchService, private router: Router) {}
+  constructor(public bookSearchService: BookSearchService, private auth: AuthService, private router: Router) {
+    this.isAdmin = this.auth.isAdmin();
+  }
 
   ngOnInit(): void {
+    // Subscribe to admin status changes
+    this.subs.push(this.auth.isAdmin$.subscribe(isAdmin => {
+      this.isAdmin = isAdmin;
+    }));
     this.subs.push(this.bookSearchService.response$.subscribe((r: OpenLibrarySearchResponse | null) => {
       this.searchResults = r?.docs || [];
       this.totalResults = r?.numFound || 0;

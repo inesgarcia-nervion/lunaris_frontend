@@ -100,7 +100,6 @@
         <div class="book-info-simple">
           <h3 class="book-title-simple">{{ book.title }}</h3>
           <p *ngIf="isSaga(book)" class="saga-badge">Saga</p>
-          <button *ngIf="isAdmin" class="admin-import-btn" (click)="importBook(book); $event.stopPropagation()">Añadir a BD</button>
         </div>
       </div>
     </div>
@@ -138,7 +137,6 @@
     <!-- Botón volver -->
     <div class="detail-top-actions">
       <button (click)="backToSearch()" class="btn btn-back">{{ backButtonLabel }}</button>
-      <button *ngIf="isAdmin" (click)="importBook(selectedBook)" class="btn btn-import">Importar a BD</button>
     </div>
 
     <div class="detail-container">

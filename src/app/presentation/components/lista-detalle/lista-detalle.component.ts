@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ListasService, ListaItem } from '../../services/listas.service';
+import { ListasService, ListaItem } from '../../../domain/services/listas.service';
 import { Subscription } from 'rxjs';
-import { BookSearchService, OpenLibraryBook } from '../../services/book-search.service';
+import { BookSearchService, OpenLibraryBook } from '../../../domain/services/book-search.service';
 
 @Component({
   selector: 'app-lista-detalle',

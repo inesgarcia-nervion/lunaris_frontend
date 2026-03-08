@@ -107,8 +107,10 @@ export class AuthService {
       if (rememberMe) {
         localStorage.setItem(this.TOKEN_KEY, token);
         localStorage.setItem(this.REMEMBER_KEY, 'true');
+        sessionStorage.removeItem(this.TOKEN_KEY);
       } else {
         sessionStorage.setItem(this.TOKEN_KEY, token);
+        localStorage.removeItem(this.TOKEN_KEY);
         localStorage.removeItem(this.REMEMBER_KEY);
       }
     }
@@ -116,7 +118,13 @@ export class AuthService {
 
 
   getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY) || sessionStorage.getItem(this.TOKEN_KEY);
+    const isJwt = (t: string | null) => t != null && t.split('.').length === 3;
+    const local = localStorage.getItem(this.TOKEN_KEY);
+    const session = sessionStorage.getItem(this.TOKEN_KEY);
+    // Discard stale non-JWT values (e.g. old dev-admin-token)
+    if (local && !isJwt(local)) { localStorage.removeItem(this.TOKEN_KEY); }
+    if (session && !isJwt(session)) { sessionStorage.removeItem(this.TOKEN_KEY); }
+    return (isJwt(local) ? local : null) || (isJwt(session) ? session : null);
   }
 
 
@@ -176,6 +184,8 @@ export class AuthService {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.REMEMBER_KEY);
     sessionStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem('lunaris_is_admin');
+    this.isAdminSubject.next(false);
     try {
       localStorage.removeItem('lunaris_current_user');
       sessionStorage.removeItem('lunaris_current_user');

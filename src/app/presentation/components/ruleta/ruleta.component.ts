@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ListasService, ListaItem } from '../../services/listas.service';
-import { BookSearchService, OpenLibraryBook } from '../../services/book-search.service';
+import { ListasService, ListaItem } from '../../../domain/services/listas.service';
+import { BookSearchService, OpenLibraryBook } from '../../../domain/services/book-search.service';
 
 @Component({
   selector: 'app-ruleta',

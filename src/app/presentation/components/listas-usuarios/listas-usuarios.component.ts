@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { BookSearchService, OpenLibraryBook } from '../../services/book-search.service';
-import { ListasService } from '../../services/listas.service';
+import { BookSearchService, OpenLibraryBook } from '../../../domain/services/book-search.service';
+import { ListasService } from '../../../domain/services/listas.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';

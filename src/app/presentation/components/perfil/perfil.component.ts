@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { ListasService, ListaItem } from '../../services/listas.service';
-import { AuthService } from '../../services/auth.service';
-import { BookSearchService } from '../../services/book-search.service';
+import { ListasService, ListaItem } from '../../../domain/services/listas.service';
+import { AuthService } from '../../../domain/services/auth.service';
+import { BookSearchService } from '../../../domain/services/book-search.service';
 
 @Component({
   selector: 'app-perfil',

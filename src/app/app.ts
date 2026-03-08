@@ -1,9 +1,9 @@
 import { Component, signal, OnInit, OnDestroy } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
-import { HeaderComponent } from './components/header/header.component';
+import { HeaderComponent } from './presentation/components/header/header.component';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import { ListasService } from './services/listas.service';
+import { ListasService } from './domain/services/listas.service';
 
 @Component({
   selector: 'app-root',

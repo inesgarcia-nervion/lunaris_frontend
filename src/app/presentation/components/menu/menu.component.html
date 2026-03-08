@@ -51,6 +51,11 @@
         <div class="nav-icon">📰</div>
         <div class="nav-label">Noticias</div>
       </div>
+      <!-- Botón admin para crear libros -->
+      <div *ngIf="isAdmin" class="nav-card admin-badge" (click)="navigate('/admin/create-book')">
+        <div class="nav-icon">📖</div>
+        <div class="nav-label">Crear Libro</div>
+      </div>
     </div>
   </div>
 </div>

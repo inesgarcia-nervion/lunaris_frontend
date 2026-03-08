@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, BehaviorSubject, forkJoin, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 /**
  * Interfaz para los libros de Open Library
@@ -116,8 +116,36 @@ export class BookSearchService {
       .set('limit', limit.toString())
       .set('offset', offset.toString());
 
-    return this.http.get<any>(`${this.apiUrl}/api/openlibrary/search`, { params })
-      .pipe(map(response => this.mapBooks(response)));
+    const openLibrary$ = this.http
+      .get<any>(`${this.apiUrl}/api/openlibrary/search`, { params })
+      .pipe(
+        map(response => this.mapBooks(response)),
+        catchError(() => of({ numFound: 0, start: 0, docs: [] } as OpenLibrarySearchResponse))
+      );
+
+    const localSearch$ = this.http
+      .get<any[]>(`${this.apiUrl}/books/search`, { params: new HttpParams().set('q', query) })
+      .pipe(
+        map(books => books.map(b => ({
+          key: b.apiId,
+          title: b.title,
+          authorNames: b.author ? [b.author] : [],
+          firstPublishYear: b.releaseYear,
+          coverUrl: b.coverImage,
+          description: b.description,
+          ratingsAverage: b.score
+        } as OpenLibraryBook))),
+        catchError(() => of([] as OpenLibraryBook[]))
+      );
+
+    return forkJoin([openLibrary$, localSearch$]).pipe(
+      map(([olResponse, localBooks]) => {
+        const localKeys = new Set(localBooks.map(b => b.key));
+        const filteredOl = olResponse.docs.filter(b => !localKeys.has(b.key));
+        const merged = [...localBooks, ...filteredOl];
+        return { numFound: merged.length, start: 0, docs: merged };
+      })
+    );
   }
 
   /**
@@ -265,6 +293,23 @@ export class BookSearchService {
    */
   importBook(book: OpenLibraryBook): Observable<any> {
     return this.http.post(`${this.apiUrl}/books/import/openlibrary`, book);
+  }
+
+  /**
+   * Crea un nuevo libro en la base de datos (solo admin)
+   * @param book Objeto con los datos del libro a crear
+   */
+  createBook(bookData: {
+    title: string;
+    author: string;
+    description?: string;
+    coverImage?: string;
+    releaseYear?: number;
+    score?: number;
+    source?: string;
+    userId?: number;
+  }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/books`, bookData);
   }
 
   /**
