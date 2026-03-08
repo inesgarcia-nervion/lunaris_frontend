@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -12,19 +12,23 @@ import { AuthService } from '../../../domain/services/auth.service';
   templateUrl: './admin-create-book.component.html',
   styleUrl: './admin-create-book.component.css'
 })
-export class AdminCreateBookComponent {
+export class AdminCreateBookComponent implements OnInit {
   title: string = '';
   author: string = '';
   description: string = '';
   coverImage: string = '';
   releaseYear: number | null = null;
   score: number | null = null;
-  
+
+  allGenres: { id: number; name: string }[] = [];
+  selectedGenreIds: number[] = [];
+  genreDropdownOpen: boolean = false;
+
   loading: boolean = false;
   error: string | null = null;
   success: string | null = null;
   filePreview: string | null = null;
-  
+
   isAdmin: boolean = false;
   currentUserId: number | null = null;
 
@@ -52,6 +56,47 @@ export class AdminCreateBookComponent {
       this.error = 'No tienes permisos para acceder a esta página';
       setTimeout(() => this.router.navigate(['/menu']), 2000);
     }
+  }
+
+  ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    this.bookService.getGenres().subscribe({
+      next: (genres) => { this.allGenres = genres; },
+      error: () => { /* no bloquear si falla */ }
+    });
+  }
+
+  toggleGenreDropdown(): void {
+    this.genreDropdownOpen = !this.genreDropdownOpen;
+  }
+
+  isGenreSelected(id: number): boolean {
+    return this.selectedGenreIds.includes(id);
+  }
+
+  toggleGenre(id: number): void {
+    const idx = this.selectedGenreIds.indexOf(id);
+    if (idx >= 0) {
+      this.selectedGenreIds.splice(idx, 1);
+    } else {
+      this.selectedGenreIds.push(id);
+    }
+  }
+
+  removeGenre(id: number): void {
+    this.selectedGenreIds = this.selectedGenreIds.filter(g => g !== id);
+  }
+
+  getGenreName(id: number): string {
+    return this.allGenres.find(g => g.id === id)?.name || '';
+  }
+
+  getDropdownLabel(): string {
+    if (this.selectedGenreIds.length === 0) return 'Selecciona géneros...';
+    return this.allGenres
+      .filter(g => this.selectedGenreIds.includes(g.id))
+      .map(g => g.name)
+      .join(', ');
   }
 
   onFileChange(event: Event): void {
@@ -85,6 +130,8 @@ export class AdminCreateBookComponent {
     this.filePreview = null;
     this.error = null;
     this.success = null;
+    this.selectedGenreIds = [];
+    this.genreDropdownOpen = false;
   }
 
   submit(): void {
@@ -122,7 +169,8 @@ export class AdminCreateBookComponent {
       releaseYear: this.releaseYear || undefined,
       score: this.score || undefined,
       source: 'custom', // Marcamos como libro creado manualmente
-      userId: this.currentUserId || undefined
+      userId: this.currentUserId || undefined,
+      genreIds: this.selectedGenreIds.length > 0 ? this.selectedGenreIds : undefined
     };
 
     this.bookService.createBook(bookData).subscribe({

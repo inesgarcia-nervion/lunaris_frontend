@@ -82,6 +82,38 @@
         />
       </div>
 
+      <!-- Géneros -->
+      <div class="form-group">
+        <label>Géneros</label>
+        <div class="genre-dropdown" [class.open]="genreDropdownOpen">
+          <button
+            type="button"
+            class="genre-toggle"
+            (click)="toggleGenreDropdown()"
+            [disabled]="loading"
+          >
+            <span class="genre-toggle-label">{{ getDropdownLabel() }}</span>
+            <span class="genre-arrow">{{ genreDropdownOpen ? '▲' : '▼' }}</span>
+          </button>
+          <div class="genre-options" *ngIf="genreDropdownOpen">
+            <label class="genre-option" *ngFor="let genre of allGenres">
+              <input
+                type="checkbox"
+                [checked]="isGenreSelected(genre.id)"
+                (change)="toggleGenre(genre.id)"
+              />
+              {{ genre.name }}
+            </label>
+          </div>
+        </div>
+        <div class="selected-genre-tags" *ngIf="selectedGenreIds.length > 0">
+          <span class="genre-tag" *ngFor="let id of selectedGenreIds">
+            {{ getGenreName(id) }}
+            <button type="button" class="genre-tag-remove" (click)="removeGenre(id)">×</button>
+          </span>
+        </div>
+      </div>
+
       <!-- Portada -->
       <div class="form-group">
         <label for="coverImage">Portada (URL o imagen)</label>
@@ -128,14 +160,6 @@
           [disabled]="loading"
         >
           {{ loading ? 'Creando...' : 'Crear Libro' }}
-        </button>
-        <button
-          type="button"
-          class="btn btn-secondary"
-          (click)="clearForm()"
-          [disabled]="loading"
-        >
-          Limpiar
         </button>
         <button
           type="button"

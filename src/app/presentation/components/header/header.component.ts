@@ -302,20 +302,32 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   getSagaName(book: any): string | null {
-    const sagaKeywords = ['saga', 'serie', 'trilogy', 'duology', 'cycle', 'series'];
     const title = (book.title || '').toLowerCase();
     if (book.series && Array.isArray(book.series) && book.series.length > 0) {
-      return book.series[0];
+      // Try entries with "series:Name" prefix — strip the prefix
+      for (const s of book.series) {
+        if (typeof s === 'string' && !s.includes('=') && /^series:/i.test(s)) {
+          const name = s.substring(s.indexOf(':') + 1).trim();
+          if (name.length > 0 && name.length < 100) return name;
+        }
+      }
+      // Fall back to plain names with no internal identifier pattern
+      const validSeries = book.series.filter((s: string) =>
+        typeof s === 'string' && !s.includes('=') && !/^[A-Za-z_]+:/.test(s)
+      );
+      if (validSeries.length > 0) return validSeries[0];
     }
     if (book.subject && Array.isArray(book.subject)) {
       for (const subject of book.subject) {
+        if (typeof subject !== 'string' || subject.includes('=')) continue;
         const subjectLower = subject.toLowerCase();
-        if (subjectLower.includes('saga') || subjectLower.includes('series') || 
+        if (subjectLower.includes('saga') || subjectLower.includes('series') ||
             subjectLower.includes('trilogy') || subjectLower.includes('cycle')) {
-          const sagaName = subject.split('--')[0].trim();
-          if (sagaName.length > 0 && sagaName.length < 100) {
-            return sagaName;
-          }
+          let sagaName = subject.split('--')[0].trim();
+          // Strip any "word:" prefix (e.g. "series:", "serie:")
+          const prefixMatch = sagaName.match(/^[A-Za-z_]+:(.+)/);
+          if (prefixMatch) sagaName = prefixMatch[1].trim();
+          if (sagaName.length > 0 && sagaName.length < 100) return sagaName;
         }
       }
     }
@@ -346,12 +358,27 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   getCategories(book: any): string[] {
-    const categories = book.subject || book.subjects || book.categories || [];
-    if (Array.isArray(categories) && categories.length > 0) {
-      return categories.slice(0, 5);
+    const raw: any[] = book.subject || book.subjects || book.categories || [];
+    if (Array.isArray(raw) && raw.length > 0) {
+      const seen = new Set<string>();
+      const result: string[] = [];
+      for (const s of raw) {
+        if (typeof s !== 'string' || s.includes('=') || /^[A-Za-z_]+:/.test(s)) continue;
+        // Split on commas to separate compound values like "Fiction, fantasy, general"
+        const parts = s.split(',').map((p: string) => p.trim()).filter(Boolean);
+        for (const part of parts) {
+          const key = part.toLowerCase();
+          if (!seen.has(key)) {
+            seen.add(key);
+            result.push(part);
+          }
+          if (result.length >= 5) break;
+        }
+        if (result.length >= 5) break;
+      }
+      if (result.length > 0) return result;
     }
-    const defaultCategories = this.inferCategories(book);
-    return defaultCategories;
+    return this.inferCategories(book);
   }
 
   private inferCategories(book: any): string[] {
