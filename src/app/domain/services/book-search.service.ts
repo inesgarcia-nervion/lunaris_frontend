@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject, forkJoin, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError as rxCatchError } from 'rxjs/operators';
 
 /**
  * Interfaz para los libros de Open Library
@@ -110,7 +110,7 @@ export class BookSearchService {
    * @param limit Número de resultados (default: 10)
    * @param offset Para paginación
    */
-  searchBooks(query: string, limit: number = 10, offset: number = 0): Observable<OpenLibrarySearchResponse> {
+  searchBooks(query: string, limit: number = 12, offset: number = 0): Observable<OpenLibrarySearchResponse> {
     let params = new HttpParams()
       .set('q', query)
       .set('limit', limit.toString())
@@ -120,7 +120,55 @@ export class BookSearchService {
       .get<any>(`${this.apiUrl}/api/openlibrary/search`, { params })
       .pipe(
         map(response => this.mapBooks(response)),
-        catchError(() => of({ numFound: 0, start: 0, docs: [] } as OpenLibrarySearchResponse))
+        rxCatchError(() => of({ numFound: 0, start: 0, docs: [] } as OpenLibrarySearchResponse))
+      );
+
+    // Local books are only fetched on page 1 (offset === 0) to avoid duplicates on subsequent pages
+    const localSearch$ = offset === 0
+      ? this.http
+          .get<any[]>(`${this.apiUrl}/books/search`, { params: new HttpParams().set('q', query) })
+          .pipe(
+            map(books => books.map(b => ({
+              key: b.apiId,
+              title: b.title,
+              authorNames: b.author ? [b.author] : [],
+              firstPublishYear: b.releaseYear,
+              coverUrl: b.coverImage,
+              description: b.description,
+              ratingsAverage: b.score
+            } as OpenLibraryBook))),
+            rxCatchError(() => of([] as OpenLibraryBook[]))
+          )
+      : of([] as OpenLibraryBook[]);
+
+    return forkJoin([openLibrary$, localSearch$]).pipe(
+      map(([olResponse, localBooks]) => {
+        const localKeys = new Set(localBooks.map(b => b.key));
+        const filteredOl = olResponse.docs.filter(b => !localKeys.has(b.key));
+        const merged = [...localBooks, ...filteredOl];
+        // Use OpenLibrary's real total so all pages are reachable via pagination
+        const total = (olResponse.numFound || 0) + (offset === 0 ? localBooks.length : 0);
+        return { numFound: total || merged.length, start: offset, docs: merged };
+      })
+    );
+  }
+
+  /**
+   * Recupera todos los resultados (OpenLibrary + locales) sin paginar.
+   * WARNING: solicita un límite alto a OpenLibrary para traer suficientes resultados
+   * y permitir paginación client-side. Ajustar `maxResults` según sea necesario.
+   */
+  searchAll(query: string, maxResults: number = 1000): Observable<OpenLibraryBook[]> {
+    let params = new HttpParams()
+      .set('q', query)
+      .set('limit', maxResults.toString())
+      .set('offset', '0');
+
+    const openLibrary$ = this.http
+      .get<any>(`${this.apiUrl}/api/openlibrary/search`, { params })
+      .pipe(
+        map(response => this.mapBooks(response).docs),
+        rxCatchError(() => of([] as OpenLibraryBook[]))
       );
 
     const localSearch$ = this.http
@@ -135,15 +183,14 @@ export class BookSearchService {
           description: b.description,
           ratingsAverage: b.score
         } as OpenLibraryBook))),
-        catchError(() => of([] as OpenLibraryBook[]))
+        rxCatchError(() => of([] as OpenLibraryBook[]))
       );
 
     return forkJoin([openLibrary$, localSearch$]).pipe(
-      map(([olResponse, localBooks]) => {
+      map(([olDocs, localBooks]) => {
         const localKeys = new Set(localBooks.map(b => b.key));
-        const filteredOl = olResponse.docs.filter(b => !localKeys.has(b.key));
-        const merged = [...localBooks, ...filteredOl];
-        return { numFound: merged.length, start: 0, docs: merged };
+        const filteredOl = (olDocs as OpenLibraryBook[]).filter(b => !localKeys.has(b.key));
+        return [...localBooks, ...filteredOl];
       })
     );
   }
@@ -171,13 +218,13 @@ export class BookSearchService {
     if (categories.length === 0) return;
 
     this.getGenres().pipe(
-      catchError(() => of([] as { id: number; name: string }[]))
+      rxCatchError(() => of([] as { id: number; name: string }[]))
     ).subscribe(existing => {
       const existingNames = new Set(existing.map(g => g.name.toLowerCase()));
       const toCreate = categories.filter(c => !existingNames.has(c.toLowerCase()));
       toCreate.forEach(name => {
         this.http.post(`${this.apiUrl}/genres`, { name })
-          .pipe(catchError(() => of(null)))
+          .pipe(rxCatchError(() => of(null)))
           .subscribe();
       });
     });
@@ -222,7 +269,7 @@ export class BookSearchService {
   /**
    * Ejecuta la búsqueda usando la query y la página actuales y publica los resultados
    */
-  searchCurrent(limit: number = 10): void {
+  searchCurrent(limit: number = 12): void {
     if (!this.currentQuery || !this.currentQuery.trim()) {
       this.setError('Por favor ingresa un término de búsqueda');
       return;
@@ -233,9 +280,9 @@ export class BookSearchService {
     this.setError(null);
     this.setSuccess(null);
 
+    // Paginación server-side: cada página pide sólo `limit` libros a OpenLibrary con el offset correcto
     this.searchBooks(this.currentQuery, limit, offset).subscribe({
       next: (response) => {
-        console.log('searchCurrent response for query:', this.currentQuery, response);
         this.publishResults(response);
         this.setLoading(false);
         if (!response.docs || response.docs.length === 0) {

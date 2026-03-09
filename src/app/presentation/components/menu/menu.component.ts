@@ -71,7 +71,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   }
 
   getTotalPages(): number {
-    return Math.ceil(this.totalResults / 10) || 1;
+    return Math.ceil(this.totalResults / 12) || 1;
   }
 
   hasNextPage(): boolean {
