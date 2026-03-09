@@ -35,11 +35,15 @@ export class PerfilComponent implements OnInit {
     private router: Router
   ) {}
 
+  onAvatarError(): void {
+    try { this.authService.setLocalAvatar(null); } catch (e) { /* ignore */ }
+  }
+
   ngOnInit(): void {
     this.username = this.authService.getCurrentUsername();
     // subscribe to avatar changes so perfil updates immediately
     try {
-      this.avatar = localStorage.getItem('lunaris_avatar');
+      this.avatar = this.authService.getLocalAvatar();
       this.authService.avatar$.subscribe(a => this.avatar = a);
     } catch (e) {
       console.warn('Unable to read avatar', e);

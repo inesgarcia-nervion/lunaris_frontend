@@ -35,7 +35,7 @@ export class ConfiguracionComponent implements OnInit {
     // normalize stored username to avoid whitespace/case mismatches
     this.username = stored ? stored.trim() : null;
     this.newUsername = this.username || '';
-    const storedAvatar = localStorage.getItem('lunaris_avatar');
+    const storedAvatar = this.auth.getLocalAvatar();
     // do not show existing avatar as a preview on load; only use it as the initial snapshot
     this.initialUsername = this.username || '';
     this.initialAvatar = storedAvatar || null;
@@ -129,11 +129,6 @@ export class ConfiguracionComponent implements OnInit {
   }
 
   private saveAppliedAvatar(toApply: string) {
-    try {
-      localStorage.setItem('lunaris_avatar', toApply);
-    } catch (e) {
-      console.warn('Unable to save avatar to localStorage', e);
-    }
     try { this.auth.setLocalAvatar(toApply); } catch (e) { console.warn(e); }
     this.success = 'Avatar aplicado correctamente';
     setTimeout(() => this.success = null, 2500);

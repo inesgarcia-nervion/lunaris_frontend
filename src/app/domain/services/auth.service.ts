@@ -39,6 +39,12 @@ export class AuthService {
     } catch (e) {
       // ignore initialization errors
     }
+    // Load the stored avatar for the current user (if any)
+    try {
+      this.avatarSubject.next(localStorage.getItem(this.getAvatarKey()) || null);
+    } catch (e) {
+      // ignore
+    }
   }
 
   // Use absolute backend URL to avoid proxy issues in dev server
@@ -75,6 +81,13 @@ export class AuthService {
           try { localStorage.setItem('lunaris_is_admin', admin ? 'true' : 'false'); } catch {}
         } catch (e) {
           console.warn('Unable to determine admin role', e);
+        }
+        // Load user-specific avatar on login
+        try {
+          const savedAvatar = localStorage.getItem(this.getAvatarKey(username)) || null;
+          this.avatarSubject.next(savedAvatar);
+        } catch (e) {
+          console.warn('Unable to load user avatar on login', e);
         }
       })
     );
@@ -165,14 +178,24 @@ export class AuthService {
 
 
   // Avatar observable: emits current avatar data (data URL or URL) and updates when changed
-  private avatarSubject = new BehaviorSubject<string | null>(localStorage.getItem('lunaris_avatar') || null);
+  private avatarSubject = new BehaviorSubject<string | null>(null);
   public avatar$ = this.avatarSubject.asObservable();
 
 
-  setLocalAvatar(avatar: string | null) {
+  private getAvatarKey(username?: string | null): string {
+    const u = username ?? this.getCurrentUsername();
+    return u ? `lunaris_avatar_${u}` : 'lunaris_avatar';
+  }
+
+  getLocalAvatar(username?: string | null): string | null {
+    try { return localStorage.getItem(this.getAvatarKey(username)); } catch { return null; }
+  }
+
+  setLocalAvatar(avatar: string | null, username?: string | null) {
+    const key = this.getAvatarKey(username);
     try {
-      if (avatar) localStorage.setItem('lunaris_avatar', avatar);
-      else localStorage.removeItem('lunaris_avatar');
+      if (avatar) localStorage.setItem(key, avatar);
+      else localStorage.removeItem(key);
     } catch (e) {
       console.error('Unable to set local avatar', e);
     }
@@ -186,6 +209,7 @@ export class AuthService {
     sessionStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem('lunaris_is_admin');
     this.isAdminSubject.next(false);
+    this.avatarSubject.next(null);
     try {
       localStorage.removeItem('lunaris_current_user');
       sessionStorage.removeItem('lunaris_current_user');

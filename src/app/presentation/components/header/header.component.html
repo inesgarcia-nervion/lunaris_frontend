@@ -39,7 +39,7 @@
       <!-- Menú de usuario -->
       <div class="user-menu">
         <button (click)="onUserButtonClick($event)" class="user-btn">
-          <img *ngIf="avatar; else noAvatar" [src]="avatar" class="user-avatar" alt="avatar" />
+          <img *ngIf="avatar; else noAvatar" [src]="avatar" class="user-avatar" alt="avatar" (error)="onAvatarError()" />
           <ng-template #noAvatar><span class="user-icon">👤</span></ng-template>
         </button>
        

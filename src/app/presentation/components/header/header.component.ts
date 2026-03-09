@@ -170,6 +170,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.router.navigate(['/login']);
   }
 
+  onAvatarError(): void {
+    try { this.auth.setLocalAvatar(null); } catch (e) { /* ignore */ }
+  }
+
   private clearAlertAfterDelay(): void {
     setTimeout(() => {
       this.error = null;
