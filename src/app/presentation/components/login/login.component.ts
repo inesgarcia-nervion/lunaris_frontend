@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -12,7 +12,7 @@ import { ListasService } from '../../../domain/services/listas.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   username = '';
   password = '';
   rememberMe = false;
@@ -23,6 +23,25 @@ export class LoginComponent {
 
   constructor(private auth: AuthService, public router: Router, private cdr: ChangeDetectorRef, private listasService: ListasService) {}
 
+  ngOnInit(): void {
+    try {
+      // If the user previously chose "remember me" we stored a flag and the username
+      const remembered = localStorage.getItem('lunaris_remember');
+      if (remembered === 'true') {
+        this.rememberMe = true;
+        this.username = (localStorage.getItem('lunaris_current_user') || '') as string;
+        const encodedPass = localStorage.getItem('lunaris_remember_pass');
+        if (encodedPass) {
+          try { this.password = atob(encodedPass); } catch { /* ignore decode error */ }
+        }
+      } else {
+        // If not remembered but there is a session-stored username, prefill it
+        this.username = (sessionStorage.getItem('lunaris_current_user') || '');
+      }
+    } catch (e) {
+      // ignore storage errors
+    }
+  }
 
   submit() {
     this.error = null;
@@ -41,6 +60,17 @@ export class LoginComponent {
           this.listasService.assignUnownedListsToCurrentUser(this.username);
         } catch (e) {
           console.error('Error assigning list ownership', e);
+        }
+        // Ensure remember flags and current user are stored (double-check)
+        try {
+          if (this.rememberMe) {
+            try { localStorage.setItem('lunaris_remember', 'true'); } catch {}
+            try { localStorage.setItem('lunaris_current_user', this.username); } catch {}
+          } else {
+            try { sessionStorage.setItem('lunaris_current_user', this.username); } catch {}
+          }
+        } catch (e) {
+          console.warn('Unable to persist remember-me settings', e);
         }
         this.loading = false;
         this.cdr.detectChanges();

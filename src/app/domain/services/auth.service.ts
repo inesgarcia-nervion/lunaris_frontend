@@ -15,6 +15,7 @@ export class AuthService {
   public isAdmin$ = this.isAdminSubject.asObservable();
   private readonly TOKEN_KEY = 'lunaris_jwt';
   private readonly REMEMBER_KEY = 'lunaris_remember';
+  private readonly REMEMBER_PASS_KEY = 'lunaris_remember_pass';
 
 
   constructor(private http: HttpClient) {
@@ -59,8 +60,10 @@ export class AuthService {
         try {
           if (rememberMe) {
             localStorage.setItem('lunaris_current_user', username);
+            localStorage.setItem(this.REMEMBER_PASS_KEY, btoa(password));
           } else {
             sessionStorage.setItem('lunaris_current_user', username);
+            localStorage.removeItem(this.REMEMBER_PASS_KEY);
           }
         } catch (e) {
           console.error('Unable to save current user', e);
@@ -204,18 +207,23 @@ export class AuthService {
 
 
   logout(): void {
+    // Read remember-me preference BEFORE removing anything
+    const remembered = localStorage.getItem(this.REMEMBER_KEY) === 'true';
+
     localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.REMEMBER_KEY);
     sessionStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem('lunaris_is_admin');
     this.isAdminSubject.next(false);
     this.avatarSubject.next(null);
-    try {
+
+    if (!remembered) {
+      // No "recuérdame": limpiar todo
+      localStorage.removeItem(this.REMEMBER_KEY);
       localStorage.removeItem('lunaris_current_user');
-      sessionStorage.removeItem('lunaris_current_user');
-    } catch (e) {
-      console.error('Unable to remove current user', e);
+      localStorage.removeItem(this.REMEMBER_PASS_KEY);
     }
+    // Siempre limpiar la sesión
+    sessionStorage.removeItem('lunaris_current_user');
   }
 
 
