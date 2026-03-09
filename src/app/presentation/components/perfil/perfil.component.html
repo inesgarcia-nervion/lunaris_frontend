@@ -1,7 +1,10 @@
 <div class="perfil-container">
     <div class="perfil-header">
-    <div class="avatar"><img *ngIf="avatar; else noAvatar" [src]="avatar" alt="avatar" (error)="onAvatarError()" /></div>
-    <ng-template #noAvatar><div class="avatar">👤</div></ng-template>
+    <div class="avatar-wrapper">
+      <span *ngIf="isAdmin" class="small-crown">👑</span>
+      <div class="avatar"><img *ngIf="avatar; else noAvatar" [src]="avatar" alt="avatar" (error)="onAvatarError()" /></div>
+      <ng-template #noAvatar><div class="avatar">👤</div></ng-template>
+    </div>
     <h1 class="username">{{ username || 'Usuario' }}</h1>
   </div>
 

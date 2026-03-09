@@ -15,6 +15,7 @@ import { BookSearchService } from '../../../domain/services/book-search.service'
 export class PerfilComponent implements OnInit {
   username: string | null = null;
   avatar: string | null = null;
+  isAdmin: boolean = false;
 
   // Profile fixed sections
   leyendo: any[] = [];
@@ -41,6 +42,7 @@ export class PerfilComponent implements OnInit {
 
   ngOnInit(): void {
     this.username = this.authService.getCurrentUsername();
+    this.isAdmin = this.authService.isAdmin();
     // subscribe to avatar changes so perfil updates immediately
     try {
       this.avatar = this.authService.getLocalAvatar();

@@ -33,6 +33,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   listas: any[] = [];
   avatar: string | null = null;
   isAdmin: boolean = false;
+  username: string | null = null;
 
   // Return only the user's custom lists (exclude reserved profile lists)
   get customLists(): any[] {
@@ -88,6 +89,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // reflect current admin state immediately
     this.isAdmin = this.auth.isAdmin();
+    this.username = this.auth.getCurrentUsername();
     this.subs.push(this.auth.isAdmin$.subscribe(v => { this.isAdmin = v; this.cdr.markForCheck(); }));
     // inicializar estado de ruta
     this.isMenuRoute = this.router.url.startsWith('/menu');
