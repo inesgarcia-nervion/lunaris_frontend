@@ -245,6 +245,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.currentPage--;
       this.bookSearchService.setCurrentPage(this.currentPage);
       this.bookSearchService.searchCurrent(this.limit);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
@@ -254,6 +255,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.currentPage++;
       this.bookSearchService.setCurrentPage(this.currentPage);
       this.bookSearchService.searchCurrent(this.limit);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
@@ -380,9 +382,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
             seen.add(key);
             result.push(capitalize(part));
           }
-          if (result.length >= 5) break;
         }
-        if (result.length >= 5) break;
       }
       if (result.length > 0) return result;
     }

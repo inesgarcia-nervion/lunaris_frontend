@@ -1308,6 +1308,15 @@
   padding: 10px; /* padding solo en la info */
 }
 
+.book-author-simple {
+  font-size: 15px;
+  color: #888;
+  margin: 2px 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .saga-badge {
   display: inline-block;
   background: #9d4edd;

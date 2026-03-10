@@ -135,7 +135,8 @@ export class BookSearchService {
               firstPublishYear: b.releaseYear,
               coverUrl: b.coverImage,
               description: b.description,
-              ratingsAverage: b.score
+              ratingsAverage: b.score,
+              categories: b.genres ? b.genres.map((g: any) => g.name) : []
             } as OpenLibraryBook))),
             rxCatchError(() => of([] as OpenLibraryBook[]))
           )
@@ -181,7 +182,8 @@ export class BookSearchService {
           firstPublishYear: b.releaseYear,
           coverUrl: b.coverImage,
           description: b.description,
-          ratingsAverage: b.score
+          ratingsAverage: b.score,
+          categories: b.genres ? b.genres.map((g: any) => g.name) : []
         } as OpenLibraryBook))),
         rxCatchError(() => of([] as OpenLibraryBook[]))
       );
