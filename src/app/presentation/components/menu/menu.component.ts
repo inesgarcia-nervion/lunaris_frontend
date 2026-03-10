@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BookSearchService, OpenLibraryBook, OpenLibrarySearchResponse } from '../../../domain/services/book-search.service';
 import { AuthService } from '../../../domain/services/auth.service';
+import { PeticionesService, BookRequestDto } from '../../../domain/services/peticiones.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 
@@ -21,6 +22,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   successMessage: string | null = null;
   currentPage: number = 1;
   isAdmin: boolean = false;
+  adminRequests: BookRequestDto[] = [];
 
   // Local UI state for review/list selectors
   userRating: number = 0;
@@ -30,7 +32,7 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   private subs: Subscription[] = [];
 
-  constructor(public bookSearchService: BookSearchService, private auth: AuthService, private router: Router) {
+  constructor(public bookSearchService: BookSearchService, private auth: AuthService, private router: Router, private peticiones: PeticionesService) {
     this.isAdmin = this.auth.isAdmin();
   }
 
@@ -39,6 +41,9 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.subs.push(this.auth.isAdmin$.subscribe(isAdmin => {
       this.isAdmin = isAdmin;
     }));
+    // If already admin or becomes admin, load recent requests to show in menu
+    if (this.isAdmin) this.loadAdminRequests();
+    this.subs.push(this.auth.isAdmin$.subscribe(isAdmin => { if (isAdmin) this.loadAdminRequests(); }));
     this.subs.push(this.bookSearchService.response$.subscribe((r: OpenLibrarySearchResponse | null) => {
       this.searchResults = r?.docs || [];
       this.totalResults = r?.numFound || 0;
@@ -49,6 +54,10 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.subs.push(this.bookSearchService.error$.subscribe(e => this.error = e));
     this.subs.push(this.bookSearchService.success$.subscribe(s => this.successMessage = s));
     this.subs.push(this.bookSearchService.currentPage$.subscribe(p => this.currentPage = p));
+  }
+
+  private loadAdminRequests(): void {
+    this.peticiones.getAll().subscribe({ next: (r) => { this.adminRequests = r || []; }, error: () => { this.adminRequests = []; } });
   }
 
   ngOnDestroy(): void {

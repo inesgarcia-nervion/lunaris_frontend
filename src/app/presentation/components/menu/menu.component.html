@@ -51,11 +51,27 @@
         <div class="nav-icon">📰</div>
         <div class="nav-label">Noticias</div>
       </div>
+      <div *ngIf="!isAdmin" class="nav-card" (click)="navigate('/peticiones')">
+        <div class="nav-icon">✉️</div>
+        <div class="nav-label">Peticiones</div>
+      </div>
       <!-- Botón admin para crear libros -->
       <div *ngIf="isAdmin" class="nav-card admin-badge" (click)="navigate('/admin/create-book')">
         <div class="nav-icon">📖</div>
         <div class="nav-label">Crear Libro</div>
       </div>
+      <div *ngIf="isAdmin" class="nav-card admin-badge" (click)="navigate('/admin/peticiones')">
+        <div class="nav-icon">🗂️</div>
+        <div class="nav-label">Peticiones (Admin)</div>
+      </div>
+    </div>
+    <!-- Vista previa de peticiones para admins (se cargan automáticamente) -->
+    <div *ngIf="isAdmin && adminRequests && adminRequests.length > 0" class="admin-requests">
+      <h3>Peticiones recientes</h3>
+      <ul>
+        <li *ngFor="let r of adminRequests | slice:0:3">{{r.title}} — {{r.author}}</li>
+      </ul>
+      <a class="link" (click)="navigate('/admin/peticiones')">Ver todas</a>
     </div>
   </div>
 </div>

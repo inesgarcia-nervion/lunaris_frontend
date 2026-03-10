@@ -1,0 +1,7 @@
+.admin-peticiones { max-width:900px; margin:20px auto; padding:16px }
+.cards { display:flex; flex-direction:column; gap:10px }
+.card { display:flex; justify-content:space-between; align-items:center; padding:10px; border:1px solid #ddd; border-radius:6px }
+.card-body .title { font-weight:700 }
+.card-body .author { color:#555 }
+.card-actions button { background:#ff6b6b; color:white; border:none; padding:6px 10px; border-radius:4px }
+.error { color:#a12a2a }

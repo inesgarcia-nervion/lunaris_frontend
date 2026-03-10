@@ -1,0 +1,8 @@
+.peticiones-container { max-width:600px; margin:20px auto; padding:16px; }
+.form-row { margin-bottom:12px; display:flex; flex-direction:column; }
+.form-row label { font-weight:600; margin-bottom:6px; }
+.form-row input { padding:8px; font-size:14px; }
+.actions { margin-top:12px }
+.message { margin-top:12px; padding:8px; border-radius:4px }
+.message.success { background:#e6ffed; color:#1a7f37 }
+.message.error { background:#ffe6e6; color:#a12a2a }

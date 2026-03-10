@@ -1,0 +1,20 @@
+<div class="admin-peticiones">
+  <h2>Peticiones de libros</h2>
+
+  <div *ngIf="loading">Cargando...</div>
+  <div *ngIf="error" class="error">{{error}}</div>
+
+  <div *ngIf="!loading && requests.length === 0">No hay peticiones actualmente.</div>
+
+  <div class="cards">
+    <div class="card" *ngFor="let r of requests">
+      <div class="card-body">
+        <div class="title">{{r.title}}</div>
+        <div class="author">{{r.author}}</div>
+      </div>
+      <div class="card-actions">
+        <button (click)="remove(r.id)" [disabled]="deletingId === r.id">{{ deletingId === r.id ? 'Eliminando...' : 'Eliminar' }}</button>
+      </div>
+    </div>
+  </div>
+</div>

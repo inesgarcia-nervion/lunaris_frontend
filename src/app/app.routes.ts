@@ -15,6 +15,8 @@ import { RuletaComponent } from './presentation/components/ruleta/ruleta.compone
 import { NoticiasComponent } from './presentation/components/noticias/noticias.component';
 import { NoticiasDetailComponent } from './presentation/components/noticias/noticias-detail.component';
 import { AdminCreateBookComponent } from './presentation/components/admin-create-book/admin-create-book.component';
+import { PeticionesComponent } from './presentation/components/peticiones/peticiones.component';
+import { AdminPeticionesComponent } from './presentation/components/admin-peticiones/admin-peticiones.component';
 
 export const routes: Routes = [
 	{ path: '', component: InicioComponent },
@@ -24,6 +26,8 @@ export const routes: Routes = [
 	{ path: 'reset-password', component: ResetPasswordComponent },
 	{ path: 'menu', component: MenuComponent, canActivate: [AuthGuard] },
 	{ path: 'admin/create-book', component: AdminCreateBookComponent, canActivate: [AuthGuard] },
+	{ path: 'peticiones', component: PeticionesComponent, canActivate: [AuthGuard] },
+	{ path: 'admin/peticiones', component: AdminPeticionesComponent, canActivate: [AuthGuard] },
 	{ path: 'listas-usuarios', component: ListasUsuariosComponent, canActivate: [AuthGuard] },
 	{ path: 'listas/:id', component: ListaDetalleComponent, canActivate: [AuthGuard] },
 	{ path: 'perfil', component: PerfilComponent, canActivate: [AuthGuard] },

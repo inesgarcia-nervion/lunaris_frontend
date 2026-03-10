@@ -1,0 +1,20 @@
+<div class="peticiones-container">
+  <h2>Pedir un libro</h2>
+
+  <div class="form-row">
+    <label for="pet-title">Título</label>
+    <input id="pet-title" [(ngModel)]="title" type="text" />
+  </div>
+
+  <div class="form-row">
+    <label for="pet-author">Autor</label>
+    <input id="pet-author" [(ngModel)]="author" type="text" />
+  </div>
+
+  <div class="actions">
+    <button type="button" (click)="submit()" [disabled]="loading">Enviar petición</button>
+  </div>
+
+  <div class="message success" *ngIf="success">{{success}}</div>
+  <div class="message error" *ngIf="error">{{error}}</div>
+</div>
