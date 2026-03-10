@@ -1,0 +1,20 @@
+<div class="bubble-post" (click)="onOpen()">
+  <div class="post-header">
+    <img *ngIf="post.user.avatarUrl; else avatarLetter" [src]="post.user.avatarUrl" class="avatar">
+    <ng-template #avatarLetter>
+      <div class="avatar letter">{{ post.user.name.charAt(0) }}</div>
+    </ng-template>
+    <div class="user-name">{{ post.user.name }}</div>
+  </div>
+
+  <div class="post-body" (click)="$event.stopPropagation()">
+    <img *ngIf="post.imageUrl" [src]="post.imageUrl" class="post-image">
+    <div class="post-text" [class.full]="!post.imageUrl">{{ post.text }}</div>
+  </div>
+
+  <div class="post-actions">
+    <button class="like" (click)="$event.stopPropagation(); onToggleLike()">❤️ {{ post.likes }}</button>
+    <button class="comment" (click)="$event.stopPropagation()">💬 {{ post.comments?.length || 0 }}</button>
+    <button class="edit" (click)="$event.stopPropagation(); onEdit()">✏️</button>
+  </div>
+</div>

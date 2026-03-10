@@ -1,0 +1,77 @@
+<div class="bubble-container">
+  <h2>Bubble</h2>
+
+  <section class="create-post">
+    <div class="create-controls">
+      <button class="open-create" *ngIf="!creating" (click)="openCreate()">➕ Crear publicación</button>
+      <div class="create-card" *ngIf="creating">
+        <div class="create-header">
+          <img *ngIf="auth?.getLocalAvatar() else letterAvatar" [src]="auth.getLocalAvatar()" class="avatar">
+          <ng-template #letterAvatar>
+            <div class="avatar letter">{{ (auth.getCurrentUsername() || 'Tú').charAt(0) }}</div>
+          </ng-template>
+          <div class="user-name">{{ auth.getCurrentUsername() || 'Tú' }}</div>
+        </div>
+
+        <div class="create-body">
+          <div class="image-col">
+            <div class="image-preview" *ngIf="newImagePreview"><img [src]="newImagePreview"></div>
+            <input type="file" accept="image/*" (change)="onImageSelected($event)">
+          </div>
+          <div class="text-col">
+            <textarea rows="4" placeholder="Escribe algo..." maxlength="1000" [(ngModel)]="newText"></textarea>
+            <div class="char-counter">{{ newText.length }} / 1000</div>
+          </div>
+        </div>
+
+        <div class="create-actions">
+          <button (click)="publish()" [disabled]="( !newText.trim() && !newImagePreview ) || imageLoading">Publicar</button>
+          <button class="cancel" (click)="cancelCreate()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="posts">
+    <div *ngIf="posts.length === 0" class="empty-state">Aún no hay publicaciones. Sé el primero en publicar.</div>
+    <app-bubble-post *ngFor="let p of posts" [post]="p" (like)="toggleLike($event)" (open)="openPost($event)" (edit)="startEdit($event)"></app-bubble-post>
+  </section>
+
+  <div class="detail-overlay" *ngIf="selected">
+    <div class="detail-card">
+      <button class="close" (click)="closeDetail()">✕</button>
+
+      <div class="detail-post">
+        <div class="post-header">
+          <img *ngIf="selected.user.avatarUrl; else letterAvatarDetail" [src]="selected.user.avatarUrl" class="avatar">
+          <ng-template #letterAvatarDetail>
+            <div class="avatar letter">{{ selected.user.name.charAt(0) }}</div>
+          </ng-template>
+          <div class="user-name">{{ selected.user.name }}</div>
+        </div>
+
+        <div class="detail-body">
+          <div *ngIf="selected.imageUrl" class="detail-image"><img [src]="selected.imageUrl"></div>
+          <div class="detail-text">{{ selected.text }}</div>
+        </div>
+
+        <div class="detail-actions">
+          <button (click)="toggleLike(selected.id)">❤️ {{ selected.likes }}</button>
+        </div>
+      </div>
+
+      <div class="comments">
+        <h3>Comentarios</h3>
+        <div *ngIf="!(selected.comments && selected.comments.length)">Sé el primero en comentar.</div>
+        <div *ngFor="let c of selected.comments">
+          <div class="comment"><strong>{{ c.user.name }}:</strong> {{ c.text }}</div>
+        </div>
+
+        <div class="add-comment">
+          <textarea [(ngModel)]="newCommentText" placeholder="Escribe un comentario..."></textarea>
+          <div class="comment-actions"><button (click)="addComment()" [disabled]="!newCommentText.trim()">Enviar</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

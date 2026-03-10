@@ -1,0 +1,48 @@
+.bubble-container { max-width:800px; margin:20px auto; }
+.mock-create { padding:12px; border:1px dashed #ccc; border-radius:8px; margin-bottom:12px; }
+.detail-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; }
+.detail-card { width:90%; max-width:720px; background:#fff; padding:18px; border-radius:10px; position:relative }
+.detail-card .close { position:absolute; right:12px; top:12px; border:none; background:transparent; font-size:18px; cursor:pointer }
+.comments { margin-top:12px }
+
+.detail-post .post-header { display:flex; gap:8px; align-items:center; margin-bottom:12px }
+.detail-post .avatar { width:48px; height:48px; border-radius:50%; object-fit:cover }
+.detail-body { display:flex; gap:16px; align-items:flex-start }
+.detail-image img { max-width:320px; width:100%; height:auto; border-radius:8px }
+.detail-text { flex:1; white-space:pre-wrap }
+.detail-body { flex-wrap:wrap }
+.detail-text { word-break:break-word; white-space:normal }
+.detail-actions { margin-top:8px }
+.comments .comment { padding:6px 0; border-bottom:1px solid #f0f0f0 }
+.add-comment textarea { width:100%; min-height:80px; padding:8px; border-radius:6px; border:1px solid #ddd; box-sizing:border-box }
+.comment-actions { margin-top:6px; display:flex; justify-content:flex-end }
+.comment-actions button { padding:6px 10px; border-radius:6px }
+.char-counter { margin-top:6px; font-size:12px; color:#666; text-align:right }
+
+.create-controls { margin-bottom:12px }
+.open-create { padding:8px 12px; border-radius:8px; border:1px solid #ccc; background:#fff; cursor:pointer }
+.create-card { border:1px solid #e0e0e0; padding:12px; border-radius:10px; background:#fff }
+.create-header { display:flex; align-items:center; gap:8px; margin-bottom:8px }
+.create-header .avatar { width:40px; height:40px; border-radius:50%; object-fit:cover }
+.create-header .avatar.letter { width:40px; height:40px; border-radius:50%; background:#ddd; display:flex; align-items:center; justify-content:center; font-weight:600 }
+.create-card { border:1px solid #e0e0e0; padding:12px; border-radius:10px; background:#fff; box-sizing:border-box; overflow:hidden }
+
+.create-body { display:flex; gap:16px; align-items:flex-start; min-width:0 }
+.image-col { flex: 0 0 160px; min-width:120px }
+.image-preview { min-height:120px; display:flex; align-items:center; justify-content:center; background:#fafafa; border-radius:8px; overflow:hidden }
+.image-preview img { width:100%; height:auto; max-height:300px; object-fit:cover; border-radius:8px; display:block }
+.image-col input[type="file"] { display:block; margin-top:8px; width:100%; font-size:0 }
+.image-col input[type="file"]::file-selector-button { font-size:14px; padding:6px 8px }
+.image-col input[type="file"]::-webkit-file-upload-button { font-size:14px; padding:6px 8px }
+.text-col { flex: 1 1 auto; min-width:0 }
+.text-col textarea { width:100%; padding:12px; border-radius:8px; border:1px solid #ccc; min-height:140px; box-sizing:border-box; resize:vertical }
+.create-actions { margin-top:8px; display:flex; gap:8px }
+.create-actions button { padding:8px 12px; border-radius:8px; cursor:pointer }
+.create-actions .cancel { background:transparent; border:1px solid #ccc }
+.empty-state { padding:18px; border:1px dashed #ddd; border-radius:8px; text-align:center; color:#666 }
+
+@media (max-width: 700px) {
+	.create-body { flex-direction:column }
+	.image-col { width:100%; }
+	.image-preview img { width:100%; height:auto }
+}

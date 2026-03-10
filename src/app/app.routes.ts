@@ -17,6 +17,7 @@ import { NoticiasDetailComponent } from './presentation/components/noticias/noti
 import { AdminCreateBookComponent } from './presentation/components/admin-create-book/admin-create-book.component';
 import { PeticionesComponent } from './presentation/components/peticiones/peticiones.component';
 import { AdminPeticionesComponent } from './presentation/components/admin-peticiones/admin-peticiones.component';
+import { BubbleFeedComponent } from './presentation/components/bubble-feed/bubble-feed.component';
 
 export const routes: Routes = [
 	{ path: '', component: InicioComponent },
@@ -35,5 +36,6 @@ export const routes: Routes = [
 	{ path: 'ruleta', component: RuletaComponent, canActivate: [AuthGuard] },
 	{ path: 'noticias/:id', component: NoticiasDetailComponent, canActivate: [AuthGuard] },
 	{ path: 'noticias', component: NoticiasComponent, canActivate: [AuthGuard] },
+	{ path: 'bubble', component: BubbleFeedComponent, canActivate: [AuthGuard] },
 	{ path: '**', redirectTo: 'login' }
 ];
