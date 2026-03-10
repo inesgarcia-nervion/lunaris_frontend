@@ -5,7 +5,7 @@
   <div *ngIf="isAdmin" class="admin-news-form">
     <h3>Crear noticia</h3>
     <input [(ngModel)]="title" placeholder="Título" />
-    <textarea [(ngModel)]="text" placeholder="Texto"></textarea>
+    <input [(ngModel)]="text" placeholder="Texto" />
     <input type="file" (change)="onFileChange($event)" accept="image/*" />
     <button (click)="addNews()">Crear</button>
   </div>

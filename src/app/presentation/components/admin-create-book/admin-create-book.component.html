@@ -43,14 +43,14 @@
       <!-- Descripción -->
       <div class="form-group">
         <label for="description">Descripción</label>
-        <textarea
+        <input
+          type="text"
           id="description"
           [(ngModel)]="description"
           name="description"
           placeholder="Descripción del libro (opcional)"
-          rows="4"
           [disabled]="loading"
-        ></textarea>
+        />
       </div>
 
       <!-- Año de lanzamiento -->

@@ -272,11 +272,12 @@
               <button *ngIf="currentUserReview" (click)="deleteReview()" class="btn btn-delete">Eliminar</button>
             </div>
           </div>
-          <textarea
+          <input
+            type="text"
             [(ngModel)]="userReview"
             placeholder="Escribe tu review aquí..."
-            class="review-textarea"
-          ></textarea>
+            class="review-textinput"
+          />
         </div>
       </div>
 
