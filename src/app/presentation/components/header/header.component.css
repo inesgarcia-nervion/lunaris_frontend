@@ -1753,8 +1753,8 @@
 }
 
 .review-date {
-  font-size: 12px;
-  color: #aaa;
+  font-size: 14px;
+  color: #666;
 }
 
 .review-rating-example {
@@ -1794,8 +1794,8 @@
 
 .review-text-example {
   margin: 0;
-  font-size: 13px;
-  color: #666;
+  font-size: 16px;
+  color: #444;
 }
 
 /* List and state section */

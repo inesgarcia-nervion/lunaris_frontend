@@ -256,6 +256,7 @@
                   type="number"
                   min="0"
                   max="5"
+                  step="0.1"
                   [(ngModel)]="userRating"
                   class="rating-input"
                 />
@@ -263,8 +264,10 @@
               </div>
             </div>
             <div class="review-actions">
-              <button (click)="submitReview()" class="btn btn-edit">Editar reseña</button>
-              <button class="btn btn-delete">Eliminar</button>
+              <button (click)="submitReview()" class="btn btn-primary" [disabled]="!userReview && !userRating">
+                {{ currentUserReview ? 'Editar reseña' : 'Publicar' }}
+              </button>
+              <button *ngIf="currentUserReview" (click)="deleteReview()" class="btn btn-delete">Eliminar</button>
             </div>
           </div>
           <textarea
@@ -279,19 +282,23 @@
       <!-- Reviews de usuarios -->
       <div class="user-reviews-section">
         <h3>Reviews de usuarios</h3>
-        <div class="user-review-example">
+        <div *ngIf="reviews && reviews.length === 0">No hay reviews todavía.</div>
+        <div *ngFor="let r of reviews" class="user-review-item">
           <div class="review-header-example">
-            <p class="reviewer-name-example">viva.Will.Herondale</p>
-            <span class="review-date">13/02/2026</span>
+            <p class="reviewer-name-example">{{ r.username || 'Usuario' }}</p>
+            <span class="review-date">{{ r.date | date:'dd/MM/yyyy' }}</span>
+            <button *ngIf="isAdmin || (r.username && r.username === username)"
+                    (click)="$event.stopPropagation(); deleteReviewById(r.id)"
+                    class="btn btn-delete btn-delete-inline">
+              Eliminar
+            </button>
           </div>
           <div class="review-rating-example">
-            <span class="star-example filled">★</span>
-            <span class="star-example filled">★</span>
-            <span class="star-example filled">★</span>
-            <span class="star-example filled">★</span>
-            <span class="star-example">★</span>
+            <ng-container *ngFor="let s of generateRatingArray(r.rating)">
+              <span class="star-example" [ngClass]="{ 'filled': s === 'full', 'half': s === 'half' }">★</span>
+            </ng-container>
           </div>
-          <p class="review-text-example">Amazing</p>
+          <p class="review-text-example">{{ r.comment }}</p>
         </div>
       </div>
     </div>

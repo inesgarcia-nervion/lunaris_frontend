@@ -7,6 +7,7 @@ import { BookSearchService, OpenLibraryBook, OpenLibrarySearchResponse } from '.
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../../domain/services/auth.service';
 import { ListasService } from '../../../domain/services/listas.service';
+import { ReviewService } from '../../../domain/services/review.service';
 
 @Component({
   selector: 'app-header',
@@ -46,6 +47,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   selectedStatus: string = '';
   userRating: number = 0;
   userReview: string = '';
+  reviews: any[] = [];
+  currentUserReview: any | null = null;
   isMenuRoute: boolean = false;
 
   constructor(
@@ -54,7 +57,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private auth: AuthService,
     private router: Router
     , private listasService: ListasService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private reviewService: ReviewService
   ) { }
 
   onUserButtonClick(event: Event) {
@@ -122,6 +126,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.subs.push(this.bookSearchService.selectedBook$.subscribe(b => {
       this.selectedBook = b;
       this.updateSelectedListFromBook(b);
+      // reset user's draft review UI when opening new book
+      this.userReview = '';
+      this.userRating = 0;
+      this.currentUserReview = null;
+      // load reviews for the selected book (if any)
+      this.loadReviewsForSelectedBook();
     }));
     // subscribe to avatar changes so header shows the current avatar immediately
     this.subs.push(this.auth.avatar$.subscribe(a => { this.avatar = a; this.cdr.markForCheck(); }));
@@ -591,11 +601,123 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe());
   }
+  private loadReviewsForSelectedBook(): void {
+    this.reviews = [];
+    this.currentUserReview = null;
+    if (!this.selectedBook || !this.selectedBook.key) return;
+    this.reviewService.getByBookApiId(this.selectedBook.key).subscribe({
+      next: (res) => {
+        this.reviews = (res || []).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        const currentUser = this.auth.getCurrentUsername() || this.listasService.getCurrentUser();
+        this.currentUserReview = this.reviews.find(r => r.username === currentUser) || null;
+        if (this.currentUserReview) {
+          this.userReview = this.currentUserReview.comment || '';
+          this.userRating = this.currentUserReview.rating || 0;
+        }
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error('Error cargando reseñas:', err);
+      }
+    });
+  }
 
   submitReview(): void {
-    if (this.userReview.trim()) {
-      this.successMessage = 'Review enviado correctamente';
+    if (!this.selectedBook || !this.selectedBook.key) {
+      this.error = 'No hay libro seleccionado';
       this.clearAlertAfterDelay();
+      return;
     }
+    // rating may be decimal, clamp to 0-5 and round to 1 decimal
+    let rating = Number(this.userRating) || 0;
+    if (rating < 0) rating = 0;
+    if (rating > 5) rating = 5;
+    rating = Math.round(rating * 10) / 10;
+
+    const payload: any = {
+      comment: this.userReview || '',
+      rating: rating,
+      date: new Date().toISOString(),
+      bookApiId: this.selectedBook.key,
+      username: this.auth.getCurrentUsername() || this.listasService.getCurrentUser()
+    };
+
+    if (this.currentUserReview && this.currentUserReview.id) {
+      // update
+      this.reviewService.update(this.currentUserReview.id, payload).subscribe({
+        next: (updated) => {
+          // replace in list
+          const idx = this.reviews.findIndex(r => r.id === updated.id);
+          if (idx >= 0) this.reviews[idx] = updated;
+          this.currentUserReview = updated;
+          this.successMessage = 'Reseña actualizada';
+          this.clearAlertAfterDelay();
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          console.error('Error actualizando reseña:', err);
+          this.error = 'Error al actualizar la reseña';
+          this.clearAlertAfterDelay();
+        }
+      });
+    } else {
+      // create
+      this.reviewService.create(payload).subscribe({
+        next: (created) => {
+          this.reviews.unshift(created);
+          this.currentUserReview = created;
+          this.successMessage = 'Reseña publicada';
+          this.clearAlertAfterDelay();
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          console.error('Error creando reseña:', err);
+          this.error = 'Error al publicar la reseña';
+          this.clearAlertAfterDelay();
+        }
+      });
+    }
+  }
+
+  deleteReview(): void {
+    if (!this.currentUserReview || !this.currentUserReview.id) return;
+    this.reviewService.delete(this.currentUserReview.id).subscribe({
+      next: () => {
+        this.reviews = this.reviews.filter(r => r.id !== this.currentUserReview.id);
+        this.currentUserReview = null;
+        this.userReview = '';
+        this.userRating = 0;
+        this.successMessage = 'Reseña eliminada';
+        this.clearAlertAfterDelay();
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error('Error eliminando reseña:', err);
+        this.error = 'Error al eliminar la reseña';
+        this.clearAlertAfterDelay();
+      }
+    });
+  }
+
+  deleteReviewById(id: number | undefined): void {
+    if (!id) return;
+    this.reviewService.delete(id).subscribe({
+      next: () => {
+        this.reviews = this.reviews.filter(r => r.id !== id);
+        if (this.currentUserReview && this.currentUserReview.id === id) {
+          this.currentUserReview = null;
+          this.userReview = '';
+          this.userRating = 0;
+        }
+        this.successMessage = 'Reseña eliminada';
+        this.clearAlertAfterDelay();
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error('Error eliminando reseña:', err);
+        this.error = 'Error al eliminar la reseña';
+        this.clearAlertAfterDelay();
+      }
+    });
   }
 }
