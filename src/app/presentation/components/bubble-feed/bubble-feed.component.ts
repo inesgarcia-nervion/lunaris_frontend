@@ -1,6 +1,8 @@
-import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
 import { BubblePostComponent, BubblePost } from '../bubble-post/bubble-post.component';
 import { AuthService } from '../../../domain/services/auth.service';
 
@@ -11,7 +13,7 @@ import { AuthService } from '../../../domain/services/auth.service';
   templateUrl: './bubble-feed.component.html',
   styleUrls: ['./bubble-feed.component.css']
 })
-export class BubbleFeedComponent {
+export class BubbleFeedComponent implements OnInit, OnDestroy {
   // Start empty — user will add posts later
   posts: BubblePost[] = [];
 
@@ -29,10 +31,19 @@ export class BubbleFeedComponent {
   imageLoading = false;
   private imageObjectUrl: string | null = null;
 
-  constructor(public auth: AuthService, private zone: NgZone, private cdr: ChangeDetectorRef) {}
+  constructor(public auth: AuthService, private zone: NgZone, private cdr: ChangeDetectorRef, private route: ActivatedRoute, private router: Router, private location: Location) {}
 
   ngOnInit(): void {
-    // nothing for now
+    // If route contains an id param, open that post when posts are available
+    this.route.params.subscribe(params => {
+      const id = params['id'];
+      if (!id) { this.selected = undefined; return; }
+      const pid = Number(id);
+      // If posts are already loaded, open immediately
+      const p = this.posts.find(x => x.id === pid);
+      if (p) this.selected = p;
+      // Otherwise keep selected undefined; when posts are published locally they will appear in the list
+    });
   }
 
   toggleLike(postId: number) {
@@ -42,11 +53,19 @@ export class BubbleFeedComponent {
     p.likes += p.liked ? 1 : -1;
   }
 
+
   openPost(post: BubblePost) {
     this.selected = post;
+    // Update URL without re-navigating so the component (and posts list) is not recreated
+    try { this.location.go(`/bubble/${post.id}`); } catch (_) {}
+    try { document.body.style.overflow = 'hidden'; } catch (_) {}
   }
 
-  closeDetail() { this.selected = undefined }
+  closeDetail() { this.selected = undefined; try { this.location.go('/bubble'); } catch (_) {} try { document.body.style.overflow = ''; } catch (_) {} }
+
+  ngOnDestroy(): void {
+    try { document.body.style.overflow = ''; } catch (_) {}
+  }
 
   addComment() {
     if (!this.selected) return;

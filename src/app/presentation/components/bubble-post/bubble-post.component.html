@@ -1,4 +1,4 @@
-<div class="bubble-post" (click)="onOpen()">
+<div class="bubble-post" (click)="onMaybeOpen($event)">
   <div class="post-header">
     <img *ngIf="post.user.avatarUrl; else avatarLetter" [src]="post.user.avatarUrl" class="avatar">
     <ng-template #avatarLetter>
@@ -7,8 +7,10 @@
     <div class="user-name">{{ post.user.name }}</div>
   </div>
 
-  <div class="post-body" (click)="$event.stopPropagation()">
-    <img *ngIf="post.imageUrl" [src]="post.imageUrl" class="post-image">
+  <div class="post-body">
+    <div *ngIf="post.imageUrl" class="post-image">
+      <img [src]="post.imageUrl" alt="post image">
+    </div>
     <div class="post-text" [class.full]="!post.imageUrl">{{ post.text }}</div>
   </div>
 

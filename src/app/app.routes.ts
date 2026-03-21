@@ -37,5 +37,6 @@ export const routes: Routes = [
 	{ path: 'noticias/:id', component: NoticiasDetailComponent, canActivate: [AuthGuard] },
 	{ path: 'noticias', component: NoticiasComponent, canActivate: [AuthGuard] },
 	{ path: 'bubble', component: BubbleFeedComponent, canActivate: [AuthGuard] },
+	{ path: 'bubble/:id', component: BubbleFeedComponent, canActivate: [AuthGuard] },
 	{ path: '**', redirectTo: 'login' }
 ];

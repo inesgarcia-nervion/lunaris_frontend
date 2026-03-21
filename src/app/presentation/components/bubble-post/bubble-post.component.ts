@@ -46,4 +46,12 @@ export class BubblePostComponent {
   onOpen() {
     this.open.emit(this.post);
   }
+
+  onMaybeOpen(event: MouseEvent) {
+    const target = event.target as HTMLElement | null;
+    if (!target) return;
+    // if the click originated inside a button, input, or element with role button, don't open
+    if (target.closest('button') || target.closest('input') || target.closest('a')) return;
+    this.onOpen();
+  }
 }

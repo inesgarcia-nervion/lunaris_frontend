@@ -3,9 +3,12 @@
   background: #fff;
   padding: 0.6rem 2rem;
   box-shadow: 0 2px 8px rgba(233, 228, 228, 0.08);
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 1000;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 1200;
   border-bottom: 1px solid #868686;
 }
 .navbar-container {

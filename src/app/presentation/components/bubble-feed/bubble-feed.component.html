@@ -19,7 +19,7 @@
             <input type="file" accept="image/*" (change)="onImageSelected($event)">
           </div>
           <div class="text-col">
-            <input type="text" placeholder="Escribe algo..." maxlength="1000" class="post-input" [(ngModel)]="newText">
+            <textarea placeholder="Escribe algo..." maxlength="1000" class="post-input" [(ngModel)]="newText" rows="5"></textarea>
             <div class="char-counter">{{ newText.length }} / 1000</div>
           </div>
         </div>
@@ -68,7 +68,7 @@
         </div>
 
         <div class="add-comment">
-          <input type="text" class="comment-input" [(ngModel)]="newCommentText" placeholder="Escribe un comentario...">
+          <textarea class="comment-input" [(ngModel)]="newCommentText" placeholder="Escribe un comentario..." rows="2"></textarea>
           <div class="comment-actions"><button (click)="addComment()" [disabled]="!newCommentText.trim()">Enviar</button></div>
         </div>
       </div>
