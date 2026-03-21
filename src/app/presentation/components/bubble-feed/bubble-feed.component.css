@@ -1,9 +1,14 @@
-.bubble-container { max-width:800px; margin:140px auto 20px; }
-.mock-create { padding:12px; border:1px dashed #ccc; border-radius:8px; margin-bottom:12px; }
+/* Raise the background closer to the header and lower the title inside the container */
+.bubble-container { max-width:920px; margin:120px auto 28px; padding:0 12px }
+
+/* Lower the main title so it sits further from the header */
+.bubble-container > h2 { margin-top: 56px; margin-bottom: 12px; font-size: 1.75rem; letter-spacing: -0.02em }
+.app-bg { background: linear-gradient(180deg,#f7f9fc 0%, #ffffff 100%); padding-bottom:40px }
+.mock-create { padding:14px; border:1px dashed #e6e9f2; border-radius:10px; margin-bottom:16px; background:#fbfbfd }
 .detail-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:flex-start; justify-content:center; padding-top:160px; box-sizing:border-box }
-.detail-card { width:90%; max-width:720px; background:#fff; padding:18px; border-radius:10px; position:relative; max-height:80vh; overflow:auto }
+.detail-card { width:90%; max-width:760px; background:#fff; padding:20px; border-radius:12px; position:relative; max-height:80vh; overflow:auto }
 .detail-card .close { position:absolute; right:12px; top:12px; border:none; background:transparent; font-size:18px; cursor:pointer }
-.comments { margin-top:12px }
+.comments { margin-top:18px }
 
 .comments { width:100%; box-sizing:border-box }
 .add-comment { width:100%; box-sizing:border-box }
@@ -43,7 +48,10 @@
 .create-actions { margin-top:8px; display:flex; gap:8px }
 .create-actions button { padding:8px 12px; border-radius:8px; cursor:pointer }
 .create-actions .cancel { background:transparent; border:1px solid #ccc }
-.empty-state { padding:18px; border:1px dashed #ddd; border-radius:8px; text-align:center; color:#666 }
+.empty-state { padding:18px; border:1px dashed #e6e9f2; border-radius:10px; text-align:center; color:#666; background:#fbfbfd }
+
+/* Accent color for buttons */
+.accent { color: #5b6ef6 }
 
 @media (max-width: 700px) {
 	.create-body { flex-direction:column }
