@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { ListasService, ListaItem } from '../../../domain/services/listas.service';
 import { Subscription } from 'rxjs';
@@ -18,14 +19,12 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
   private currentId: string = '';
   currentUser: string | null = null;
 
-  constructor(private route: ActivatedRoute, private listas: ListasService, private router: Router, private bookSearch: BookSearchService) {}
+  constructor(private route: ActivatedRoute, private listas: ListasService, private router: Router, private bookSearch: BookSearchService, private location: Location) {}
 
   ngOnInit(): void {
     this.currentId = this.route.snapshot.paramMap.get('id') || '';
     this.lista = this.listas.getById(this.currentId);
     this.currentUser = this.listas.getCurrentUser();
-    // Asegurar que al entrar en el detalle la página esté scrolleada arriba
-    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch {}
     // Subscribe to updates so new books show up live
     this.subs.push(this.listas.listas$.subscribe(() => {
       this.lista = this.listas.getById(this.currentId);
@@ -54,7 +53,7 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
     if (origin) {
       if (origin.type === 'menu') {
         this.bookSearch.setNavigationOrigin(null);
-        this.router.navigateByUrl('/menu');
+        this.location.back();
         return;
       }
       if (origin.type === 'listas') {

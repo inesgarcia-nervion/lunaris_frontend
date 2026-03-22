@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BookSearchService, OpenLibraryBook, OpenLibrarySearchResponse } from '../../../domain/services/book-search.service';
 import { AuthService } from '../../../domain/services/auth.service';
@@ -51,7 +51,7 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   private subs: Subscription[] = [];
 
-  constructor(public bookSearchService: BookSearchService, private auth: AuthService, private router: Router, private peticiones: PeticionesService, private listasService: ListasService, private reviewService: ReviewService, private newsService: NewsService) {
+  constructor(public bookSearchService: BookSearchService, private auth: AuthService, private router: Router, private peticiones: PeticionesService, private listasService: ListasService, private reviewService: ReviewService, private newsService: NewsService, private cdr: ChangeDetectorRef) {
     this.isAdmin = this.auth.isAdmin();
   }
 
@@ -98,6 +98,10 @@ export class MenuComponent implements OnInit, OnDestroy {
       this.allReviews = reviews;
       if (this.reviewPageIndex >= this.reviewTotalPages) {
         this.reviewPageIndex = Math.max(0, this.reviewTotalPages - 1);
+      }
+      // Force change detection so the menu shows latest reviews immediately
+      try { this.cdr.detectChanges(); } catch (e) { 
+
       }
     }));
     this.reviewService.refreshAll();
