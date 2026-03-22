@@ -73,5 +73,40 @@
       </ul>
       <a class="link" (click)="navigate('/admin/peticiones')">Ver todas</a>
     </div>
+
+    <!-- Sección: Listas creadas por usuarios -->
+    <div *ngIf="userLists.length > 0" class="user-lists-section">
+      <div class="user-lists-header">
+        <div class="section-deco">✦ • •</div>
+        <h2 class="section-title">Listas creadas por usuarios</h2>
+        <p class="section-desc">Descubre las diferentes listas creadas por los usuarios y encuentra inspiración en las selecciones de otros. Explora listas temáticas, populares o recientes de la comunidad y descubre nuevas lecturas que se adapten a tus intereses</p>
+      </div>
+      <div class="user-lists-grid">
+        <div *ngFor="let lista of pagedLists" class="list-card" (click)="navigate('/listas/' + lista.id)">
+          <div class="list-covers">
+            <ng-container *ngIf="getListCover(lista, 0) as cover0; else placeholder0">
+              <img [src]="cover0" alt="Portada" class="list-cover-img">
+            </ng-container>
+            <ng-template #placeholder0><div class="list-cover-placeholder"></div></ng-template>
+            <ng-container *ngIf="getListCover(lista, 1) as cover1; else placeholder1">
+              <img [src]="cover1" alt="Portada" class="list-cover-img">
+            </ng-container>
+            <ng-template #placeholder1><div class="list-cover-placeholder"></div></ng-template>
+          </div>
+          <div class="list-card-body">
+            <h3 class="list-card-title">{{ lista.nombre }}</h3>
+            <p class="list-card-desc">Descubre los {{ lista.nombre | lowercase }}</p>
+            <button class="btn-descubrelo" (click)="$event.stopPropagation(); navigate('/listas/' + lista.id)">Descúbrelo</button>
+          </div>
+        </div>
+      </div>
+      <div class="user-lists-footer">
+        <span class="list-page-info">{{ currentListPageDisplay }} de {{ listTotalPagesDisplay }}</span>
+        <div class="list-page-arrows">
+          <button class="arrow-btn" (click)="listPagePrev()" [disabled]="listPageIndex === 0">&#8592;</button>
+          <button class="arrow-btn" (click)="listPageNext()" [disabled]="listPageIndex >= listTotalPages - 1">&#8594;</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

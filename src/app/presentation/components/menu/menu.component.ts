@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { BookSearchService, OpenLibraryBook, OpenLibrarySearchResponse } from '../../../domain/services/book-search.service';
 import { AuthService } from '../../../domain/services/auth.service';
 import { PeticionesService, BookRequestDto } from '../../../domain/services/peticiones.service';
+import { ListasService, ListaItem } from '../../../domain/services/listas.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 
@@ -24,6 +25,11 @@ export class MenuComponent implements OnInit, OnDestroy {
   isAdmin: boolean = false;
   adminRequests: BookRequestDto[] = [];
 
+  // Listas de usuarios
+  userLists: ListaItem[] = [];
+  listPageIndex: number = 0;
+  readonly listsPerPage = 3;
+
   // Local UI state for review/list selectors
   userRating: number = 0;
   userReview: string = '';
@@ -32,7 +38,7 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   private subs: Subscription[] = [];
 
-  constructor(public bookSearchService: BookSearchService, private auth: AuthService, private router: Router, private peticiones: PeticionesService) {
+  constructor(public bookSearchService: BookSearchService, private auth: AuthService, private router: Router, private peticiones: PeticionesService, private listasService: ListasService) {
     this.isAdmin = this.auth.isAdmin();
   }
 
@@ -47,6 +53,16 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.subs.push(this.bookSearchService.response$.subscribe((r: OpenLibrarySearchResponse | null) => {
       this.searchResults = r?.docs || [];
       this.totalResults = r?.numFound || 0;
+    }));
+
+    // Listas creadas por usuarios (excluir listas de perfil)
+    this.subs.push(this.listasService.listas$.subscribe(listas => {
+      this.userLists = listas
+        .filter(l => !this.listasService.isProfileListName(l.nombre))
+        .sort((a, b) => Number(b.id) - Number(a.id));
+      if (this.listPageIndex >= this.listTotalPages) {
+        this.listPageIndex = Math.max(0, this.listTotalPages - 1);
+      }
     }));
 
     this.subs.push(this.bookSearchService.selectedBook$.subscribe(b => this.selectedBook = b));
@@ -171,5 +187,37 @@ export class MenuComponent implements OnInit, OnDestroy {
   navigate(path: string): void {
     console.log('Menu navigate called:', path);
     this.router.navigateByUrl(path);
+  }
+
+  // ===== Listas de usuarios =====
+  get pagedLists(): ListaItem[] {
+    const start = this.listPageIndex * this.listsPerPage;
+    return this.userLists.slice(start, start + this.listsPerPage);
+  }
+
+  get listTotalPages(): number {
+    return Math.max(1, Math.ceil(this.userLists.length / this.listsPerPage));
+  }
+
+  get currentListPageDisplay(): string {
+    return (this.listPageIndex + 1).toString().padStart(2, '0');
+  }
+
+  get listTotalPagesDisplay(): string {
+    return this.listTotalPages.toString().padStart(2, '0');
+  }
+
+  listPageNext(): void {
+    if (this.listPageIndex < this.listTotalPages - 1) this.listPageIndex++;
+  }
+
+  listPagePrev(): void {
+    if (this.listPageIndex > 0) this.listPageIndex--;
+  }
+
+  getListCover(lista: ListaItem, index: number): string {
+    const book = lista.libros?.[index];
+    if (!book) return '';
+    return this.bookSearchService.getCoverUrl(book);
   }
 }
