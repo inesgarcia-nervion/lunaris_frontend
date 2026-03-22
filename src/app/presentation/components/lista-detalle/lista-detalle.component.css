@@ -56,11 +56,14 @@
 }
 .libro-cover:hover { /* no movement on image hover; the whole card moves instead */ }
 .btn-back {
+  display: inline-block;
   background: none;
   border: none;
   color: #333;
   cursor: pointer;
-  margin-bottom: 12px;
+  margin: 100px 0 16px 0; /* aumentado para bajar mucho más */
+  padding: 6px 10px;
+  border-radius: 8px;
 }
 
 .libro-title { font-size: 1rem; margin: 8px 0 4px; cursor: pointer; }

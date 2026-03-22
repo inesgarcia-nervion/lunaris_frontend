@@ -5,3 +5,17 @@
 	overflow: hidden !important;
 	height: 100%;
 }
+
+/* Increase top spacing for main content containers so they are not too close to the header.
+   Exclude `.lista-detalle-container` which is already adjusted separately.
+   Note: .ruleta-container, .noticias-container and .bubble-container manage their
+   own margin in their component CSS to match the white-card layout used by listas. */
+.book-search-container,
+.admin-create-book-container,
+.config-container,
+.peticiones-container,
+.perfil-container,
+.app-container {
+  margin-top: 120px;
+}
+

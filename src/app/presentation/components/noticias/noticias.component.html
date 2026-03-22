@@ -5,7 +5,8 @@
   <div *ngIf="isAdmin" class="admin-news-form">
     <h3>Crear noticia</h3>
     <input [(ngModel)]="title" placeholder="Título" />
-    <input [(ngModel)]="text" placeholder="Texto" />
+    <input [(ngModel)]="text" placeholder="Descripción (resumen opcional)" />
+    <textarea [(ngModel)]="body" placeholder="Contenido de la noticia (obligatorio)" rows="6"></textarea>
     <input type="file" (change)="onFileChange($event)" accept="image/*" />
     <button (click)="addNews()">Crear</button>
   </div>
@@ -20,12 +21,20 @@
         <h2>{{ n.title }}</h2>
         <span class="news-date">{{ n.date | date:'long' }}</span>
       </div>
+      <p class="news-summary">{{ n.text ? (n.text | slice:0:140) + (n.text.length>140 ? '...' : '') : '' }}</p>
       <div *ngIf="n.image" class="news-image">
         <img [src]="n.image" alt="imagen noticia" />
       </div>
       <!-- Preview text removed: open detail page to see full content -->
       <div *ngIf="isAdmin" class="news-actions">
-        <button (click)="$event.stopPropagation(); remove(n.id)">Eliminar</button>
+        <ng-container *ngIf="pendingDeleteId !== n.id">
+          <button (click)="$event.stopPropagation(); confirmRemove(n.id)">Eliminar</button>
+        </ng-container>
+        <ng-container *ngIf="pendingDeleteId === n.id" class="inline-confirm">
+          <span>¿Eliminar?</span>
+          <button class="confirm-yes" (click)="$event.stopPropagation(); removeConfirmed(n.id)">Sí</button>
+          <button class="confirm-no" (click)="$event.stopPropagation(); cancelRemove()">No</button>
+        </ng-container>
       </div>
     </div>
   </div>

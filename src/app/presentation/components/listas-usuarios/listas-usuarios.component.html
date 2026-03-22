@@ -42,7 +42,7 @@
       <img *ngFor="let book of filteredListas[0].libros | slice:0:5" [src]="getCoverForTemplate(book)" class="preview-img" [alt]="getTitleForTemplate(book)" />
       <div *ngIf="filteredListas[0].libros.length > 5" class="more-badge">+{{ filteredListas[0].libros.length - 5 }}</div>
     </div>
-    <button class="btn-go-list" (click)="router.navigate(['/listas', filteredListas[0].id])" aria-label="Ver lista">→</button>
+    <button class="btn-go-list" (click)="openListFromListas(filteredListas[0].id)" aria-label="Ver lista">→</button>
   </div>
 
   <div *ngIf="filteredListas.length > 1" class="listas-grid">
@@ -55,7 +55,7 @@
         <img *ngFor="let book of lista.libros | slice:0:5" [src]="getCoverForTemplate(book)" class="preview-img" [alt]="getTitleForTemplate(book)" />
         <div *ngIf="lista.libros.length > 5" class="more-badge">+{{ lista.libros.length - 5 }}</div>
       </div>
-      <button class="btn-go-list" (click)="router.navigate(['/listas', lista.id])" aria-label="Ver lista">→</button>
+      <button class="btn-go-list" (click)="openListFromListas(lista.id)" aria-label="Ver lista">→</button>
       <!-- Aquí puedes mostrar más info de la lista -->
     </div>
   </div>

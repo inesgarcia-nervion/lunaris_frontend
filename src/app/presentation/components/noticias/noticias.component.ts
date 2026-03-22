@@ -17,8 +17,11 @@ export class NoticiasComponent implements OnInit {
   news: NewsItem[] = [];
   title = '';
   text = '';
+  body = '';
   imageData: string | null = null;
   isAdmin = false;
+  // id of the news pending deletion (for inline confirm)
+  pendingDeleteId: string | null = null;
 
 
   
@@ -52,17 +55,30 @@ export class NoticiasComponent implements OnInit {
     if (!this.isAdmin) return;
     const title = this.title.trim();
     const text = this.text.trim();
-    if (!title || !text) return alert('Título y texto son obligatorios');
-    this.newsService.addNews({ title, text, image: this.imageData || undefined });
+    const body = this.body.trim();
+    if (!title || !body) return alert('Título y contenido (body) son obligatorios');
+    // text (summary) is optional; body holds the full news content
+    this.newsService.addNews({ title, text, body, image: this.imageData || undefined });
     this.title = '';
     this.text = '';
+    this.body = '';
     this.imageData = null;
   }
 
 
-  remove(id: string) {
+  // Inline confirmation handlers
+  confirmRemove(id: string) {
     if (!this.isAdmin) return;
-    if (!confirm('Eliminar noticia?')) return;
+    this.pendingDeleteId = id;
+  }
+
+  cancelRemove() {
+    this.pendingDeleteId = null;
+  }
+
+  removeConfirmed(id: string) {
+    if (!this.isAdmin) return;
     this.newsService.removeNews(id);
+    if (this.pendingDeleteId === id) this.pendingDeleteId = null;
   }
 }

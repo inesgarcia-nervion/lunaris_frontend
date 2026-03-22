@@ -5,7 +5,8 @@ import { BehaviorSubject } from 'rxjs';
 export interface NewsItem {
   id: string;
   title: string;
-  text: string;
+  text: string; // short description / summary
+  body?: string; // full content of the news
   image?: string; // data URL or external URL
   date: string; // ISO
 }

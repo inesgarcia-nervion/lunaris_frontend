@@ -1,6 +1,13 @@
 
-.ruleta-container { padding: 32px 16px 16px; }
-.card { max-width: 720px; margin: 48px auto 0; display: flex; flex-direction: column; gap: 16px; }
+.ruleta-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 32px 24px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+.card { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 .big-box { min-height: 360px; display:flex; align-items:center; justify-content:center; background: transparent; color:var(--text-color, #000); position:relative; margin-bottom: 8px; }
 .placeholder { font-size: 24px; opacity:0.9; }
 

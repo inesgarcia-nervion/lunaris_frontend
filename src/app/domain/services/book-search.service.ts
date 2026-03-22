@@ -56,7 +56,7 @@ export class BookSearchService {
   private selectedBookSubject = new BehaviorSubject<OpenLibraryBook | null>(null);
   selectedBook$ = this.selectedBookSubject.asObservable();
   // navigation origin: tells where the detail was opened from (search or list)
-  private originSubject = new BehaviorSubject<{ type: 'search' | 'list' | 'other' | 'profile'; listId?: string } | null>(null);
+  private originSubject = new BehaviorSubject<{ type: 'search' | 'list' | 'other' | 'profile' | 'menu' | 'listas'; listId?: string } | null>(null);
   origin$ = this.originSubject.asObservable();
 
   private loadingSubject = new BehaviorSubject<boolean>(false);
@@ -232,11 +232,11 @@ export class BookSearchService {
     });
   }
 
-  setNavigationOrigin(origin: { type: 'search' | 'list' | 'other' | 'profile'; listId?: string } | null): void {
+  setNavigationOrigin(origin: { type: 'search' | 'list' | 'other' | 'profile' | 'menu' | 'listas'; listId?: string } | null): void {
     this.originSubject.next(origin);
   }
 
-  getNavigationOrigin(): { type: 'search' | 'list' | 'other' | 'profile'; listId?: string } | null {
+  getNavigationOrigin(): { type: 'search' | 'list' | 'other' | 'profile' | 'menu' | 'listas'; listId?: string } | null {
     return this.originSubject.value;
   }
 
@@ -391,6 +391,12 @@ export class BookSearchService {
    */
   getGenres(): Observable<{ id: number; name: string }[]> {
     return this.http.get<{ id: number; name: string }[]>(`${this.apiUrl}/genres`);
+  }
+
+  getBookByApiId(apiId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/books/by-api-id`, { params: { apiId } }).pipe(
+      rxCatchError(() => of(null))
+    );
   }
 
   /**

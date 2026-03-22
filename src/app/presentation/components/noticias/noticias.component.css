@@ -1,4 +1,11 @@
-.noticias-container { padding: 16px; }
+.noticias-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 32px 24px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
 .admin-news-form { margin-bottom: 20px; display:flex; flex-direction:column; gap:8px; max-width:600px; }
 .admin-news-form input { padding:8px; font-size:14px; }
 .news-list { display:flex; flex-direction:column; gap:12px; }
@@ -8,3 +15,16 @@
 .news-text { margin-top:8px; }
 .news-actions { margin-top:8px; }
 .empty-news { color:#666; }
+
+.inline-confirm { display:inline-flex; gap:8px; align-items:center; }
+.inline-confirm .confirm-yes { background:#d32f2f; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; }
+.inline-confirm .confirm-no { background:#eee; color:#333; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; }
+.admin-news-form textarea { padding:8px; font-size:14px; resize:vertical; }
+
+.news-summary {
+  margin: 8px 0 12px 0;
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  max-width: 100%;
+}

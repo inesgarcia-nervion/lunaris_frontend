@@ -96,6 +96,8 @@ export class ListasUsuariosComponent implements OnInit {
     // create list with current user as owner (ListasService handles owner assignment)
     const nueva = this.listasService.addList(name);
     // filteredListas se actualizará por suscripción
+    // marcar el origen para que al volver desde la vista detalle se pueda regresar aquí
+    this.bookSearchService.setNavigationOrigin({ type: 'listas' });
     this.router.navigate(['/listas', nueva.id]);
     // force change detection to ensure template updates (handles edge cases)
     this.cdr.detectChanges();
@@ -128,5 +130,10 @@ export class ListasUsuariosComponent implements OnInit {
     this.bookSearchService.setSelectedBook(b);
     this.bookSearchService.setSearchQuery('');
     this.router.navigate(['/menu']);
+  }
+
+  openListFromListas(listId: string): void {
+    this.bookSearchService.setNavigationOrigin({ type: 'listas' });
+    this.router.navigate(['/listas', listId]);
   }
 }

@@ -1,5 +1,5 @@
 <div class="lista-detalle-container">
-  <button class="btn-back" (click)="back()">← Volver a listas</button>
+  <button class="btn-back" (click)="back()">{{ backButtonLabel }}</button>
 
   <div *ngIf="lista; else notFound" class="lista-content">
     <!-- Header: title + owner actions -->

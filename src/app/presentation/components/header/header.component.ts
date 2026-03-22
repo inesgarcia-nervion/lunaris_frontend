@@ -639,6 +639,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
       rating: rating,
       date: new Date().toISOString(),
       bookApiId: this.selectedBook.key,
+      bookTitle: this.selectedBook.title || '',
+      coverUrl: this.bookSearchService.getCoverUrl(this.selectedBook),
       username: this.auth.getCurrentUsername() || this.listasService.getCurrentUser()
     };
 
@@ -652,6 +654,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
           this.currentUserReview = updated;
           this.successMessage = 'Reseña actualizada';
           this.clearAlertAfterDelay();
+          this.reviewService.refreshAll();
           this.cdr.markForCheck();
         },
         error: (err) => {
@@ -668,6 +671,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
           this.currentUserReview = created;
           this.successMessage = 'Reseña publicada';
           this.clearAlertAfterDelay();
+          this.reviewService.refreshAll();
           this.cdr.markForCheck();
         },
         error: (err) => {
@@ -689,6 +693,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.userRating = 0;
         this.successMessage = 'Reseña eliminada';
         this.clearAlertAfterDelay();
+        this.reviewService.refreshAll();
         this.cdr.markForCheck();
       },
       error: (err) => {

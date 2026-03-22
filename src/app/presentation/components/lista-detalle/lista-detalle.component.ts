@@ -24,6 +24,8 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
     this.currentId = this.route.snapshot.paramMap.get('id') || '';
     this.lista = this.listas.getById(this.currentId);
     this.currentUser = this.listas.getCurrentUser();
+    // Asegurar que al entrar en el detalle la página esté scrolleada arriba
+    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch {}
     // Subscribe to updates so new books show up live
     this.subs.push(this.listas.listas$.subscribe(() => {
       this.lista = this.listas.getById(this.currentId);
@@ -48,8 +50,18 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
 
   back(): void {
     const origin = this.bookSearch.getNavigationOrigin();
-    // If we came from a profile, return to the profile view instead of the general lists
+    // Respect origin types so "volver" returns to the place the user came from
     if (origin) {
+      if (origin.type === 'menu') {
+        this.bookSearch.setNavigationOrigin(null);
+        this.router.navigateByUrl('/menu');
+        return;
+      }
+      if (origin.type === 'listas') {
+        this.bookSearch.setNavigationOrigin(null);
+        this.router.navigateByUrl('/listas-usuarios');
+        return;
+      }
       if (origin.type === 'profile') {
         this.bookSearch.setNavigationOrigin(null);
         this.router.navigateByUrl('/perfil');
@@ -62,7 +74,17 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
         return;
       }
     }
+    // default
     this.router.navigateByUrl('/listas-usuarios');
+  }
+
+  get backButtonLabel(): string {
+    const origin = this.bookSearch.getNavigationOrigin();
+    if (!origin) return '← Volver';
+    if (origin.type === 'menu') return '← Volver al menú';
+    if (origin.type === 'listas') return '← Volver a listas';
+    if (origin.type === 'profile') return '← Volver al perfil';
+    return '← Volver';
   }
 
   ngOnDestroy(): void {

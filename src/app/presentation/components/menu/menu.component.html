@@ -82,7 +82,7 @@
         <p class="section-desc">Descubre las diferentes listas creadas por los usuarios y encuentra inspiración en las selecciones de otros. Explora listas temáticas, populares o recientes de la comunidad y descubre nuevas lecturas que se adapten a tus intereses</p>
       </div>
       <div class="user-lists-grid">
-        <div *ngFor="let lista of pagedLists" class="list-card" (click)="navigate('/listas/' + lista.id)">
+        <div *ngFor="let lista of pagedLists" class="list-card" (click)="openListFromMenu(lista.id)">
           <div class="list-covers">
             <ng-container *ngIf="getListCover(lista, 0) as cover0; else placeholder0">
               <img [src]="cover0" alt="Portada" class="list-cover-img">
@@ -96,7 +96,7 @@
           <div class="list-card-body">
             <h3 class="list-card-title">{{ lista.nombre }}</h3>
             <p class="list-card-desc">Descubre los {{ lista.nombre | lowercase }}</p>
-            <button class="btn-descubrelo" (click)="$event.stopPropagation(); navigate('/listas/' + lista.id)">Descúbrelo</button>
+            <button class="btn-descubrelo" (click)="$event.stopPropagation(); openListFromMenu(lista.id)">Descúbrelo</button>
           </div>
         </div>
       </div>
@@ -108,5 +108,78 @@
         </div>
       </div>
     </div>
+
+    <!-- Sección: Últimas reseñas de lecturas -->
+    <div *ngIf="allReviews.length > 0" class="reviews-section">
+      <div class="user-lists-header">
+        <div class="section-deco">✦ • •</div>
+        <h2 class="section-title">Últimas reseñas de lecturas</h2>
+        <p class="section-desc">Lee las últimas reseñas de nuestros usuarios sobre sus recientes lecturas. Descubre recomendaciones reales que pueden inspirar tu próxima elección y explora opiniones de otros lectores que te ayudarán a encontrar historias alineadas con tus gustos.</p>
+      </div>
+      <div class="user-lists-grid">
+        <div *ngFor="let review of pagedReviews" class="review-card">
+          <div class="review-cover-wrap">
+            <img [src]="getReviewCoverUrl(review)" alt="Portada" class="review-cover-img" />
+          </div>
+          <div class="review-stars">
+            <span *ngFor="let s of getReviewStars(review.rating)" class="review-star" [class.filled]="s === 'full'" [class.half]="s === 'half'">★</span>
+          </div>
+          <div class="review-card-body">
+            <h3 class="list-card-title">{{ review.bookTitle || review.bookApiId || 'Libro' }}</h3>
+            <p class="list-card-desc">{{ review.comment }}</p>
+            <div class="review-author">
+              <ng-container *ngIf="getReviewAvatarUrl(review.username) as avatarUrl; else letterAvatar">
+                <img [src]="avatarUrl" alt="Avatar" class="review-avatar review-avatar-img" />
+              </ng-container>
+              <ng-template #letterAvatar>
+                <div class="review-avatar">{{ (review.username || '?').charAt(0).toUpperCase() }}</div>
+              </ng-template>
+              <span class="review-username">{{ review.username }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="user-lists-footer">
+        <span class="list-page-info">{{ currentReviewPageDisplay }} de {{ reviewTotalPagesDisplay }}</span>
+        <div class="list-page-arrows">
+          <button class="arrow-btn" (click)="reviewPagePrev()" [disabled]="reviewPageIndex === 0">&#8592;</button>
+          <button class="arrow-btn" (click)="reviewPageNext()" [disabled]="reviewPageIndex >= reviewTotalPages - 1">&#8594;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Últimas noticias literarias -->
+    <div *ngIf="latestNews.length > 0" class="news-preview-section">
+      <div class="user-lists-header">
+        <div class="section-deco">✦ • •</div>
+        <h2 class="section-title">Últimas noticias literarias</h2>
+        <p class="section-desc">Descubre las últimas noticias de tus autores favoritos, conoce sus nuevos proyectos, lanzamientos y eventos literarios, y mantente siempre al día con todo lo que sucede en el mundo de la literatura.</p>
+      </div>
+      <div class="user-lists-grid">
+        <div *ngFor="let item of latestNews" class="news-preview-card">
+          <div class="news-preview-body">
+            <h3 class="news-preview-title">{{ item.title }}</h3>
+            <p class="news-preview-desc">{{ item.text }}</p>
+            <button class="btn-descubrelo" (click)="navigate('/noticias/' + item.id)">Leer más</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Ruleta literaria -->
+    <div class="ruleta-preview-section">
+      <div class="ruleta-preview-content">
+        <div class="ruleta-preview-left">
+          <h2 class="ruleta-section-title">Ruleta literaria</h2>
+          <p class="ruleta-section-subtitle">Si no sabes qué leer, ¡esta ruleta lo decide por ti!</p>
+          <p class="ruleta-section-desc">Si te sientes indeciso/a o simplemente quieres dejar que la suerte elija tu próxima tarea, nuestra ruleta aleatoria de pendientes es ideal. Con solo un clic, descubrirás qué pendiente debes abordar primero, ayudándote a organizar tu tiempo y mantenerte enfocado sin estrés.</p>
+        </div>
+        <div class="ruleta-preview-right">
+          <button class="btn-ruleta" (click)="navigate('/ruleta')">Descubre tu próxima lectura</button>
+        </div>
+      </div>
+      <img src="/assets/menu/MenuLibros.jpg" alt="" class="ruleta-bg-img" aria-hidden="true" />
+    </div>
+
   </div>
 </div>

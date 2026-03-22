@@ -3,6 +3,9 @@
   <h1>{{ noticia.title }}</h1>
   <div class="meta">{{ noticia.date | date:'long' }} {{ noticia.date | date:'shortTime' }}</div>
   <div *ngIf="noticia.image" class="image"><img [src]="noticia.image" alt="imagen noticia" /></div>
-  <div class="text"><p>{{ noticia.text }}</p></div>
+  <div class="text">
+    <p *ngIf="noticia.body && noticia.body.length > 0">{{ noticia.body }}</p>
+    <p *ngIf="!noticia.body">{{ noticia.text }}</p>
+  </div>
 </div>
 <div *ngIf="!noticia" class="not-found">Noticia no encontrada.</div>

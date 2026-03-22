@@ -4,6 +4,8 @@ import { BookSearchService, OpenLibraryBook, OpenLibrarySearchResponse } from '.
 import { AuthService } from '../../../domain/services/auth.service';
 import { PeticionesService, BookRequestDto } from '../../../domain/services/peticiones.service';
 import { ListasService, ListaItem } from '../../../domain/services/listas.service';
+import { ReviewService, ReviewDto } from '../../../domain/services/review.service';
+import { NewsService, NewsItem } from '../../../domain/services/news.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 
@@ -30,6 +32,17 @@ export class MenuComponent implements OnInit, OnDestroy {
   listPageIndex: number = 0;
   readonly listsPerPage = 3;
 
+  // Reseñas recientes
+  allReviews: ReviewDto[] = [];
+  reviewPageIndex: number = 0;
+  readonly reviewsPerPage = 3;
+
+  // Noticias recientes (3 últimas)
+  latestNews: NewsItem[] = [];
+
+  // Cache de portadas para libros custom (key: apiId, value: coverUrl)
+  private customCoverCache = new Map<string, string>();
+
   // Local UI state for review/list selectors
   userRating: number = 0;
   userReview: string = '';
@@ -38,7 +51,7 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   private subs: Subscription[] = [];
 
-  constructor(public bookSearchService: BookSearchService, private auth: AuthService, private router: Router, private peticiones: PeticionesService, private listasService: ListasService) {
+  constructor(public bookSearchService: BookSearchService, private auth: AuthService, private router: Router, private peticiones: PeticionesService, private listasService: ListasService, private reviewService: ReviewService, private newsService: NewsService) {
     this.isAdmin = this.auth.isAdmin();
   }
 
@@ -65,11 +78,29 @@ export class MenuComponent implements OnInit, OnDestroy {
       }
     }));
 
-    this.subs.push(this.bookSearchService.selectedBook$.subscribe(b => this.selectedBook = b));
+    this.subs.push(this.bookSearchService.selectedBook$.subscribe(b => {
+      this.selectedBook = b;
+      // When returning to hero view, reload reviews to pick up any new ones
+      if (!b) this.reviewService.refreshAll();
+    }));
     this.subs.push(this.bookSearchService.loading$.subscribe(l => this.loading = l));
     this.subs.push(this.bookSearchService.error$.subscribe(e => this.error = e));
     this.subs.push(this.bookSearchService.success$.subscribe(s => this.successMessage = s));
     this.subs.push(this.bookSearchService.currentPage$.subscribe(p => this.currentPage = p));
+
+    // Noticias recientes (3 últimas)
+    this.subs.push(this.newsService.news$.subscribe(items => {
+      this.latestNews = items.slice(0, 3);
+    }));
+
+    // Reseñas recientes — stay in sync via shared BehaviorSubject
+    this.subs.push(this.reviewService.reviews$.subscribe(reviews => {
+      this.allReviews = reviews;
+      if (this.reviewPageIndex >= this.reviewTotalPages) {
+        this.reviewPageIndex = Math.max(0, this.reviewTotalPages - 1);
+      }
+    }));
+    this.reviewService.refreshAll();
   }
 
   private loadAdminRequests(): void {
@@ -189,6 +220,12 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.router.navigateByUrl(path);
   }
 
+  openListFromMenu(listId: string): void {
+    // Mark origin so lista-detalle can return here
+    this.bookSearchService.setNavigationOrigin({ type: 'menu' });
+    this.router.navigate(['/listas', listId]);
+  }
+
   // ===== Listas de usuarios =====
   get pagedLists(): ListaItem[] {
     const start = this.listPageIndex * this.listsPerPage;
@@ -218,6 +255,71 @@ export class MenuComponent implements OnInit, OnDestroy {
   getListCover(lista: ListaItem, index: number): string {
     const book = lista.libros?.[index];
     if (!book) return '';
-    return this.bookSearchService.getCoverUrl(book);
+    const url = this.bookSearchService.getCoverUrl(book);
+    // If the book is custom and returns the default SVG, try to fetch the real cover
+    const isDefault = url === 'assets/default-book-cover.svg';
+    const apiId: string = (book as any).key || '';
+    if (isDefault && apiId.startsWith('custom-')) {
+      if (this.customCoverCache.has(apiId)) {
+        return this.customCoverCache.get(apiId)!;
+      }
+      // Put a placeholder immediately so we don't spam requests
+      this.customCoverCache.set(apiId, url);
+      this.bookSearchService.getBookByApiId(apiId).subscribe((b: any) => {
+        if (b?.coverImage) this.customCoverCache.set(apiId, b.coverImage);
+      });
+    }
+    return url;
+  }
+
+  // ===== Reseñas recientes =====
+  get pagedReviews(): ReviewDto[] {
+    const start = this.reviewPageIndex * this.reviewsPerPage;
+    return this.allReviews.slice(start, start + this.reviewsPerPage);
+  }
+
+  get reviewTotalPages(): number {
+    return Math.max(1, Math.ceil(this.allReviews.length / this.reviewsPerPage));
+  }
+
+  get currentReviewPageDisplay(): string {
+    return (this.reviewPageIndex + 1).toString().padStart(2, '0');
+  }
+
+  get reviewTotalPagesDisplay(): string {
+    return this.reviewTotalPages.toString().padStart(2, '0');
+  }
+
+  reviewPageNext(): void {
+    if (this.reviewPageIndex < this.reviewTotalPages - 1) this.reviewPageIndex++;
+  }
+
+  reviewPagePrev(): void {
+    if (this.reviewPageIndex > 0) this.reviewPageIndex--;
+  }
+
+  getReviewCoverUrl(review: ReviewDto): string {
+    if (review.coverUrl) return review.coverUrl;
+    // Fallback: derive from bookApiId (support several OpenLibrary patterns)
+    const id = review.bookApiId;
+    if (!id || id.startsWith('custom-')) return 'assets/default-book-cover.svg';
+    const last = id.split('/').pop();
+    if (!last) return 'assets/default-book-cover.svg';
+    // Try common OpenLibrary cover endpoints: works, books (olid), and cover id
+    const candidates = [
+      `https://covers.openlibrary.org/b/works/${last}-M.jpg`,
+      `https://covers.openlibrary.org/b/olid/${last}-M.jpg`,
+      `https://covers.openlibrary.org/b/id/${last}-M.jpg`
+    ];
+    // Return first candidate; browser will show fallback if 404 — choose the most likely first
+    return candidates[0] || 'assets/default-book-cover.svg';
+  }
+
+  getReviewAvatarUrl(username?: string): string | null {
+    return this.auth.getLocalAvatar(username) || null;
+  }
+
+  getReviewStars(rating: number | undefined): string[] {
+    return this.bookSearchService.generateRatingArray(rating);
   }
 }

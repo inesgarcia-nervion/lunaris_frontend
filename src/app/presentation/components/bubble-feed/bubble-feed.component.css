@@ -1,8 +1,15 @@
 /* Raise the background closer to the header and lower the title inside the container */
-.bubble-container { max-width:920px; margin:120px auto 28px; padding:0 12px }
+.bubble-container {
+  max-width: 920px;
+  margin: 40px auto 28px;
+  padding: 32px 24px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
 
 /* Lower the main title so it sits further from the header */
-.bubble-container > h2 { margin-top: 56px; margin-bottom: 12px; font-size: 1.75rem; letter-spacing: -0.02em }
+.bubble-container > h2 { margin-top: 0; margin-bottom: 12px; font-size: 1.75rem; letter-spacing: -0.02em }
 .app-bg { background: linear-gradient(180deg,#f7f9fc 0%, #ffffff 100%); padding-bottom:40px }
 .mock-create { padding:14px; border:1px dashed #e6e9f2; border-radius:10px; margin-bottom:16px; background:#fbfbfd }
 .detail-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:flex-start; justify-content:center; padding-top:160px; box-sizing:border-box }
