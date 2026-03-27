@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NewsService, NewsItem } from '../../../domain/services/news.service';
@@ -24,6 +24,8 @@ export class NoticiasComponent implements OnInit {
   pendingDeleteId: string | null = null;
 
   @ViewChild('bodyEditor') bodyEditorRef?: ElementRef<HTMLElement>;
+  @ViewChild('fileInput') fileInputRef?: ElementRef<HTMLInputElement>;
+  showCreateModal = false;
 
 
   
@@ -36,7 +38,7 @@ export class NoticiasComponent implements OnInit {
     this.auth.isAdmin$.subscribe(v => this.isAdmin = v);
   }
 
-  constructor(private newsService: NewsService, private auth: AuthService, private router: Router) {}
+  constructor(private newsService: NewsService, private auth: AuthService, private router: Router, private cdr: ChangeDetectorRef) {}
 
   openDetail(id: string) {
     this.router.navigate(['noticias', id]);
@@ -48,7 +50,7 @@ export class NoticiasComponent implements OnInit {
     if (!input.files || input.files.length === 0) return;
     const file = input.files[0];
     const reader = new FileReader();
-    reader.onload = () => { this.imageData = reader.result as string; };
+    reader.onload = () => { this.imageData = reader.result as string; this.cdr.detectChanges(); };
     reader.readAsDataURL(file);
   }
 
@@ -65,7 +67,15 @@ export class NoticiasComponent implements OnInit {
     this.text = '';
     this.body = '';
     this.imageData = null;
+    try { if (this.fileInputRef?.nativeElement) this.fileInputRef.nativeElement.value = ''; } catch (_) {}
     try { if (this.bodyEditorRef?.nativeElement) this.bodyEditorRef.nativeElement.innerHTML = ''; } catch (_) {}
+    this.closeCreateModal();
+  }
+
+  clearImage() {
+    this.imageData = null;
+    try { if (this.fileInputRef?.nativeElement) this.fileInputRef.nativeElement.value = ''; } catch (_) {}
+    this.cdr.detectChanges();
   }
 
   // Contenteditable helpers
@@ -91,6 +101,24 @@ export class NoticiasComponent implements OnInit {
     } catch (e) {
       return el.textContent || '';
     }
+  }
+
+  openCreateModal() {
+    this.showCreateModal = true;
+    // small timeout to ensure modal renders before focus
+    setTimeout(() => { try { this.bodyEditorRef?.nativeElement?.focus(); } catch (_) {} }, 50);
+  }
+
+  closeCreateModal() {
+    this.showCreateModal = false;
+    // clear form fields when closing/cancelling
+    this.title = '';
+    this.text = '';
+    this.body = '';
+    this.imageData = null;
+    try { if (this.fileInputRef?.nativeElement) this.fileInputRef.nativeElement.value = ''; } catch (_) {}
+    try { if (this.bodyEditorRef?.nativeElement) this.bodyEditorRef.nativeElement.innerHTML = ''; } catch (_) {}
+    try { this.cdr.detectChanges(); } catch (_) {}
   }
 
 

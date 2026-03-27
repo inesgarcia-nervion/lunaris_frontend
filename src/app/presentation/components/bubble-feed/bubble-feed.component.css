@@ -47,6 +47,8 @@
 .image-col { flex: 0 0 160px; min-width:120px }
 .image-preview { min-height:120px; height:180px; display:flex; align-items:center; justify-content:center; background:#fafafa; border-radius:8px; overflow:hidden }
 .image-preview img { width:100%; height:100%; object-fit:cover; object-position:top; border-radius:8px; display:block }
+.create-card .image-preview { min-height:80px; height:100px; width:120px; flex:0 0 120px }
+.create-card .image-preview img { object-position:center }
 .image-col input[type="file"] { display:block; margin-top:8px; width:100%; font-size:0 }
 .image-col input[type="file"]::file-selector-button { font-size:14px; padding:6px 8px }
 .image-col input[type="file"]::-webkit-file-upload-button { font-size:14px; padding:6px 8px }

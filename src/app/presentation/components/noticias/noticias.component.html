@@ -2,13 +2,27 @@
   <h1>Noticias</h1>
 
 
-  <div *ngIf="isAdmin" class="admin-news-form">
-    <h3>Crear noticia</h3>
-    <input [(ngModel)]="title" placeholder="Título" />
-    <input [(ngModel)]="text" placeholder="Descripción (resumen opcional)" />
-    <div #bodyEditor contenteditable="true" class="news-body-editor editable" (input)="onBodyInput(bodyEditor)" (keydown)="onBodyKeydown($event, bodyEditor)" aria-label="Contenido de la noticia (obligatorio)"></div>
-    <input type="file" (change)="onFileChange($event)" accept="image/*" />
-    <button (click)="addNews()">Crear</button>
+  <!-- Floating create button for admins -->
+  <button *ngIf="isAdmin" class="floating-create" (click)="openCreateModal()" aria-label="Crear noticia">+</button>
+
+  <!-- Create modal (for admins) -->
+  <div *ngIf="showCreateModal" class="create-modal-overlay">
+    <div class="create-modal">
+      <button class="close-modal" (click)="closeCreateModal()">✕</button>
+      <h3>Crear noticia</h3>
+      <input [(ngModel)]="title" placeholder="Título" />
+      <input [(ngModel)]="text" placeholder="Descripción (resumen opcional)" />
+      <div #bodyEditor contenteditable="true" class="news-body-editor editable" (input)="onBodyInput(bodyEditor)" (keydown)="onBodyKeydown($event, bodyEditor)" aria-label="Contenido de la noticia (obligatorio)"></div>
+      <input #fileInput type="file" (change)="onFileChange($event)" accept="image/*" />
+      <div *ngIf="imageData" class="image-preview create-modal-preview">
+        <button class="preview-remove" (click)="$event.stopPropagation(); clearImage()" aria-label="Eliminar imagen">✕</button>
+        <img [src]="imageData" alt="preview" />
+      </div>
+      <div class="modal-actions">
+        <button (click)="addNews()">Crear</button>
+        <button class="cancel" (click)="closeCreateModal()">Cancelar</button>
+      </div>
+    </div>
   </div>
 
 

@@ -1,5 +1,13 @@
-.noticia-detail { padding:16px; max-width:900px; }
+.noticia-detail {
+	padding:16px;
+	max-width:900px;
+	background: #fff;
+	border: 1px solid #e6e9f2;
+	border-radius: 10px;
+	box-shadow: 0 8px 20px rgba(22,31,84,0.04);
+}
 .noticia-detail .image img { max-width:100%; height:auto; border-radius:6px; margin:12px 0; }
 .noticia-detail .meta { color:#666; margin-bottom:8px; }
+.noticia-detail .text { white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; }
 .back { background:none; border:0; color:#007bff; cursor:pointer; margin-bottom:8px; }
 .not-found { color:#999; padding:16px; }
