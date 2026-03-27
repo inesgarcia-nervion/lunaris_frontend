@@ -6,7 +6,7 @@
     <h3>Crear noticia</h3>
     <input [(ngModel)]="title" placeholder="Título" />
     <input [(ngModel)]="text" placeholder="Descripción (resumen opcional)" />
-    <textarea [(ngModel)]="body" placeholder="Contenido de la noticia (obligatorio)" rows="6"></textarea>
+    <div #bodyEditor contenteditable="true" class="news-body-editor editable" (input)="onBodyInput(bodyEditor)" (keydown)="onBodyKeydown($event, bodyEditor)" aria-label="Contenido de la noticia (obligatorio)"></div>
     <input type="file" (change)="onFileChange($event)" accept="image/*" />
     <button (click)="addNews()">Crear</button>
   </div>

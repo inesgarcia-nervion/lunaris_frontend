@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -27,6 +27,9 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
 
   selected?: BubblePost;
   newCommentText = '';
+
+  @ViewChild('postEditor') postEditorRef?: ElementRef<HTMLElement>;
+  @ViewChild('commentEditor') commentEditorRef?: ElementRef<HTMLElement>;
 
   imageLoading = false;
   private imageObjectUrl: string | null = null;
@@ -79,6 +82,8 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     const p = this.posts.find(x => x.id === this.selected!.id);
     if (p) p.comments = this.selected.comments;
     this.newCommentText = '';
+    // clear editor content
+    try { if (this.commentEditorRef?.nativeElement) this.commentEditorRef.nativeElement.innerHTML = ''; } catch (_) {}
   }
 
   openCreate() { this.creating = true }
@@ -118,6 +123,75 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     };
     reader.onerror = () => { this.zone.run(() => { this.newImagePreview = this.newImagePreview || null; this.imageLoading = false; this.cdr.detectChanges(); }); };
     reader.readAsDataURL(f);
+  }
+
+  // ---- Contenteditable helpers ----
+  onPostInput(el: HTMLElement) {
+    const text = this.extractTextFromEditable(el);
+    if (text.length > 1000) {
+      const truncated = text.slice(0, 1000);
+      this.setEditableFromText(el, truncated);
+      this.newText = truncated;
+    } else {
+      this.newText = text;
+    }
+  }
+
+  onCommentInput(el: HTMLElement) {
+    const text = this.extractTextFromEditable(el);
+    this.newCommentText = text;
+  }
+
+  onPostKeydown(event: KeyboardEvent, el: HTMLElement) {
+    // Prevent exceeding max length when typing
+    const text = this.extractTextFromEditable(el);
+    if (text.length >= 1000 && !this.isControlKey(event)) {
+      // allow navigation and deletion
+      event.preventDefault();
+      return;
+    }
+  }
+
+  onCommentKeydown(event: KeyboardEvent, el: HTMLElement) {
+    // Allow Enter for newline; do nothing special here but keep hook for future rules
+  }
+
+  private isControlKey(e: KeyboardEvent) {
+    return e.key === 'Backspace' || e.key === 'Delete' || e.ctrlKey || e.metaKey || e.key.startsWith('Arrow');
+  }
+
+  private extractTextFromEditable(el: HTMLElement): string {
+    try {
+      const clone = el.cloneNode(true) as HTMLElement;
+      // convert <br> to newlines
+      clone.querySelectorAll('br').forEach(b => b.replaceWith(document.createTextNode('\n')));
+      // convert block elements to their text plus newline
+      clone.querySelectorAll('div, p').forEach(node => {
+        const t = node.textContent || '';
+        node.replaceWith(document.createTextNode(t + '\n'));
+      });
+      // textContent preserves spaces; trim trailing newline
+      let txt = clone.textContent || '';
+      if (txt.endsWith('\n')) txt = txt.slice(0, -1);
+      return txt;
+    } catch (e) {
+      return el.textContent || '';
+    }
+  }
+
+  private setEditableFromText(el: HTMLElement, text: string) {
+    // escape HTML and replace newlines with <br>
+    const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const html = esc(text).replace(/\n/g, '<br>');
+    el.innerHTML = html;
+    // place caret at end
+    try {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      const sel = window.getSelection();
+      if (sel) { sel.removeAllRanges(); sel.addRange(range); }
+    } catch (_) {}
   }
 
   publish() {
@@ -162,6 +236,7 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
   private clearForm() {
     this.newText = '';
     this.newImageFile = null;
+    try { if (this.postEditorRef?.nativeElement) this.postEditorRef.nativeElement.innerHTML = ''; } catch (_) {}
     if (this.imageObjectUrl) { try { URL.revokeObjectURL(this.imageObjectUrl); } catch {} this.imageObjectUrl = null; }
     this.newImagePreview = null;
   }

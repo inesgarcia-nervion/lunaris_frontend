@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NewsService, NewsItem } from '../../../domain/services/news.service';
@@ -22,6 +22,8 @@ export class NoticiasComponent implements OnInit {
   isAdmin = false;
   // id of the news pending deletion (for inline confirm)
   pendingDeleteId: string | null = null;
+
+  @ViewChild('bodyEditor') bodyEditorRef?: ElementRef<HTMLElement>;
 
 
   
@@ -63,6 +65,32 @@ export class NoticiasComponent implements OnInit {
     this.text = '';
     this.body = '';
     this.imageData = null;
+    try { if (this.bodyEditorRef?.nativeElement) this.bodyEditorRef.nativeElement.innerHTML = ''; } catch (_) {}
+  }
+
+  // Contenteditable helpers
+  onBodyInput(el: HTMLElement) {
+    this.body = this.extractTextFromEditable(el);
+  }
+
+  onBodyKeydown(event: KeyboardEvent, el: HTMLElement) {
+    // allow newlines; no special rules for now
+  }
+
+  private extractTextFromEditable(el: HTMLElement): string {
+    try {
+      const clone = el.cloneNode(true) as HTMLElement;
+      clone.querySelectorAll('br').forEach(b => b.replaceWith(document.createTextNode('\n')));
+      clone.querySelectorAll('div, p').forEach(node => {
+        const t = node.textContent || '';
+        node.replaceWith(document.createTextNode(t + '\n'));
+      });
+      let txt = clone.textContent || '';
+      if (txt.endsWith('\n')) txt = txt.slice(0, -1);
+      return txt;
+    } catch (e) {
+      return el.textContent || '';
+    }
   }
 
 

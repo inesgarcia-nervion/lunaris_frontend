@@ -20,6 +20,7 @@
 .inline-confirm .confirm-yes { background:#d32f2f; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; }
 .inline-confirm .confirm-no { background:#eee; color:#333; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; }
 .admin-news-form textarea { padding:8px; font-size:14px; resize:vertical; }
+.admin-news-form .news-body-editor { padding:8px; font-size:14px; min-height:140px; border:1px solid #ddd; border-radius:6px; box-sizing:border-box; white-space:pre-wrap; }
 
 .news-summary {
   margin: 8px 0 12px 0;
