@@ -14,6 +14,9 @@
       class="input-crear-lista"
       autofocus
     />
+    <label class="create-list-privada">
+      <input type="checkbox" [(ngModel)]="newListPrivate" /> Privada
+    </label>
     <button class="btn-confirm" (click)="confirmCreate()">Crear</button>
     <button class="btn-cancel" (click)="cancelCreate()">Cancelar</button>
   </div>
@@ -36,6 +39,15 @@
   <div *ngIf="filteredListas.length > 0" class="lista-featured">
     <div class="lista-header">
       <h2 class="lista-nombre">{{ filteredListas[0].nombre }}</h2>
+      <div class="list-author">
+        <ng-container *ngIf="getOwnerAvatar(filteredListas[0].owner) as avatarUrl; else letterAvatarFeatured">
+          <img [src]="avatarUrl" alt="Avatar" class="list-avatar list-avatar-img" />
+        </ng-container>
+        <ng-template #letterAvatarFeatured>
+          <div class="list-avatar">{{ (filteredListas[0].owner || '?').charAt(0).toUpperCase() }}</div>
+        </ng-template>
+        <span class="list-username">{{ filteredListas[0].owner }}</span>
+      </div>
       <div *ngIf="filteredListas[0].owner && filteredListas[0].owner === currentUser" class="lista-actions-featured"></div>
     </div>
     <div *ngIf="filteredListas[0].libros.length > 0" class="previews">
@@ -49,6 +61,15 @@
     <div *ngFor="let lista of filteredListas | slice:1" class="lista-card">
       <div class="lista-header">
         <h2 class="lista-nombre">{{ lista.nombre }}</h2>
+        <div class="list-author">
+          <ng-container *ngIf="getOwnerAvatar(lista.owner) as avatarUrl; else letterAvatarCard">
+            <img [src]="avatarUrl" alt="Avatar" class="list-avatar list-avatar-img" />
+          </ng-container>
+          <ng-template #letterAvatarCard>
+            <div class="list-avatar">{{ (lista.owner || '?').charAt(0).toUpperCase() }}</div>
+          </ng-template>
+          <span class="list-username">{{ lista.owner }}</span>
+        </div>
         <div *ngIf="lista.owner && lista.owner === currentUser" class="lista-actions-card"></div>
       </div>
       <div *ngIf="lista.libros.length > 0" class="previews">

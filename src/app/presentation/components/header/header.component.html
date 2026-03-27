@@ -59,7 +59,7 @@
           <a (click)="navigateAndClose('/configuracion')" class="dropdown-item">Configuración</a>
           <a *ngIf="isAdmin" (click)="navigateAndClose('/noticias')" class="dropdown-item">Gestionar noticias</a>
           <a *ngIf="isAdmin" (click)="navigateAndClose('/admin/peticiones')" class="dropdown-item">Peticiones de libros</a>
-          <a *ngIf="!isAdmin" (click)="navigateAndClose('/peticiones')" class="dropdown-item">Pedir un libro</a>
+          <!-- 'Pedir un libro' moved to footer for users -->
           <hr />
           <button (click)="logout()" class="dropdown-item logout-btn">
             Cerrar sesión

@@ -1,13 +1,62 @@
 <div class="bubble-container">
   <h2>Bubble</h2>
 
-  <section class="create-post">
-    <div class="create-controls">
-      <button class="open-create" *ngIf="!creating" (click)="openCreate()">➕ Crear publicación</button>
-      <div class="create-card" *ngIf="creating">
+  <!-- Top create removed; creation now via floating button -->
+
+  <section class="posts">
+    <div *ngIf="posts.length === 0" class="empty-state">Aún no hay publicaciones. Sé el primero en publicar.</div>
+    <div *ngFor="let p of posts">
+      <ng-container *ngIf="editingId !== p.id">
+        <app-bubble-post [post]="p" (like)="toggleLike($event)" (open)="openPost($event)" (edit)="startEdit($event)" [canDelete]="auth.isAdmin() || (auth.getCurrentUsername() === p.user.name)" (delete)="confirmRemovePost($event)"></app-bubble-post>
+        <div *ngIf="auth.isAdmin() || (auth.getCurrentUsername() === p.user.name)" class="news-actions">
+          <ng-container *ngIf="pendingDeleteId !== p.id">
+            <button (click)="$event.stopPropagation(); confirmRemovePost(p.id)">Eliminar</button>
+          </ng-container>
+          <ng-container *ngIf="pendingDeleteId === p.id" class="inline-confirm">
+            <span>¿Eliminar?</span>
+            <button class="confirm-yes" (click)="$event.stopPropagation(); removeConfirmedPost(p.id)">Sí</button>
+            <button class="confirm-no" (click)="$event.stopPropagation(); cancelRemovePost()">No</button>
+          </ng-container>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="editingId === p.id">
+        <div class="create-card edit-card">
+          <div class="create-header">
+            <img *ngIf="auth?.getLocalAvatar() else letterAvatarEdit" [src]="auth.getLocalAvatar()" class="avatar">
+            <ng-template #letterAvatarEdit>
+              <div class="avatar letter">{{ (auth.getCurrentUsername() || 'Tú').charAt(0) }}</div>
+            </ng-template>
+            <div class="user-name">{{ auth.getCurrentUsername() || 'Tú' }}</div>
+          </div>
+
+          <div class="create-body">
+            <div class="image-col">
+              <div class="image-preview" *ngIf="newImagePreview"><img [src]="newImagePreview"></div>
+              <input type="file" accept="image/*" (change)="onImageSelected($event)">
+            </div>
+            <div class="text-col">
+              <div #postEditor contenteditable="true" class="post-input editable" (input)="onPostInput(postEditor)" (keydown)="onPostKeydown($event, postEditor)"></div>
+              <div class="char-counter">{{ newText.length }} / 1000</div>
+            </div>
+          </div>
+
+          <div class="create-actions">
+            <button (click)="publish()" [disabled]="( !newText.trim() && !newImagePreview ) || imageLoading">Guardar</button>
+            <button class="cancel" (click)="cancelCreate()">Cancelar</button>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </section>
+
+  <!-- Modal create overlay opened by floating button -->
+  <div *ngIf="creating" class="create-modal-overlay">
+    <div class="create-modal">
+      <button class="close-modal" (click)="cancelCreate()">✕</button>
+      <div class="create-card">
         <div class="create-header">
-          <img *ngIf="auth?.getLocalAvatar() else letterAvatar" [src]="auth.getLocalAvatar()" class="avatar">
-          <ng-template #letterAvatar>
+          <img *ngIf="auth?.getLocalAvatar() else letterAvatarModal" [src]="auth.getLocalAvatar()" class="avatar">
+          <ng-template #letterAvatarModal>
             <div class="avatar letter">{{ (auth.getCurrentUsername() || 'Tú').charAt(0) }}</div>
           </ng-template>
           <div class="user-name">{{ auth.getCurrentUsername() || 'Tú' }}</div>
@@ -30,12 +79,10 @@
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <section class="posts">
-    <div *ngIf="posts.length === 0" class="empty-state">Aún no hay publicaciones. Sé el primero en publicar.</div>
-    <app-bubble-post *ngFor="let p of posts" [post]="p" (like)="toggleLike($event)" (open)="openPost($event)" (edit)="startEdit($event)"></app-bubble-post>
-  </section>
+  <!-- Floating create button (fixed) -->
+  <button *ngIf="!creating" class="floating-create" (click)="openCreate()" aria-label="Crear publicación">+</button>
 
   <div class="detail-overlay" *ngIf="selected">
     <div class="detail-card">
@@ -64,7 +111,13 @@
         <h3>Comentarios</h3>
         <div *ngIf="!(selected.comments && selected.comments.length)">Sé el primero en comentar.</div>
         <div *ngFor="let c of selected.comments">
-          <div class="comment"><strong>{{ c.user.name }}:</strong> {{ c.text }}</div>
+          <div class="comment">
+            <strong>{{ c.user.name }}:</strong>
+            <div class="comment-body">{{ c.text }}</div>
+            <div class="comment-meta">
+              <button class="comment-delete" *ngIf="auth.isAdmin() || (auth.getCurrentUsername() === c.user.name)" (click)="$event.stopPropagation(); deleteComment(c.id)">Eliminar</button>
+            </div>
+          </div>
         </div>
 
         <div class="add-comment">

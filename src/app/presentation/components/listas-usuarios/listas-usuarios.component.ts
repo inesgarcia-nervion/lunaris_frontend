@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { BookSearchService, OpenLibraryBook } from '../../../domain/services/book-search.service';
+import { AuthService } from '../../../domain/services/auth.service';
 import { ListasService } from '../../../domain/services/listas.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -18,13 +19,15 @@ export class ListasUsuariosComponent implements OnInit {
   filteredListas: any[] = [];
   showCreateInput: boolean = false;
   newListName: string = '';
+  newListPrivate: boolean = false;
   currentUser: string | null = null;
 
   constructor(
     public bookSearchService: BookSearchService,
     private cdr: ChangeDetectorRef,
     private listasService: ListasService,
-    public router: Router
+    public router: Router,
+    public auth: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -75,7 +78,12 @@ export class ListasUsuariosComponent implements OnInit {
     return listas.filter(l => {
       try {
         const nombre = (l.nombre || '').toString().toLowerCase();
-        return !skip.has(nombre);
+        // Exclude profile lists and exclude private lists for non-admins
+        const isProfile = skip.has(nombre);
+        const isPrivate = !!l.isPrivate;
+        if (isProfile) return false;
+        if (isPrivate && !this.auth.isAdmin()) return false;
+        return true;
       } catch {
         return true;
       }
@@ -94,7 +102,7 @@ export class ListasUsuariosComponent implements OnInit {
       return;
     }
     // create list with current user as owner (ListasService handles owner assignment)
-    const nueva = this.listasService.addList(name);
+    const nueva = this.listasService.addList(name, !!this.newListPrivate);
     // filteredListas se actualizará por suscripción
     // marcar el origen para que al volver desde la vista detalle se pueda regresar aquí
     this.bookSearchService.setNavigationOrigin({ type: 'listas' });
@@ -104,6 +112,7 @@ export class ListasUsuariosComponent implements OnInit {
     // limpiar estado del input
     this.newListName = '';
     this.showCreateInput = false;
+    this.newListPrivate = false;
   }
 
   cancelCreate(): void {
@@ -114,6 +123,10 @@ export class ListasUsuariosComponent implements OnInit {
   // Template helper: accept unknown (from localStorage) and return cover URL
   getCoverForTemplate(book: unknown): string {
     return this.bookSearchService.getCoverUrl(book as OpenLibraryBook);
+  }
+
+  getOwnerAvatar(owner?: string | null): string | null {
+    return this.auth.getLocalAvatar(owner) || null;
   }
   getTitleForTemplate(book: unknown): string {
     try {

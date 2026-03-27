@@ -8,6 +8,8 @@ export interface ListaItem {
   libros: OpenLibraryBook[];
   // optional owner identifier (e.g. username)
   owner?: string | null;
+  // whether the list is private (not shown in public menus)
+  isPrivate?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -41,8 +43,8 @@ export class ListasService {
     return this.listasSubject.getValue();
   }
 
-  addList(nombre: string): ListaItem {
-    const nueva: ListaItem = { id: Date.now().toString(), nombre, libros: [], owner: this.getCurrentUser() };
+  addList(nombre: string, isPrivate: boolean = false): ListaItem {
+    const nueva: ListaItem = { id: Date.now().toString(), nombre, libros: [], owner: this.getCurrentUser(), isPrivate };
     const listas = [nueva, ...this.getAll()];
     this.saveToStorage(listas);
     this.listasSubject.next(listas);
@@ -121,7 +123,7 @@ export class ListasService {
     required.forEach(name => {
       const exists = listas.some(l => l.owner === username && l.nombre === name);
       if (!exists) {
-        listas.unshift({ id: Date.now().toString() + Math.random().toString(36).slice(2,8), nombre: name, libros: [], owner: username });
+        listas.unshift({ id: Date.now().toString() + Math.random().toString(36).slice(2,8), nombre: name, libros: [], owner: username, isPrivate: false });
         changed = true;
       }
     });

@@ -71,7 +71,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     // Listas creadas por usuarios (excluir listas de perfil)
     this.subs.push(this.listasService.listas$.subscribe(listas => {
       this.userLists = listas
-        .filter(l => !this.listasService.isProfileListName(l.nombre))
+        .filter(l => !this.listasService.isProfileListName(l.nombre) && (!l.isPrivate || this.auth.isAdmin()))
         .sort((a, b) => Number(b.id) - Number(a.id));
       if (this.listPageIndex >= this.listTotalPages) {
         this.listPageIndex = Math.max(0, this.listTotalPages - 1);
@@ -319,7 +319,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     return candidates[0] || 'assets/default-book-cover.svg';
   }
 
-  getReviewAvatarUrl(username?: string): string | null {
+  getReviewAvatarUrl(username?: string | null): string | null {
     return this.auth.getLocalAvatar(username) || null;
   }
 

@@ -220,3 +220,36 @@
   font-weight: 700;
   font-size: 0.85rem;
 }
+
+/* Author / avatar for lists */
+.list-author {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 8px;
+}
+
+.list-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #6c41d4;
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.list-avatar-img {
+  object-fit: cover;
+  background: none;
+}
+
+.list-username {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333;
+}

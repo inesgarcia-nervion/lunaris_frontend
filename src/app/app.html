@@ -2,8 +2,16 @@
   <app-header *ngIf="showHeader"></app-header>
   <router-outlet />
   <footer class="app-footer">
-    <span>&copy;2025 Lunaris. All Rights Reserved.</span>
-    <span class="footer-sep">Terms &amp; Conditions</span>
+    <div class="footer-content horizontal">
+      <div class="footer-item footer-copyright">©2025 Lunaris</div>
+      <div class="footer-separator">•</div>
+      <div class="footer-item footer-help">
+        <span class="help-text">¿Necesitas ayuda?</span>
+        <button *ngIf="!auth.isAdmin()" (click)="navigateToPeticiones()" class="footer-link">Accede a nuestras peticiones</button>
+      </div>
+      <div class="footer-separator">•</div>
+      <div class="footer-item footer-terms">Terms &amp; Conditions</div>
+    </div>
   </footer>
 </div>
 
@@ -18,7 +26,6 @@
 
   .app-footer {
     margin-top: auto;
-    text-align: center;
     padding: 1.5rem 2rem;
     background: #f9f7f4;
     color: #999;
@@ -28,13 +35,25 @@
     align-items: center;
     justify-content: center;
     gap: 2rem;
+    flex-direction: column;
+    text-align: center;
   }
 
-  .footer-sep {
+  .footer-content { display:flex; align-items:center; justify-content:center; gap:18px; width:100%; max-width:980px }
+  .footer-content.horizontal { flex-direction:row; flex-wrap:wrap }
+  .footer-item { display:flex; align-items:center; gap:8px }
+  .footer-separator { color:#ccc }
+  .help-text { color:#666; font-weight:500 }
+  .footer-link {
+    background: linear-gradient(90deg, #5b6ef6, #8a5df5);
+    color: white;
+    border: none;
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(91,110,246,0.12);
     cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
   }
-  .footer-sep:hover {
-    color: #555;
-    text-decoration: underline;
-  }
+  .footer-link:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(91,110,246,0.18); }
 </style>

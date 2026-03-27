@@ -27,6 +27,8 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
 
   selected?: BubblePost;
   newCommentText = '';
+  // id of the post pending deletion (for inline confirm)
+  pendingDeleteId: number | null = null;
 
   @ViewChild('postEditor') postEditorRef?: ElementRef<HTMLElement>;
   @ViewChild('commentEditor') commentEditorRef?: ElementRef<HTMLElement>;
@@ -86,7 +88,49 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     try { if (this.commentEditorRef?.nativeElement) this.commentEditorRef.nativeElement.innerHTML = ''; } catch (_) {}
   }
 
-  openCreate() { this.creating = true }
+  deleteComment(commentId: number) {
+    if (!this.selected || !this.selected.comments) return;
+    const currentUser = this.auth.getCurrentUsername();
+    const isAdmin = this.auth.isAdmin();
+    const comment = this.selected.comments.find(c => c.id === commentId);
+    if (!comment) return;
+    if (!isAdmin && comment.user.name !== currentUser) return; // not allowed
+
+    // remove from selected.comments
+    this.selected.comments = this.selected.comments.filter(c => c.id !== commentId);
+
+    // update the post in the posts list as well
+    const p = this.posts.find(x => x.id === this.selected!.id);
+    if (p) p.comments = this.selected.comments;
+    try { this.cdr.detectChanges(); } catch (_) {}
+  }
+
+  // ---- Post deletion (inline confirm like Noticias) ----
+  confirmRemovePost(id: number) {
+    this.pendingDeleteId = id;
+  }
+
+  cancelRemovePost() {
+    this.pendingDeleteId = null;
+  }
+
+  removeConfirmedPost(id: number) {
+    const isAdmin = this.auth.isAdmin();
+    const currentUser = this.auth.getCurrentUsername();
+    const p = this.posts.find(x => x.id === id);
+    if (!p) return;
+    if (!isAdmin && p.user.name !== currentUser) return;
+    this.posts = this.posts.filter(x => x.id !== id);
+    if (this.selected && this.selected.id === id) this.selected = undefined;
+    if (this.pendingDeleteId === id) this.pendingDeleteId = null;
+  }
+
+  
+  openCreate() {
+    this.creating = true;
+    // set editor content after modal renders
+    setTimeout(() => { try { this.setPostEditorContent(); if (this.postEditorRef?.nativeElement) this.postEditorRef.nativeElement.focus(); } catch (_) {} }, 50);
+  }
 
   cancelCreate() { this.creating = false; this.clearForm(); this.editingId = null; }
 
@@ -230,7 +274,16 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     this.editingId = p.id;
     this.newText = p.text || '';
     this.newImagePreview = p.imageUrl || null;
-    this.creating = true;
+    // Do not open the top create form; show inline editor instead
+    // set editor content after the inline editor is rendered
+    setTimeout(() => { try { this.setPostEditorContent(); if (this.postEditorRef?.nativeElement) this.postEditorRef.nativeElement.focus(); } catch (_) {} }, 50);
+  }
+
+  // Ensure contenteditable reflects `newText` after view updates
+  private setPostEditorContent() {
+    try {
+      if (this.postEditorRef?.nativeElement) this.setEditableFromText(this.postEditorRef.nativeElement, this.newText || '');
+    } catch (_) {}
   }
 
   private clearForm() {

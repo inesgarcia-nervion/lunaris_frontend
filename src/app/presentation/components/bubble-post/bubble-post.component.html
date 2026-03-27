@@ -18,5 +18,6 @@
     <button class="like" (click)="$event.stopPropagation(); onToggleLike()">❤️ {{ post.likes }}</button>
     <button class="comment" (click)="$event.stopPropagation()">💬 {{ post.comments?.length || 0 }}</button>
     <button class="edit" (click)="$event.stopPropagation(); onEdit()">✏️</button>
+    <button *ngIf="canDelete" class="delete-post" (click)="$event.stopPropagation(); onDelete()">Eliminar</button>
   </div>
 </div>

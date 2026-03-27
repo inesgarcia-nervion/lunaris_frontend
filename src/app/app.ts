@@ -4,6 +4,7 @@ import { HeaderComponent } from './presentation/components/header/header.compone
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ListasService } from './domain/services/listas.service';
+import { AuthService } from './domain/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +18,11 @@ export class App implements OnInit, OnDestroy {
   private subs: Subscription[] = [];
   private publicFirstSegments = new Set(['', 'login', 'register', 'recuperar-contrasena', 'reset-password']);
 
-  constructor(private router: Router, private listasService: ListasService) {}
+  constructor(private router: Router, private listasService: ListasService, public auth: AuthService) {}
+
+  navigateToPeticiones(): void {
+    this.router.navigate(['/peticiones']);
+  }
 
   ngOnInit(): void {
     // If user already logged in, assign ownership to any lists created before owner support

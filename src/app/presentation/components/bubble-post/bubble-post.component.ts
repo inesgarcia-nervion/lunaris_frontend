@@ -31,9 +31,11 @@ export interface BubblePost {
 })
 export class BubblePostComponent {
   @Input() post!: BubblePost;
+  @Input() canDelete: boolean = false;
   @Output() like = new EventEmitter<number>();
   @Output() edit = new EventEmitter<number>();
   @Output() open = new EventEmitter<BubblePost>();
+  @Output() delete = new EventEmitter<number>();
 
   onToggleLike() {
     this.like.emit(this.post.id);
@@ -41,6 +43,10 @@ export class BubblePostComponent {
 
   onEdit() {
     this.edit.emit(this.post.id);
+  }
+
+  onDelete() {
+    this.delete.emit(this.post.id);
   }
 
   onOpen() {
