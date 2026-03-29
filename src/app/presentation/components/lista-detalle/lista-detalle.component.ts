@@ -94,6 +94,33 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
     return this.listas.isProfileListName(name || undefined);
   }
 
+  getCover(book: any): string {
+    try {
+      // Prefer service helper (handles local and OL shapes)
+      return this.bookSearch.getCoverUrl(book as OpenLibraryBook);
+    } catch {
+      // Fallbacks for older shapes
+      const coverId = (book && (book.cover_i || book.coverId));
+      if (coverId) return 'https://covers.openlibrary.org/b/id/' + coverId + '-M.jpg';
+      if (book && book.coverUrl) return book.coverUrl;
+      if (book && book.coverImage) return book.coverImage;
+      return '/assets/placeholder.png';
+    }
+  }
+
+  getAuthor(book: any): string {
+    try {
+      const fromService = this.bookSearch.getFirstAuthor(book as OpenLibraryBook);
+      if (fromService && fromService !== 'Autor desconocido') return fromService;
+    } catch {}
+    if (book) {
+      if (Array.isArray(book.author_name) && book.author_name.length > 0) return book.author_name[0];
+      if (Array.isArray(book.authorNames) && book.authorNames.length > 0) return book.authorNames[0];
+      if (book.author) return book.author;
+    }
+    return '';
+  }
+
   removeFromList(listId: string, book: any, event?: Event): void {
     if (event) event.stopPropagation();
     this.listas.removeBookFromList(listId, book as OpenLibraryBook);

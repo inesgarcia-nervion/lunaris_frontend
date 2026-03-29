@@ -38,7 +38,6 @@
   <!-- Mostrar la lista más reciente en grande arriba, el resto en la rejilla -->
   <div *ngIf="filteredListas.length > 0" class="lista-featured">
     <div class="lista-header">
-      <h2 class="lista-nombre">{{ filteredListas[0].nombre }}</h2>
       <div class="list-author">
         <ng-container *ngIf="getOwnerAvatar(filteredListas[0].owner) as avatarUrl; else letterAvatarFeatured">
           <img [src]="avatarUrl" alt="Avatar" class="list-avatar list-avatar-img" />
@@ -48,6 +47,7 @@
         </ng-template>
         <span class="list-username">{{ filteredListas[0].owner }}</span>
       </div>
+      <h2 class="lista-nombre">{{ filteredListas[0].nombre }}</h2>
       <div *ngIf="filteredListas[0].owner && filteredListas[0].owner === currentUser" class="lista-actions-featured"></div>
     </div>
     <div *ngIf="filteredListas[0].libros.length > 0" class="previews">
@@ -60,7 +60,6 @@
   <div *ngIf="filteredListas.length > 1" class="listas-grid">
     <div *ngFor="let lista of filteredListas | slice:1" class="lista-card">
       <div class="lista-header">
-        <h2 class="lista-nombre">{{ lista.nombre }}</h2>
         <div class="list-author">
           <ng-container *ngIf="getOwnerAvatar(lista.owner) as avatarUrl; else letterAvatarCard">
             <img [src]="avatarUrl" alt="Avatar" class="list-avatar list-avatar-img" />
@@ -70,6 +69,7 @@
           </ng-template>
           <span class="list-username">{{ lista.owner }}</span>
         </div>
+        <h2 class="lista-nombre">{{ lista.nombre }}</h2>
         <div *ngIf="lista.owner && lista.owner === currentUser" class="lista-actions-card"></div>
       </div>
       <div *ngIf="lista.libros.length > 0" class="previews">

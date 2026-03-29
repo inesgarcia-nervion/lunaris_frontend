@@ -1,12 +1,15 @@
 .lista-detalle-container {
   max-width: 900px;
-  margin: 24px auto;
-  padding: 20px;
+  margin: 40px auto;
+  padding: 32px 24px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px #0001;
 }
 .lista-title {
-  font-size: 1.6rem;
-  margin: 0;
-  line-height: 1.2;
+  font-size: 2.2rem;
+  margin: 0 0 8px 0;
+  line-height: 1.15;
 }
 .lista-header {
   display: flex;
@@ -61,7 +64,7 @@
   border: none;
   color: #333;
   cursor: pointer;
-  margin: 100px 0 16px 0; /* aumentado para bajar mucho más */
+  margin: 0 0 16px 0;
   padding: 6px 10px;
   border-radius: 8px;
 }

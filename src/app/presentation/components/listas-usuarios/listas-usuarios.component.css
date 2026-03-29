@@ -109,13 +109,16 @@
 .lista-nombre {
   font-size: 1.3rem;
   margin-bottom: 8px;
+  flex: 1; /* allow title to take available space so author and actions align to the right */
 }
 
 .lista-header {
   width: 100%;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column; /* stack author above name */
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 6px;
 }
 
 .lista-actions-card button,
@@ -127,6 +130,7 @@
 .lista-actions-card {
   display: flex;
   gap: 8px;
+  margin-left: 12px; /* small gap from the author */
 }
 
 .lista-actions-featured {
@@ -226,7 +230,10 @@
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  margin-top: 8px;
+  margin-top: 0; /* avoid vertical offset that made it look centered */
+  margin-left: 0; /* reset horizontal positioning so it sits above the title */
+  margin-right: 0;
+  margin-bottom: 4px;
 }
 
 .list-avatar {
@@ -252,4 +259,9 @@
   font-size: 0.95rem;
   font-weight: 600;
   color: #333;
+}
+
+/* Slightly increase spacing between avatar and username for clarity */
+.list-author .list-username {
+  margin-left: 8px;
 }
