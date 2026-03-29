@@ -128,7 +128,7 @@
           </div>
           <div class="review-card-body">
             <h3 class="list-card-title">{{ review.bookTitle || review.bookApiId || 'Libro' }}</h3>
-            <p class="list-card-desc">{{ review.comment }}</p>
+            <p class="list-card-desc review-comment">{{ review.comment }}</p>
             <div class="review-author">
               <ng-container *ngIf="getReviewAvatarUrl(review.username) as avatarUrl; else letterAvatar">
                 <img [src]="avatarUrl" alt="Avatar" class="review-avatar review-avatar-img" />

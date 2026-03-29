@@ -828,6 +828,32 @@
   flex: 1;
 }
 
+/* Comentario de reseña: centrado horizontal, padding y truncado a 2 líneas con puntos suspensivos */
+.review-comment {
+  box-sizing: border-box;
+  width: 100%;
+  text-align: left;
+  margin: 0; /* alinear con el título dentro de review-card-body */
+  padding: 0; /* usar el padding del contenedor (.review-card-body) */
+  line-height: 1.25em;
+  max-height: calc(1.25em * 2); /* límite visual a 2 líneas */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  hyphens: auto;
+  white-space: normal;
+}
+
+/* Fallback para navegadores que no soportan -webkit-line-clamp */
+.review-comment::after {
+  content: '';
+  display: block;
+  height: 0;
+}
+
 .review-author {
   display: flex;
   align-items: center;
