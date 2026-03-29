@@ -684,6 +684,15 @@
   gap: 0.6rem;
 }
 
+/* Separador entre contenido de la tarjeta y autor (igual que en reseñas) */
+.list-author {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f0f0f0;
+}
+
 .list-card-title {
   font-size: 1.05rem;
   font-weight: 700;
@@ -844,7 +853,8 @@
   text-overflow: ellipsis;
   word-break: break-word;
   hyphens: auto;
-  white-space: normal;
+  /* Preservar saltos de línea tal como se escribió la reseña, pero mantener el truncado a 2 líneas */
+  white-space: pre-wrap;
 }
 
 /* Fallback para navegadores que no soportan -webkit-line-clamp */

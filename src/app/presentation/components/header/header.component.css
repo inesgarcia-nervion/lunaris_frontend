@@ -1707,15 +1707,40 @@
   background: #e0e0e0;
 }
 
-.review-textinput {
+.review-textinput,
+.review-textinput.content-editable {
   width: 100%;
-  min-height: 100px;
+  min-height: 80px;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-family: Arial, sans-serif;
-  resize: vertical;
   font-size: 13px;
+  resize: none; /* disable manual resize */
+  outline: none;
+  white-space: pre-wrap !important; /* allow wrapping */
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  /* Aggressive break for long unbroken strings (e.g. AAAAA...) */
+  word-break: break-all;
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow-x: hidden; /* prevent horizontal scroll */
+  max-height: 300px; /* limit visual height */
+  overflow-y: auto; /* allow vertical scroll when content exceeds max-height */
+  min-width: 0; /* allow flex/grid parents to shrink the element */
+  hyphens: auto;
+}
+
+.review-textinput.content-editable {
+  display: block;
+}
+
+/* Placeholder for contenteditable */
+.review-textinput.content-editable:empty:before {
+  content: attr(data-placeholder);
+  color: #999;
+  pointer-events: none;
 }
 
 /* User reviews section */
@@ -1799,6 +1824,15 @@
   margin: 0;
   font-size: 16px;
   color: #444;
+  text-align: left; /* alinear con el título */
+  box-sizing: border-box;
+  /* Mostrar comentario completo: permitir saltos de línea y ajuste */
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  overflow: visible;
+  max-height: none;
+  display: block;
 }
 
 /* List and state section */

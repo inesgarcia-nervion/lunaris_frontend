@@ -1,5 +1,5 @@
 
-import { Component, ChangeDetectorRef, OnInit, OnDestroy, ElementRef, HostListener } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit, OnDestroy, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -50,6 +50,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   reviews: any[] = [];
   currentUserReview: any | null = null;
   isMenuRoute: boolean = false;
+  @ViewChild('reviewEditor') reviewEditor?: ElementRef<HTMLElement>;
 
   constructor(
     private bookSearchService: BookSearchService,
@@ -280,17 +281,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   hasPreviousPage(): boolean {
     return this.currentPage > 1;
   }
-
-  selectBook(book: OpenLibraryBook): void {
-    this.selectedBook = book;
-    this.userRating = 0;
-    this.userReview = '';
-    // mark as coming from search/header
-    this.bookSearchService.setNavigationOrigin({ type: 'search' });
-    this.bookSearchService.setSelectedBook(book);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
   backToSearch(): void {
     const origin = this.bookSearchService.getNavigationOrigin();
     if (origin) {
@@ -601,6 +591,20 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe());
   }
+  
+  // Handler for contenteditable review editor. Receives the element reference from template.
+  onReviewEditorInput(el: HTMLElement | null | undefined): void {
+    try {
+      if (!el) {
+        this.userReview = '';
+      } else {
+        this.userReview = (el as HTMLElement).innerText || '';
+      }
+    } catch (e) {
+      // Fallback: do not throw template errors
+      this.userReview = '';
+    }
+  }
   private loadReviewsForSelectedBook(): void {
     this.reviews = [];
     this.currentUserReview = null;
@@ -612,6 +616,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.currentUserReview = this.reviews.find(r => r.username === currentUser) || null;
         if (this.currentUserReview) {
           this.userReview = this.currentUserReview.comment || '';
+          // set content into editor element if present without triggering re-render
+          try { if (this.reviewEditor && this.reviewEditor.nativeElement) this.reviewEditor.nativeElement.innerText = this.userReview; } catch {}
           this.userRating = this.currentUserReview.rating || 0;
         }
         this.cdr.markForCheck();
@@ -620,6 +626,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
         console.error('Error cargando reseñas:', err);
       }
     });
+  }
+
+  selectBook(book: OpenLibraryBook): void {
+    this.selectedBook = book;
+    this.userRating = 0;
+    this.userReview = '';
+    // ensure editor cleared visually
+    try { if (this.reviewEditor && this.reviewEditor.nativeElement) this.reviewEditor.nativeElement.innerText = ''; } catch {}
+    // mark as coming from search/header
+    this.bookSearchService.setNavigationOrigin({ type: 'search' });
+    this.bookSearchService.setSelectedBook(book);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   submitReview(): void {
