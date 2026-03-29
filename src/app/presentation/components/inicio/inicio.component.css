@@ -1,6 +1,10 @@
 .inicio-root{font-family: 'Montserrat', Arial, sans-serif;color:#444}
-.hero{display:flex;height:80vh;overflow:hidden}
+.inicio-root{
+  margin-top: -120px;
+}
+.hero{display:flex;height:80vh;overflow:hidden;position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;width:100vw;box-sizing:border-box}
 .hero-left{width:50%;background:#74c2cc;padding:40px 50px;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;box-sizing:border-box}
+.hero-left{width:50%;background:#74c2cc;padding:0 32px 24px 32px;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;box-sizing:border-box}
 .hero-top{display:flex;flex-direction:row;align-items:flex-start;width:100%;gap:200px;margin-bottom:auto}
 .logo-wrap{flex-shrink:0}
 .logo{width:250px;height:auto;display:block}
@@ -62,8 +66,9 @@
 
 /* Responsivo básico */
 @media(max-width:900px){
-  .hero{flex-direction:column;height:auto}
+  .hero{flex-direction:column;height:auto;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;width:100vw}
   .hero-left,.hero-right{width:100%;padding:30px}
   .cta{width:80%}
   .card img{height:220px}
+  .inicio-root{margin-top:-80px}
 }
