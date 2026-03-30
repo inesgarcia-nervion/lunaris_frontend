@@ -48,6 +48,7 @@
         <span class="list-username">{{ filteredListas[0].owner }}</span>
       </div>
       <h2 class="lista-nombre">{{ filteredListas[0].nombre }}</h2>
+        <span class="privacy-badge" [ngClass]="filteredListas[0].isPrivate ? 'privacy-private' : 'privacy-public'">{{ filteredListas[0].isPrivate ? 'Privada' : 'Pública' }}</span>
       <div *ngIf="filteredListas[0].owner && filteredListas[0].owner === currentUser" class="lista-actions-featured"></div>
     </div>
     <div *ngIf="filteredListas[0].libros.length > 0" class="previews">
@@ -55,6 +56,9 @@
       <div *ngIf="filteredListas[0].libros.length > 5" class="more-badge">+{{ filteredListas[0].libros.length - 5 }}</div>
     </div>
     <button class="btn-go-list" (click)="openListFromListas(filteredListas[0].id)" aria-label="Ver lista">→</button>
+    <button *ngIf="filteredListas[0].owner && filteredListas[0].owner !== currentUser" class="btn-favorite featured" (click)="$event.stopPropagation(); toggleFavorite(filteredListas[0].id, $event)" [class.favorited]="isFavorited(filteredListas[0].id)" aria-label="Favorito" title="{{ isFavorited(filteredListas[0].id) ? 'Quitar de favoritos' : 'Añadir a favoritos' }}">
+      <span class="star">{{ isFavorited(filteredListas[0].id) ? '★' : '☆' }}</span>
+    </button>
   </div>
 
   <div *ngIf="filteredListas.length > 1" class="listas-grid">
@@ -70,6 +74,7 @@
           <span class="list-username">{{ lista.owner }}</span>
         </div>
         <h2 class="lista-nombre">{{ lista.nombre }}</h2>
+          <span class="privacy-badge" [ngClass]="lista.isPrivate ? 'privacy-private' : 'privacy-public'">{{ lista.isPrivate ? 'Privada' : 'Pública' }}</span>
         <div *ngIf="lista.owner && lista.owner === currentUser" class="lista-actions-card"></div>
       </div>
       <div *ngIf="lista.libros.length > 0" class="previews">
@@ -77,6 +82,10 @@
         <div *ngIf="lista.libros.length > 5" class="more-badge">+{{ lista.libros.length - 5 }}</div>
       </div>
       <button class="btn-go-list" (click)="openListFromListas(lista.id)" aria-label="Ver lista">→</button>
+      <!-- Favorite button placed inside the card (top-right) -->
+      <button *ngIf="lista.owner && lista.owner !== currentUser" class="btn-favorite" (click)="$event.stopPropagation(); toggleFavorite(lista.id, $event)" [class.favorited]="isFavorited(lista.id)" aria-label="Favorito" title="{{ isFavorited(lista.id) ? 'Quitar de favoritos' : 'Añadir a favoritos' }}">
+        <span class="star">{{ isFavorited(lista.id) ? '★' : '☆' }}</span>
+      </button>
       <!-- Aquí puedes mostrar más info de la lista -->
     </div>
   </div>

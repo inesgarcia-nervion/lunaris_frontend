@@ -38,6 +38,7 @@ export class ListasUsuariosComponent implements OnInit {
     this.filteredListas = this.listas;
     this.currentUser = this.listasService.getCurrentUser();
     this.listasService.listas$.subscribe(l => { this.listas = this.filterOutProfileLists(l || []); this.filteredListas = this.listas; this.cdr.markForCheck(); });
+    this.listasService.favorites$.subscribe(() => { this.cdr.markForCheck(); });
     console.log('ListasUsuariosComponent initialized; current searchQuery:', this.bookSearchService.getSearchQuery());
   }
 
@@ -150,5 +151,20 @@ export class ListasUsuariosComponent implements OnInit {
   openListFromListas(listId: string): void {
     this.bookSearchService.setNavigationOrigin({ type: 'listas' });
     this.router.navigate(['/listas', listId]);
+  }
+
+  isFavorited(listId: string): boolean {
+    try {
+      return this.listasService.isFavorited(listId);
+    } catch {
+      return false;
+    }
+  }
+
+  toggleFavorite(listId: string, event?: Event): void {
+    if (event) event.stopPropagation();
+    this.listasService.toggleFavorite(listId);
+    // ensure view updates
+    this.cdr.markForCheck();
   }
 }

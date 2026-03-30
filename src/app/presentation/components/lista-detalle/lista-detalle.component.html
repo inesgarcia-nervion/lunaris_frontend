@@ -4,10 +4,17 @@
   <div *ngIf="lista; else notFound" class="lista-content">
     <!-- Header: title + owner actions -->
     <div class="lista-header">
-      <h1 class="lista-title">{{ lista.nombre }}</h1>
-      <div *ngIf="lista.owner && lista.owner === currentUser && !isProfileList(lista.nombre)" class="lista-actions">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <h1 class="lista-title">{{ lista.nombre }}</h1>
+        <span class="privacy-badge" [ngClass]="lista.isPrivate ? 'privacy-private' : 'privacy-public'">{{ lista.isPrivate ? 'Privada' : 'Pública' }}</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <div *ngIf="lista.owner && lista.owner === currentUser && !isProfileList(lista.nombre)" class="lista-actions">
         <button class="btn-edit-list" (click)="editListName()">Editar</button>
         <button class="btn-delete" (click)="confirmAndDeleteList()">Eliminar lista</button>
+      </div>
+        <!-- Show 'Eliminar favorito' for lists the current user has favorited (owned by others) -->
+        <button *ngIf="lista.owner && lista.owner !== currentUser && isFavorited()" class="btn-delete-like-news" (click)="$event.stopPropagation(); confirmAndRemoveFavorite()">Eliminar favorito</button>
       </div>
     </div>
     <div *ngIf="lista.libros.length === 0" class="lista-empty">

@@ -98,18 +98,22 @@
   gap: 16px;
 }
 .lista-card {
-  background: #f9f7f4;
+  background: linear-gradient(180deg,#ffffff,#fbfbff);
   border-radius: 12px;
-  padding: 24px 18px;
-  box-shadow: 0 1px 6px #0001;
+  padding: 18px;
+  box-shadow: 0 8px 20px rgba(20,16,35,0.04);
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
+  position: relative;
+  transition: transform .14s ease, box-shadow .14s ease;
 }
+.lista-card:hover { transform: translateY(-6px); box-shadow: 0 20px 48px rgba(20,16,35,0.08); }
 .lista-nombre {
-  font-size: 1.3rem;
-  margin-bottom: 8px;
-  flex: 1; /* allow title to take available space so author and actions align to the right */
+  font-size: 1.15rem;
+  margin: 8px 0 6px;
+  font-weight: 700;
+  color: #1f2230;
 }
 
 .lista-header {
@@ -198,20 +202,61 @@
   position: relative;
 }
 
+/* Favorite button inside list card */
+.btn-favorite {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: none;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(20,16,35,0.06);
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease, color .12s ease;
+  font-size: 1.4rem;
+  color: #9aa0a6;
+  z-index: 20;
+  border: 1px solid #f0f0f0;
+}
+.btn-favorite .star { pointer-events: none; font-size: 1.1rem; line-height:1 }
+.btn-favorite:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,16,35,0.10); background: #fbfbfb; color: #6b6f76 }
+.btn-favorite:focus { outline: 2px solid rgba(108,99,255,0.18); outline-offset: 2px }
+.btn-favorite.favorited { color: #ffffff; background: linear-gradient(180deg,#ffcf5a,#ffb400); box-shadow: 0 8px 28px rgba(255,180,0,0.18); border-color: rgba(255,180,0,0.14) }
+
+/* Slight variant for featured card (position a bit left of go button) */
+.btn-favorite.featured { right: 78px; }
+
+.btn-unfavorite { /* fallback for perfil view button */
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
 .previews {
   display: flex;
-  gap: 10px;
+  gap: 0;
   align-items: center;
   margin-top: 12px;
   overflow: hidden;
+  justify-content: center;
 }
 .preview-img {
-  width: 64px;
-  height: 96px;
+  width: 56px;
+  height: 84px;
   object-fit: cover;
-  border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(20,16,35,0.06);
+  margin-left: -12px;
+  border: 1px solid rgba(0,0,0,0.04);
 }
+.preview-img:first-child { margin-left: 0 }
 
 /* small previews not used in original layout */
 
@@ -264,4 +309,26 @@
 /* Slightly increase spacing between avatar and username for clarity */
 .list-author .list-username {
   margin-left: 8px;
+}
+
+/* Badge que indica si la lista es privada o pública */
+.privacy-badge {
+  display: inline-block;
+  font-size: 0.78rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  margin-left: 8px;
+  margin-top: 6px;
+  box-shadow: 0 6px 18px rgba(20,16,35,0.04);
+}
+.privacy-private {
+  background: linear-gradient(180deg,#fff8f8,#fff3f3);
+  color: #b00020;
+  border: 1px solid #f5c6c6;
+}
+.privacy-public {
+  background: linear-gradient(180deg,#f6fff7,#e9f8ef);
+  color: #1b7a3a;
+  border: 1px solid #cfeed5;
 }

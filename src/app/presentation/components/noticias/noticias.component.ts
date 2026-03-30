@@ -130,4 +130,20 @@ export class NoticiasComponent implements OnInit {
     if (!ok) return;
     this.newsService.removeNews(id);
   }
+
+  // Inline deletion flow used by the template: set pending id, confirm or cancel
+  requestInlineDelete(id: string) {
+    if (!this.isAdmin) return;
+    this.pendingDeleteId = id;
+  }
+
+  async removeConfirmed(id: string) {
+    if (!this.isAdmin) return;
+    this.newsService.removeNews(id);
+    this.pendingDeleteId = null;
+  }
+
+  cancelRemove() {
+    this.pendingDeleteId = null;
+  }
 }

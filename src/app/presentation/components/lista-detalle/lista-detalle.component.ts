@@ -156,4 +156,21 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
     // refresh local reference
     this.lista = this.listas.getById(this.currentId);
   }
+
+  isFavorited(): boolean {
+    try {
+      return this.listas.isFavorited(this.currentId);
+    } catch {
+      return false;
+    }
+  }
+
+  async confirmAndRemoveFavorite(): Promise<void> {
+    if (!this.lista) return;
+    const ok = await this.confirm.confirm(`¿Quieres eliminar "${this.lista.nombre}" de tus favoritos?`);
+    if (!ok) return;
+    this.listas.toggleFavorite(this.currentId);
+    // no navigation; update local reference if needed
+    this.lista = this.listas.getById(this.currentId);
+  }
 }

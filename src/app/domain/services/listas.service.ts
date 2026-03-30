@@ -15,8 +15,11 @@ export interface ListaItem {
 @Injectable({ providedIn: 'root' })
 export class ListasService {
   private storageKey = 'lunaris_lists';
+  private favoritesKey = 'lunaris_favorites';
   private listasSubject = new BehaviorSubject<ListaItem[]>(this.loadFromStorage());
   listas$ = this.listasSubject.asObservable();
+  private favoritesSubject = new BehaviorSubject<Record<string, string[]>>(this.loadFavoritesMap());
+  favorites$ = this.favoritesSubject.asObservable();
 
   constructor() {}
 
@@ -108,6 +111,64 @@ export class ListasService {
   getByOwner(owner: string | null): ListaItem[] {
     if (!owner) return [];
     return this.getAll().filter(l => l.owner === owner);
+  }
+
+  /** Favorites management stored per-username in localStorage. */
+  private loadFavoritesMap(): Record<string, string[]> {
+    try {
+      const raw = localStorage.getItem(this.favoritesKey);
+      if (!raw) return {};
+      return JSON.parse(raw) as Record<string, string[]>;
+    } catch (e) {
+      console.error('Error loading favorites map', e);
+      return {};
+    }
+  }
+
+  private saveFavoritesMap(map: Record<string, string[]>) {
+    try {
+      localStorage.setItem(this.favoritesKey, JSON.stringify(map));
+      this.favoritesSubject.next(map);
+    } catch (e) {
+      console.error('Error saving favorites map', e);
+    }
+  }
+
+  getFavoritesForUser(username: string | null): string[] {
+    if (!username) return [];
+    const map = this.loadFavoritesMap();
+    return map[username] || [];
+  }
+
+  /** Return the ListaItem objects that the given user has favorited. */
+  getFavoriteListsForUser(username: string | null): ListaItem[] {
+    if (!username) return [];
+    const ids = this.getFavoritesForUser(username);
+    return this.getAll().filter(l => ids.includes(l.id));
+  }
+
+  /** Toggle favorite state for a list for the provided user (or current user if omitted). */
+  toggleFavorite(listId: string, forUser?: string | null): boolean {
+    const user = forUser ?? this.getCurrentUser();
+    if (!user) return false;
+    const map = this.loadFavoritesMap();
+    const arr = map[user] || [];
+    const idx = arr.indexOf(listId);
+    if (idx >= 0) {
+      arr.splice(idx, 1);
+    } else {
+      arr.push(listId);
+    }
+    map[user] = arr;
+    this.saveFavoritesMap(map);
+    return true;
+  }
+
+  isFavorited(listId: string, forUser?: string | null): boolean {
+    const user = forUser ?? this.getCurrentUser();
+    if (!user) return false;
+    const arr = this.getFavoritesForUser(user);
+    return arr.includes(listId);
   }
 
   /**

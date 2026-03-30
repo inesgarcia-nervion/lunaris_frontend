@@ -28,6 +28,8 @@ export class PerfilComponent implements OnInit {
 
   // Other lists created by user
   userLists: ListaItem[] = [];
+  // Lists favorited by current user (owned by other users)
+  favoriteLists: ListaItem[] = [];
 
   constructor(
     private listasService: ListasService,
@@ -35,6 +37,11 @@ export class PerfilComponent implements OnInit {
     private bookSearchService: BookSearchService,
     private router: Router
   ) {}
+
+  toggleFavorite(listId: string, event?: Event) {
+    if (event) event.stopPropagation();
+    this.listasService.toggleFavorite(listId);
+  }
 
   onAvatarError(): void {
     try { this.authService.setLocalAvatar(null); } catch (e) { /* ignore */ }
@@ -55,6 +62,7 @@ export class PerfilComponent implements OnInit {
     this.loadLists();
     // react to listas changes so profile updates live
     this.listasService.listas$.subscribe(() => this.loadLists());
+    this.listasService.favorites$.subscribe(() => this.loadLists());
   }
 
   loadLists() {
@@ -72,6 +80,9 @@ export class PerfilComponent implements OnInit {
 
     // other lists are those owned by user but not the three special ones
     this.userLists = all.filter(l => !['Leyendo', 'Leído', 'Plan para leer'].includes(l.nombre));
+
+    // favorites: lists the current user favorited but which are owned by others
+    this.favoriteLists = this.listasService.getFavoriteListsForUser(this.username).filter(l => l.owner && l.owner !== this.username);
   }
 
   // wrapper helpers for template

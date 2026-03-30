@@ -42,7 +42,7 @@
       <!-- Preview text removed: open detail page to see full content -->
       <div *ngIf="isAdmin" class="news-actions">
         <ng-container *ngIf="pendingDeleteId !== n.id">
-          <button class="btn-delete" (click)="$event.stopPropagation(); confirmRemove(n.id)">Eliminar</button>
+          <button class="btn-delete" (click)="$event.stopPropagation(); requestInlineDelete(n.id)">Eliminar</button>
         </ng-container>
         <ng-container *ngIf="pendingDeleteId === n.id" class="inline-confirm">
           <span>¿Eliminar?</span>

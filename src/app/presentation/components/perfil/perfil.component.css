@@ -74,12 +74,58 @@
 .more-btn:hover, .more-btn:focus{ transform: translateY(-4px); box-shadow: 0 8px 18px rgba(0,0,0,0.12); }
 .your-lists{ margin-top:18px }
 .lists-row{ display:flex; gap:12px; flex-wrap:wrap }
-.list-card{ width:220px; border:1px solid #ddd; padding:10px; border-radius:6px; display:flex; flex-direction:column; align-items:center }
-.list-card{ cursor: pointer }
-.list-covers{ display:flex; gap:6px; margin-bottom:8px }
-.list-cover img{ width:48px; height:72px; object-fit:cover }
-.list-name{ font-weight:600; margin-bottom:8px }
+.lists-grid-profile{
+  display:grid;
+  grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
+  gap:18px;
+}
+.list-card-profile{
+  border:1px solid rgba(28,24,20,0.06);
+  padding:14px;
+  border-radius:12px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  background:linear-gradient(180deg,#ffffff,#fbfbff);
+  cursor:pointer;
+  min-height:170px;
+  position:relative;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+  box-shadow: 0 6px 18px rgba(20,16,35,0.04);
+}
+.list-card-profile:hover{ transform: translateY(-6px); box-shadow: 0 18px 48px rgba(20,16,35,0.08); }
+.list-row-top{ display:flex; align-items:center; justify-content:center; gap:8px }
+.list-covers.small{ display:flex; gap:0; align-items:center; justify-content:center }
+.list-cover{ margin-left: -12px; }
+.list-cover:first-child{ margin-left: 0 }
+.list-cover img{ width:56px; height:84px; object-fit:cover; border-radius:6px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04); }
+.list-name{ font-weight:700; text-align:center; margin:6px 0 4px; font-size:1rem; color:#1f2230 }
+.list-owner{ text-align:center; color:#6b6f76; font-size:0.86rem }
+.list-actions-row{ display:flex; justify-content:center }
 .btn-discover{ background:#6a34ff; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; transition: transform 150ms ease, box-shadow 150ms ease; }
 .btn-discover:hover, .btn-discover:focus { transform: translateY(-6px) scale(1.03); box-shadow: 0 8px 20px rgba(106,52,255,0.18); }
 .btn-discover:active { transform: translateY(-2px) scale(0.99); }
+
+/* privacy pill */
+.privacy-pill{ font-size:0.72rem; padding:6px 10px; border-radius:999px; font-weight:700; white-space:nowrap; position:absolute; top:12px; right:12px; z-index:12; box-shadow: 0 4px 12px rgba(20,16,35,0.06); }
+.pill-private{ background: linear-gradient(180deg,#fff8f8,#fff3f3); color:#b00020; border:1px solid #f3c6c6 }
+.pill-public{ background: linear-gradient(180deg,#f6fff7,#e9f8ef); color:#1b7a3a; border:1px solid #cfeed5 }
 .empty-lists{ color:#666 }
+
+/* Match the delete button style used in noticias component */
+.btn-delete-like-news {
+  background: transparent;
+  color: #d32f2f;
+  border: 1px solid rgba(211,47,47,0.12);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .15s ease, transform .06s ease, box-shadow .15s ease;
+  font-weight: 600;
+}
+.btn-delete-like-news:hover {
+  background: rgba(211,47,47,0.06);
+  box-shadow: 0 4px 10px rgba(211,47,47,0.08);
+  transform: translateY(-1px);
+}
+.btn-delete-like-news:active { transform: translateY(0); }
