@@ -8,7 +8,7 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 .card { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
-.big-box { min-height: 360px; display:flex; align-items:center; justify-content:center; background: transparent; color:var(--text-color, #000); position:relative; margin-bottom: 8px; }
+.big-box { min-height: 560px; display:flex; align-items:center; justify-content:center; background: transparent; color:var(--text-color, #000); position:relative; margin-bottom: 8px; }
 .placeholder { font-size: 24px; opacity:0.9; }
 
 /* Wheel specific styles */
@@ -20,13 +20,22 @@
 .wheel-item-label { display:block; }
 /* clamp to three lines so long titles don't overflow their sector */
 .wheel-item-label { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; line-clamp: 3; }
-.wheel-item-label.selected { background: rgba(0,0,0,0.08); padding:8px 12px; border-radius:6px; box-shadow: 0 10px 26px rgba(0,0,0,0.36); font-weight:900; transform: translateY(-4px); }
+.wheel-item-label.selected {
+  /* Keep selected label subtle: only a slight scale and color change. */
+  background: transparent;
+  box-shadow: none;
+  transform: scale(1.03);
+  transition: transform 200ms ease, color 200ms ease;
+  color: #0b0b0b;
+  border-radius: 4px;
+}
 .pointer { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 22px; color: #c0392b; pointer-events: none; text-shadow: 0 1px 0 #fff; }
 .wheel-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; border-radius:50%; background: rgba(255,255,255,0.6); }
 .wheel-center { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:96px; height:96px; border-radius:50%; background:#111; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
 
 /* Large centered label when wheel has a single slice */
-.wheel-center-label { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: 64%; text-align: center; font-size: 22px; font-weight:800; line-height:1.1; padding: 8px 12px; border-radius: 8px; background: rgba(255,255,255,0.02); }
+.wheel-center-label { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: 64%; text-align: center; font-size: 22px; font-weight:800; line-height:1.1; padding: 8px 12px; border-radius: 8px; background: transparent; }
+
 
 /* Add a visible outer ring to separate wheel from background */
 .wheel { box-shadow: 0 12px 30px rgba(0,0,0,0.16), inset 0 8px 20px rgba(0,0,0,0.06); }
@@ -57,7 +66,7 @@ button { padding:8px 12px; }
 .title-row { display:flex; align-items:flex-start; gap:12px; }
 .accent-bar { width:6px; height:44px; border-radius:4px; background: linear-gradient(180deg, #6ea8fe, #4b86ff); box-shadow: 0 4px 14px rgba(78,132,255,0.06); }
 .titles { display:flex; flex-direction:column; gap:4px; }
-.result-title { font-size: 20px; font-weight: 800; line-height:1.05; color: #111111; max-height: 56px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.result-title { font-size: 20px; font-weight: 800; line-height:1.05; color: #111111; max-height: 56px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-clamp: 2; }
 .result-author { font-size: 13px; color: #5c6b73; }
 .result-meta-row { display:flex; gap:8px; align-items:center; }
 .chip { background: #f3f4f6; padding:6px 8px; border-radius:999px; font-size:12px; color: #2b2b2b; border:1px solid rgba(0,0,0,0.04); }

@@ -36,6 +36,11 @@ export class RuletaComponent implements OnInit {
   selectedIndex: number | null = null;
   labelOffset: number = 0;
   labelColors: string[] = [];
+  // pending spin info used to reveal result when transition ends
+  private _pendingSpinIdx: number | null = null;
+  private _pendingFinalRotation: number | null = null;
+  // Timeout id used both as fallback for missing transitionend and for the 2s delay
+  private _revealTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   get halfRadius(): number { return Math.floor(this.radius / 2); }
 
@@ -87,7 +92,6 @@ export class RuletaComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    try { document.body.classList.add('no-scroll'); } catch (e) { /* ignore */ }
     this.currentUser = this.listasService.getCurrentUser();
     this.listasService.ensureProfileSections(this.currentUser);
     this.updateAvailableLists(this.listasService.getAll() || []);
@@ -100,7 +104,7 @@ export class RuletaComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
-    try { document.body.classList.remove('no-scroll'); } catch (e) { /* ignore */ }
+    if (this._revealTimeoutId) { clearTimeout(this._revealTimeoutId); this._revealTimeoutId = null; }
   }
 
   private computeLabelOffset(): void {
@@ -162,8 +166,9 @@ export class RuletaComponent implements OnInit {
     this.titles = lista.libros.map(b => (b.title || '').toString().trim() || '—');
     const n = this.titles.length || 1;
     this.anglePer = 360 / n;
-    const computed = Math.min(760, Math.max(360, n * 52));
-    this.wheelSize = Math.max(this.initialWheelSize, computed);
+    // Keep wheel at a fixed, predictable size so page layout doesn't change
+    // regardless of how many books are added. Radius derived from that fixed size.
+    this.wheelSize = this.initialWheelSize;
     this.radius = Math.floor(this.wheelSize / 2) - 40;
     this.wheelBackground = this.buildWheelBackground(this.titles);
     this.computeLabelOffset();
@@ -208,7 +213,6 @@ export class RuletaComponent implements OnInit {
     }
     if (this.spinning) return;
 
-
     const n = lista.libros.length;
     const idx = Math.floor(Math.random() * n);
     const spins = Math.floor(Math.random() * 3) + 4;
@@ -219,22 +223,57 @@ export class RuletaComponent implements OnInit {
     this.selectedIndex = null;
     this.resultBook = null;
 
+    // clear any pending reveal timeout from previous runs
+    if (this._revealTimeoutId) { clearTimeout(this._revealTimeoutId); this._revealTimeoutId = null; }
+
+    // Keep pending info so transitionend can reveal the result
+    this._pendingSpinIdx = idx;
+    this._pendingFinalRotation = finalRotation;
+
     this.ngZone.run(() => {
       this.rotationDeg = finalRotation;
       try { this.cdr.detectChanges(); } catch (e) { /* ignore */ }
     });
-    // After the spin animation finishes, wait an extra 2000ms then reveal the result.
-    const revealDelay = this.spinDurationMs + 50 + 2000;
-    setTimeout(() => {
-      this.ngZone.run(() => {
-        this.spinning = false;
-        this.rotationDeg = ((finalRotation % 360) + 360) % 360;
-        this.selectedIndex = idx;
-        this.resultBook = lista.libros[idx];
-        try { this.cdr.detectChanges(); } catch (e) { /* ignore */ }
-      });
-    }, revealDelay);
-    // resultBook is set above; UI shows result automatically when not spinning and resultBook != null
+
+    // Fallback: reveal when the spin animation finishes.
+    // Give a small extra margin to ensure the CSS transition completed.
+    const revealDelay = this.spinDurationMs + 200;
+    this._revealTimeoutId = setTimeout(() => this.revealPendingSpin(lista), revealDelay);
+  }
+
+  private revealPendingSpin(lista: any): void {
+    if (this._revealTimeoutId) { clearTimeout(this._revealTimeoutId); this._revealTimeoutId = null; }
+    if (this._pendingSpinIdx == null) return;
+    const idx = this._pendingSpinIdx;
+    const finalRotation = this._pendingFinalRotation || 0;
+    this._pendingSpinIdx = null;
+    this._pendingFinalRotation = null;
+
+    this.ngZone.run(() => {
+      // Stop the spinning visual immediately and highlight the selected slice
+      this.spinning = false;
+      this.rotationDeg = ((finalRotation % 360) + 360) % 360;
+      this.selectedIndex = idx;
+      try { this.cdr.detectChanges(); } catch (e) { /* ignore */ }
+
+      // Schedule the final reveal after 2 seconds so the user sees the stopped wheel
+      this._revealTimeoutId = setTimeout(() => {
+        this.ngZone.run(() => {
+          try { this.resultBook = lista.libros[idx]; } catch { this.resultBook = null; }
+          try { this.cdr.detectChanges(); } catch (e) { /* ignore */ }
+          this._revealTimeoutId = null;
+        });
+      }, 2000);
+    });
+  }
+
+  onWheelTransitionEnd(ev: TransitionEvent): void {
+    // Only act on transform transitions — accept 'transform' or 'all' or missing propertyName
+    if (ev && ev.propertyName && ev.propertyName !== 'transform' && ev.propertyName !== 'all') return;
+    if (this._pendingSpinIdx == null) return;
+    const lista = this.listasService.getById(this.selectedListId || '');
+    if (!lista) return;
+    this.revealPendingSpin(lista);
   }
 
   quitarLibro(): void {
@@ -243,6 +282,7 @@ export class RuletaComponent implements OnInit {
     this.listasService.removeBookFromList(this.selectedListId, toRemove);
     this.resultBook = null;
     this.selectedIndex = null;
+    if (this._revealTimeoutId) { clearTimeout(this._revealTimeoutId); this._revealTimeoutId = null; }
     // Refresh wheel contents for the currently selected list so the removed book
     // no longer appears as a slice.
     try {

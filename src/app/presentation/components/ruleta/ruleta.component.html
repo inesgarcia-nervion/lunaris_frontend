@@ -7,6 +7,7 @@
         <div class="wheel-wrap">
           <div class="wheel"
                [class.spinning]="spinning"
+            (transitionend)="onWheelTransitionEnd($event)"
                [style.width.px]="wheelSize"
                [style.height.px]="wheelSize"
                [style.background]="wheelBackground"
