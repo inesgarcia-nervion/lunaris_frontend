@@ -1,6 +1,7 @@
 import { Component, signal, OnInit, OnDestroy } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { HeaderComponent } from './presentation/components/header/header.component';
+import { ConfirmDialogComponent } from './presentation/shared/confirm-dialog/confirm-dialog.component';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ListasService } from './domain/services/listas.service';
@@ -8,7 +9,7 @@ import { AuthService } from './domain/services/auth.service';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterOutlet, HeaderComponent],
+  imports: [CommonModule, RouterOutlet, HeaderComponent, ConfirmDialogComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

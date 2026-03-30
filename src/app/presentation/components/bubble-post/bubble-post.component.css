@@ -29,6 +29,14 @@
 .post-actions { margin-top:14px; display:flex; gap:12px; align-items:center }
 .post-actions button { background:transparent; border:none; cursor:pointer; font-size:14px; padding:6px; border-radius:6px }
 .post-actions button:hover { background:rgba(91,110,246,0.06) }
+.post-actions button:not(.btn-delete):not(.confirm-yes):not(.confirm-no):hover { background: rgba(91,110,246,0.06); }
+
+/* Ensure component-level hover doesn't override the intended btn-delete hover visual */
+.post-actions .btn-delete:hover,
+.post-actions .btn-delete--muted:hover {
+  /* let global styles define exact color, but reset button default hover background */
+  background: transparent;
+}
 
 .post-actions .like { color:#e25555 }
 

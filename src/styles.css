@@ -18,4 +18,97 @@
 .app-container {
   margin-top: 120px;
 }
+/* Inline confirmation layout helper */
+.inline-confirm { display:inline-flex; gap:8px; align-items:center; }
+
+/* Button variants for delete actions */
+.btn-delete {
+  background: transparent;
+  color: #d32f2f;
+  border: 1px solid #d32f2f;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .12s ease, border-color .12s ease, color .12s ease;
+  font-weight: 600;
+}
+.btn-delete--small { padding:6px 8px; border-radius:6px; font-size:0.95rem }
+
+/* Muted / grey variant for less-destructive actions */
+.btn-delete--muted {
+  background: transparent;
+  color: #50555a;
+  border: 1px solid #cfcfcf;
+}
+
+/* Hover: darker tone of the base color */
+.btn-delete:hover,
+.btn-delete:focus {
+  background: rgba(211,47,47,0.08);
+  border-color: #b71c1c;
+  color: #b71c1c;
+}
+.btn-delete--muted:hover,
+.btn-delete--muted:focus {
+  background: rgba(60,64,67,0.06);
+  border-color: #9aa0a6;
+  color: #333;
+}
+
+/* Make disabled state subtle */
+.btn-delete[disabled], .btn-delete--muted[disabled] { opacity:.6; cursor:not-allowed }
+
+/* Reusable action group used by news, posts, lists and any delete flows */
+.news-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+}
+.news-actions > button:not(.confirm-yes):not(.confirm-no) {
+  background: transparent;
+  color: #d32f2f;
+  border: 1px solid rgba(211,47,47,0.12);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .15s ease, transform .06s ease, box-shadow .15s ease;
+  font-weight: 600;
+}
+.news-actions > button:not(.confirm-yes):not(.confirm-no):hover {
+  background: rgba(211,47,47,0.06);
+  box-shadow: 0 4px 10px rgba(211,47,47,0.08);
+  transform: translateY(-1px);
+}
+.news-actions > button:not(.confirm-yes):not(.confirm-no):active { transform: translateY(0); }
+
+/* Confirm dialog overlay */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.35);
+  z-index: 9999;
+}
+.confirm-overlay.show { display: flex; }
+.confirm-box {
+  background: white;
+  padding: 18px 20px;
+  border-radius: 12px;
+  max-width: 92%;
+  width: 420px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+  color: #222;
+}
+.confirm-message { margin-bottom: 12px; font-weight:600 }
+.confirm-actions { display:flex; gap:10px; justify-content:flex-end; align-items:center }
+.confirm-yes {
+  background: #d32f2f; color: white; border: none; padding: 8px 12px; border-radius:8px; cursor:pointer; font-weight:700
+}
+.confirm-no {
+  background: transparent; color: #555; border: 1px solid #ddd; padding: 8px 12px; border-radius:8px; cursor:pointer; font-weight:600
+}
 

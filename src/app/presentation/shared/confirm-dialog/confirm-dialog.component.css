@@ -1,0 +1,24 @@
+.confirm-overlay {
+	position: fixed;
+	inset: 0;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0,0,0,0.35);
+	z-index: 9999;
+	padding: 24px;
+}
+.confirm-overlay.show { display: flex; }
+.confirm-box {
+	width: 100%;
+	max-width: 520px;
+	background: white;
+	padding: 16px 18px;
+	border-radius: 12px;
+	box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+	color: #222;
+}
+.confirm-message { margin-bottom: 12px; font-weight:600; font-size:1rem; min-height:20px }
+.confirm-actions { display:flex; gap:10px; justify-content:flex-end; align-items:center }
+.confirm-yes { background: #d32f2f; color: white; border: none; padding: 8px 12px; border-radius:8px; cursor:pointer; font-weight:700 }
+.confirm-no { background: transparent; color: #555; border: 1px solid #ddd; padding: 8px 12px; border-radius:8px; cursor:pointer; font-weight:600 }

@@ -7,7 +7,7 @@
       <h1 class="lista-title">{{ lista.nombre }}</h1>
       <div *ngIf="lista.owner && lista.owner === currentUser && !isProfileList(lista.nombre)" class="lista-actions">
         <button class="btn-edit-list" (click)="editListName()">Editar</button>
-        <button class="btn-delete-list" (click)="confirmAndDeleteList()">Eliminar lista</button>
+        <button class="btn-delete" (click)="confirmAndDeleteList()">Eliminar lista</button>
       </div>
     </div>
     <div *ngIf="lista.libros.length === 0" class="lista-empty">
@@ -20,7 +20,7 @@
           <img class="libro-cover" [src]="getCover(book)" alt="portada" />
           <h3 class="libro-title">{{ book.title }}</h3>
           <p class="libro-author">{{ getAuthor(book) }}</p>
-          <button class="btn-delete-list" (click)="removeFromList(lista.id, book, $event)">Eliminar</button>
+          <button class="btn-delete btn-delete--small btn-delete--muted" (click)="removeFromList(lista.id, book, $event)">Eliminar</button>
         </div>
       </div>
     </div>

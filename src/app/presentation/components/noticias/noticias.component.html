@@ -33,7 +33,7 @@
     <div *ngFor="let n of news" class="news-card" (click)="openDetail(n.id)" role="button" tabindex="0">
       <div class="news-meta">
         <h2>{{ n.title }}</h2>
-        <span class="news-date">{{ n.date | date:'long' }}</span>
+        <span class="news-date">{{ n.date | date:"d 'de' MMMM 'de' y, HH:mm" }}</span>
       </div>
       <p class="news-summary">{{ n.text ? (n.text | slice:0:140) + (n.text.length>140 ? '...' : '') : '' }}</p>
       <div *ngIf="n.image" class="news-image">
@@ -42,7 +42,7 @@
       <!-- Preview text removed: open detail page to see full content -->
       <div *ngIf="isAdmin" class="news-actions">
         <ng-container *ngIf="pendingDeleteId !== n.id">
-          <button (click)="$event.stopPropagation(); confirmRemove(n.id)">Eliminar</button>
+          <button class="btn-delete" (click)="$event.stopPropagation(); confirmRemove(n.id)">Eliminar</button>
         </ng-container>
         <ng-container *ngIf="pendingDeleteId === n.id" class="inline-confirm">
           <span>¿Eliminar?</span>

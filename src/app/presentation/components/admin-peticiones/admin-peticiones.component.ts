@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PeticionesService, BookRequestDto } from '../../../domain/services/peticiones.service';
+import { ConfirmService } from '../../shared/confirm.service';
 
 @Component({
   selector: 'app-admin-peticiones',
@@ -15,7 +16,7 @@ export class AdminPeticionesComponent implements OnInit {
   error: string | null = null;
   deletingId: number | null = null;
 
-  constructor(private peticiones: PeticionesService, private cdr: ChangeDetectorRef) {}
+  constructor(private peticiones: PeticionesService, private cdr: ChangeDetectorRef, private confirm: ConfirmService) {}
 
   ngOnInit(): void {
     this.load();
@@ -37,11 +38,13 @@ export class AdminPeticionesComponent implements OnInit {
     });
   }
 
-  remove(id?: number): void {
+  async remove(id?: number): Promise<void> {
     if (id == null) {
       this.error = 'Id de petición inválido';
       return;
     }
+    const ok = await this.confirm.confirm('¿Estás seguro de eliminar esta petición?');
+    if (!ok) return;
     this.deletingId = id;
     this.peticiones.delete(id).subscribe({
       next: () => {

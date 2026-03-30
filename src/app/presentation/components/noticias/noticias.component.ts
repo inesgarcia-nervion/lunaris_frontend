@@ -2,6 +2,7 @@ import { Component, OnInit, ElementRef, ViewChild, ChangeDetectorRef } from '@an
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NewsService, NewsItem } from '../../../domain/services/news.service';
+import { ConfirmService } from '../../shared/confirm.service';
 import { AuthService } from '../../../domain/services/auth.service';
 import { Router } from '@angular/router';
 
@@ -38,7 +39,7 @@ export class NoticiasComponent implements OnInit {
     this.auth.isAdmin$.subscribe(v => this.isAdmin = v);
   }
 
-  constructor(private newsService: NewsService, private auth: AuthService, private router: Router, private cdr: ChangeDetectorRef) {}
+  constructor(private newsService: NewsService, private auth: AuthService, private router: Router, private cdr: ChangeDetectorRef, private confirm: ConfirmService) {}
 
   openDetail(id: string) {
     this.router.navigate(['noticias', id]);
@@ -122,19 +123,11 @@ export class NoticiasComponent implements OnInit {
   }
 
 
-  // Inline confirmation handlers
-  confirmRemove(id: string) {
+  // Use centralized confirm dialog
+  async confirmRemove(id: string) {
     if (!this.isAdmin) return;
-    this.pendingDeleteId = id;
-  }
-
-  cancelRemove() {
-    this.pendingDeleteId = null;
-  }
-
-  removeConfirmed(id: string) {
-    if (!this.isAdmin) return;
+    const ok = await this.confirm.confirm('¿Estás seguro de eliminar esta noticia?');
+    if (!ok) return;
     this.newsService.removeNews(id);
-    if (this.pendingDeleteId === id) this.pendingDeleteId = null;
   }
 }

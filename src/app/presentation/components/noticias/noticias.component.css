@@ -10,15 +10,54 @@
 .admin-news-form input { padding:8px; font-size:14px; }
 .news-list { display:flex; flex-direction:column; gap:12px; }
 .news-card { border:1px solid #ddd; padding:12px; border-radius:6px; max-width:800px; cursor: pointer; }
-.news-image img { max-width:100%; height:auto; border-radius:4px; }
+.news-image { max-width:160px; margin-top:8px; }
+.news-image img { width:160px; height:200px; object-fit:cover; border-radius:4px; display:block }
 .news-meta { display:flex; justify-content:space-between; align-items:center; }
 .news-text { margin-top:8px; }
-.news-actions { margin-top:8px; }
+.news-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+}
+.news-actions > button:not(.confirm-yes):not(.confirm-no) {
+  background: transparent;
+  color: #d32f2f;
+  border: 1px solid rgba(211,47,47,0.12);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .15s ease, transform .06s ease, box-shadow .15s ease;
+  font-weight: 600;
+}
+.news-actions > button:not(.confirm-yes):not(.confirm-no):hover {
+  background: rgba(211,47,47,0.06);
+  box-shadow: 0 4px 10px rgba(211,47,47,0.08);
+  transform: translateY(-1px);
+}
+.news-actions > button:not(.confirm-yes):not(.confirm-no):active { transform: translateY(0); }
 .empty-news { color:#666; }
 
 .inline-confirm { display:inline-flex; gap:8px; align-items:center; }
-.inline-confirm .confirm-yes { background:#d32f2f; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; }
-.inline-confirm .confirm-no { background:#eee; color:#333; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; }
+.inline-confirm .confirm-yes {
+  background:#d32f2f;
+  color:white;
+  border:none;
+  padding:6px 12px;
+  border-radius:6px;
+  cursor:pointer;
+  box-shadow: 0 6px 14px rgba(211,47,47,0.18);
+}
+.inline-confirm .confirm-yes:hover { filter:brightness(.97); }
+.inline-confirm .confirm-no {
+  background:#f3f4f6;
+  color:#333;
+  border:none;
+  padding:6px 12px;
+  border-radius:6px;
+  cursor:pointer;
+}
 .admin-news-form textarea { padding:8px; font-size:14px; resize:vertical; }
 .admin-news-form .news-body-editor { padding:8px; font-size:14px; min-height:140px; border:1px solid #ddd; border-radius:6px; box-sizing:border-box; white-space:pre-wrap; }
 

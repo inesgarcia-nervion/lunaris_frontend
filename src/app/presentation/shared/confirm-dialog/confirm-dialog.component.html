@@ -1,0 +1,9 @@
+<div class="confirm-overlay" [class.show]="show" role="dialog" aria-modal="true">
+  <div class="confirm-box">
+    <div class="confirm-message">{{ message }}</div>
+    <div class="confirm-actions">
+      <button class="confirm-no" (click)="confirmNo()">No</button>
+      <button class="confirm-yes" (click)="confirmYes()">Sí</button>
+    </div>
+  </div>
+</div>

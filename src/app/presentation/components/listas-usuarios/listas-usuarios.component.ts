@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { BookSearchService, OpenLibraryBook } from '../../../domain/services/book-search.service';
 import { AuthService } from '../../../domain/services/auth.service';
 import { ListasService } from '../../../domain/services/listas.service';
+import { ConfirmService } from '../../shared/confirm.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -27,7 +28,8 @@ export class ListasUsuariosComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private listasService: ListasService,
     public router: Router,
-    public auth: AuthService
+    public auth: AuthService,
+    private confirm: ConfirmService
   ) {}
 
   ngOnInit(): void {
@@ -54,7 +56,7 @@ export class ListasUsuariosComponent implements OnInit {
     this.listasService.updateListName(listId, nombre);
   }
 
-  deleteList(listId: string): void {
+  async deleteList(listId: string): Promise<void> {
     const lista = this.listasService.getById(listId);
     if (!lista) return;
     if (!lista.owner || lista.owner !== this.currentUser) return;
@@ -62,7 +64,7 @@ export class ListasUsuariosComponent implements OnInit {
       alert('Las listas del perfil no se pueden eliminar.');
       return;
     }
-    const ok = confirm(`¿Estás seguro de eliminar la lista "${lista.nombre}"?`);
+    const ok = await this.confirm.confirm(`¿Estás seguro de eliminar la lista "${lista.nombre}"?`);
     if (!ok) return;
     this.listasService.deleteList(listId);
   }

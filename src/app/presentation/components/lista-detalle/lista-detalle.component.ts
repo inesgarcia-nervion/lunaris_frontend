@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { ListasService, ListaItem } from '../../../domain/services/listas.service';
+import { ConfirmService } from '../../shared/confirm.service';
 import { Subscription } from 'rxjs';
 import { BookSearchService, OpenLibraryBook } from '../../../domain/services/book-search.service';
 
@@ -19,7 +20,7 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
   private currentId: string = '';
   currentUser: string | null = null;
 
-  constructor(private route: ActivatedRoute, private listas: ListasService, private router: Router, private bookSearch: BookSearchService, private location: Location) {}
+  constructor(private route: ActivatedRoute, private listas: ListasService, private router: Router, private bookSearch: BookSearchService, private location: Location, private confirm: ConfirmService) {}
 
   ngOnInit(): void {
     this.currentId = this.route.snapshot.paramMap.get('id') || '';
@@ -121,18 +122,20 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  removeFromList(listId: string, book: any, event?: Event): void {
+  async removeFromList(listId: string, book: any, event?: Event): Promise<void> {
     if (event) event.stopPropagation();
+    const ok = await this.confirm.confirm('¿Estás seguro de eliminar este libro de la lista?');
+    if (!ok) return;
     this.listas.removeBookFromList(listId, book as OpenLibraryBook);
   }
 
-  confirmAndDeleteList(): void {
+  async confirmAndDeleteList(): Promise<void> {
     if (!this.lista) return;
     if (this.isProfileList(this.lista.nombre)) {
       alert('Esta lista del perfil no puede eliminarse.');
       return;
     }
-    const ok = confirm(`¿Estás seguro de que quieres eliminar la lista "${this.lista.nombre}"? Esta acción no se puede deshacer.`);
+    const ok = await this.confirm.confirm(`¿Estás seguro de que quieres eliminar la lista "${this.lista.nombre}"? Esta acción no se puede deshacer.`);
     if (!ok) return;
     this.listas.deleteList(this.lista.id);
     this.router.navigateByUrl('/listas-usuarios');

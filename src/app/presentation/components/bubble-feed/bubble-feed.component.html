@@ -7,17 +7,7 @@
     <div *ngIf="posts.length === 0" class="empty-state">Aún no hay publicaciones. Sé el primero en publicar.</div>
     <div *ngFor="let p of posts">
       <ng-container *ngIf="editingId !== p.id">
-        <app-bubble-post [post]="p" (like)="toggleLike($event)" (open)="openPost($event)" (edit)="startEdit($event)" [canDelete]="auth.isAdmin() || (auth.getCurrentUsername() === p.user.name)" (delete)="confirmRemovePost($event)"></app-bubble-post>
-        <div *ngIf="auth.isAdmin() || (auth.getCurrentUsername() === p.user.name)" class="news-actions">
-          <ng-container *ngIf="pendingDeleteId !== p.id">
-            <button (click)="$event.stopPropagation(); confirmRemovePost(p.id)">Eliminar</button>
-          </ng-container>
-          <ng-container *ngIf="pendingDeleteId === p.id" class="inline-confirm">
-            <span>¿Eliminar?</span>
-            <button class="confirm-yes" (click)="$event.stopPropagation(); removeConfirmedPost(p.id)">Sí</button>
-            <button class="confirm-no" (click)="$event.stopPropagation(); cancelRemovePost()">No</button>
-          </ng-container>
-        </div>
+        <app-bubble-post [post]="p" (like)="toggleLike($event)" (open)="openPost($event)" (edit)="startEdit($event)" [canDelete]="auth.isAdmin() || (auth.getCurrentUsername() === p.user.name)" (delete)="removeConfirmedPost($event)"></app-bubble-post>
       </ng-container>
       <ng-container *ngIf="editingId === p.id">
         <div class="create-card edit-card">
@@ -115,7 +105,7 @@
             <strong>{{ c.user.name }}:</strong>
             <div class="comment-body">{{ c.text }}</div>
             <div class="comment-meta">
-              <button class="comment-delete" *ngIf="auth.isAdmin() || (auth.getCurrentUsername() === c.user.name)" (click)="$event.stopPropagation(); deleteComment(c.id)">Eliminar</button>
+              <button class="btn-delete btn-delete--small btn-delete--muted" *ngIf="auth.isAdmin() || (auth.getCurrentUsername() === c.user.name)" (click)="$event.stopPropagation(); deleteComment(c.id)">Eliminar</button>
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../domain/services/auth.service';
+import { ConfirmService } from '../../shared/confirm.service';
 
 @Component({
   selector: 'app-configuracion',
@@ -28,7 +29,7 @@ export class ConfiguracionComponent implements OnInit {
   success: string | null = null;
   isSaving: boolean = false;
 
-  constructor(private auth: AuthService, private router: Router, private cdr: ChangeDetectorRef) {}
+  constructor(private auth: AuthService, private router: Router, private cdr: ChangeDetectorRef, private confirm: ConfirmService) {}
 
   ngOnInit(): void {
     const stored = this.auth.getCurrentUsername() || '';
@@ -162,7 +163,7 @@ export class ConfiguracionComponent implements OnInit {
       return;
     }
 
-    const ok = confirm(`¿Estás seguro de cambiar tu usuario a "${newName}"?`);
+    const ok = await this.confirm.confirm(`¿Estás seguro de cambiar tu usuario a "${newName}"?`);
     if (!ok) return;
     // prepare payload
     const payload: any = { username: newName };

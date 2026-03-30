@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { BubblePostComponent, BubblePost } from '../bubble-post/bubble-post.component';
+import { ConfirmService } from '../../shared/confirm.service';
 import { AuthService } from '../../../domain/services/auth.service';
 
 @Component({
@@ -36,7 +37,7 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
   imageLoading = false;
   private imageObjectUrl: string | null = null;
 
-  constructor(public auth: AuthService, private zone: NgZone, private cdr: ChangeDetectorRef, private route: ActivatedRoute, private router: Router, private location: Location) {}
+  constructor(public auth: AuthService, private zone: NgZone, private cdr: ChangeDetectorRef, private route: ActivatedRoute, private router: Router, private location: Location, private confirm: ConfirmService) {}
 
   ngOnInit(): void {
     // If route contains an id param, open that post when posts are available
@@ -88,13 +89,16 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     try { if (this.commentEditorRef?.nativeElement) this.commentEditorRef.nativeElement.innerHTML = ''; } catch (_) {}
   }
 
-  deleteComment(commentId: number) {
+  async deleteComment(commentId: number) {
     if (!this.selected || !this.selected.comments) return;
     const currentUser = this.auth.getCurrentUsername();
     const isAdmin = this.auth.isAdmin();
     const comment = this.selected.comments.find(c => c.id === commentId);
     if (!comment) return;
     if (!isAdmin && comment.user.name !== currentUser) return; // not allowed
+
+    const ok = await this.confirm.confirm('¿Estás seguro de eliminar este comentario?');
+    if (!ok) return;
 
     // remove from selected.comments
     this.selected.comments = this.selected.comments.filter(c => c.id !== commentId);

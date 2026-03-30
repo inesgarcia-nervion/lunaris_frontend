@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 import { AuthService } from '../../../domain/services/auth.service';
 import { ListasService } from '../../../domain/services/listas.service';
 import { ReviewService } from '../../../domain/services/review.service';
+import { ConfirmService } from '../../shared/confirm.service';
 
 @Component({
   selector: 'app-header',
@@ -56,10 +57,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private bookSearchService: BookSearchService,
     private cdr: ChangeDetectorRef,
     private auth: AuthService,
-    private router: Router
-    , private listasService: ListasService,
+    private router: Router,
+    private listasService: ListasService,
     private elementRef: ElementRef,
-    private reviewService: ReviewService
+    private reviewService: ReviewService,
+    private confirmService: ConfirmService
   ) { }
 
   onUserButtonClick(event: Event) {
@@ -701,8 +703,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
-  deleteReview(): void {
+  async deleteReview(): Promise<void> {
     if (!this.currentUserReview || !this.currentUserReview.id) return;
+    const ok = await this.confirmService.confirm('¿Estás seguro de eliminar tu reseña?');
+    if (!ok) return;
     this.reviewService.delete(this.currentUserReview.id).subscribe({
       next: () => {
         this.reviews = this.reviews.filter(r => r.id !== this.currentUserReview.id);
@@ -722,8 +726,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     });
   }
 
-  deleteReviewById(id: number | undefined): void {
+  async deleteReviewById(id: number | undefined): Promise<void> {
     if (!id) return;
+    const ok = await this.confirmService.confirm('¿Estás seguro de eliminar esta reseña?');
+    if (!ok) return;
     this.reviewService.delete(id).subscribe({
       next: () => {
         this.reviews = this.reviews.filter(r => r.id !== id);

@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { ConfirmService } from '../../shared/confirm.service';
 import { CommonModule } from '@angular/common';
 
 export interface BubbleUser {
@@ -36,6 +37,14 @@ export class BubblePostComponent {
   @Output() edit = new EventEmitter<number>();
   @Output() open = new EventEmitter<BubblePost>();
   @Output() delete = new EventEmitter<number>();
+
+  constructor(private confirmService: ConfirmService) {}
+
+  async onDeleteConfirm() {
+    const ok = await this.confirmService.confirm('¿Estás seguro de eliminar esta publicación?');
+    if (!ok) return;
+    this.delete.emit(this.post.id);
+  }
 
   onToggleLike() {
     this.like.emit(this.post.id);
