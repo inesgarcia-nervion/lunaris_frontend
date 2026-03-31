@@ -51,6 +51,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   userReview: string = '';
   reviews: any[] = [];
   currentUserReview: any | null = null;
+  reviewSuccess: string | null = null;
+  reviewError: string | null = null;
   isMenuRoute: boolean = false;
   @ViewChild('reviewEditor') reviewEditor?: ElementRef<HTMLElement>;
 
@@ -199,6 +201,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.error = null;
       this.successMessage = null;
+      this.cdr.markForCheck();
+    }, 5000);
+  }
+
+  private clearReviewAlertAfterDelay(): void {
+    setTimeout(() => {
+      this.reviewError = null;
+      this.reviewSuccess = null;
       this.cdr.markForCheck();
     }, 5000);
   }
@@ -686,15 +696,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
           const idx = this.reviews.findIndex(r => r.id === updated.id);
           if (idx >= 0) this.reviews[idx] = updated;
           this.currentUserReview = updated;
-          this.successMessage = 'Reseña actualizada';
-          this.clearAlertAfterDelay();
+          this.reviewSuccess = 'Reseña actualizada';
+          this.clearReviewAlertAfterDelay();
           this.reviewService.refreshAll();
           this.cdr.markForCheck();
         },
         error: (err) => {
           console.error('Error actualizando reseña:', err);
-          this.error = 'Error al actualizar la reseña';
-          this.clearAlertAfterDelay();
+          this.reviewError = 'Error al actualizar la reseña';
+          this.clearReviewAlertAfterDelay();
         }
       });
     } else {
@@ -703,15 +713,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
         next: (created) => {
           this.reviews.unshift(created);
           this.currentUserReview = created;
-          this.successMessage = 'Reseña publicada';
-          this.clearAlertAfterDelay();
+          this.reviewSuccess = 'Reseña publicada';
+          this.clearReviewAlertAfterDelay();
           this.reviewService.refreshAll();
           this.cdr.markForCheck();
         },
         error: (err) => {
           console.error('Error creando reseña:', err);
-          this.error = 'Error al publicar la reseña';
-          this.clearAlertAfterDelay();
+          this.reviewError = 'Error al publicar la reseña';
+          this.clearReviewAlertAfterDelay();
         }
       });
     }
@@ -727,15 +737,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.currentUserReview = null;
         this.userReview = '';
         this.userRating = 0;
-        this.successMessage = 'Reseña eliminada';
-        this.clearAlertAfterDelay();
+        this.reviewSuccess = 'Reseña eliminada';
+        this.clearReviewAlertAfterDelay();
         this.reviewService.refreshAll();
         this.cdr.markForCheck();
       },
       error: (err) => {
         console.error('Error eliminando reseña:', err);
-        this.error = 'Error al eliminar la reseña';
-        this.clearAlertAfterDelay();
+        this.reviewError = 'Error al eliminar la reseña';
+        this.clearReviewAlertAfterDelay();
       }
     });
   }
@@ -752,14 +762,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
           this.userReview = '';
           this.userRating = 0;
         }
-        this.successMessage = 'Reseña eliminada';
-        this.clearAlertAfterDelay();
+        this.reviewSuccess = 'Reseña eliminada';
+        this.clearReviewAlertAfterDelay();
         this.cdr.markForCheck();
       },
       error: (err) => {
         console.error('Error eliminando reseña:', err);
-        this.error = 'Error al eliminar la reseña';
-        this.clearAlertAfterDelay();
+        this.reviewError = 'Error al eliminar la reseña';
+        this.clearReviewAlertAfterDelay();
       }
     });
   }

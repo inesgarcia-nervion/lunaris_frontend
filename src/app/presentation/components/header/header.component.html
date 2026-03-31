@@ -243,6 +243,8 @@
 
       <!-- Tu review -->
       <div class="review-section">
+        <div *ngIf="reviewError" class="review-alert review-error">{{ reviewError }}</div>
+        <div *ngIf="reviewSuccess" class="review-alert review-success">{{ reviewSuccess }}</div>
         <h3>Tu review</h3>
         <div class="my-review">
           <div class="review-header">
