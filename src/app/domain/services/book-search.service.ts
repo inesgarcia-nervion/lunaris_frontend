@@ -48,6 +48,8 @@ export interface OpenLibrarySearchResponse {
 })
 export class BookSearchService {
   private apiUrl = 'http://localhost:8080'; // Cambiar según tu configuración
+  // simple in-memory cache for query+limit+offset -> response
+  private pageCache = new Map<string, OpenLibrarySearchResponse>();
 
   // Estado compartido para que Header publique resultados y Menu los consuma
   private responseSubject = new BehaviorSubject<OpenLibrarySearchResponse | null>(null);
@@ -278,6 +280,19 @@ export class BookSearchService {
     }
     const page = this.currentPageSubject.value || 1;
     const offset = (page - 1) * limit;
+    const cacheKey = `${this.currentQuery}::${limit}::${offset}`;
+
+    // If we have a cached page, publish immediately and return (but still prefetch next)
+    const cached = this.pageCache.get(cacheKey);
+    if (cached) {
+      this.setLoading(false);
+      this.setError(null);
+      this.publishResults(cached);
+      // prefetch next page in background
+      this.prefetchPage(this.currentQuery, limit, offset + limit);
+      return;
+    }
+
     this.setLoading(true);
     this.setError(null);
     this.setSuccess(null);
@@ -285,11 +300,15 @@ export class BookSearchService {
     // Paginación server-side: cada página pide sólo `limit` libros a OpenLibrary con el offset correcto
     this.searchBooks(this.currentQuery, limit, offset).subscribe({
       next: (response) => {
+        // cache response
+        try { this.pageCache.set(cacheKey, response); } catch (e) { /* ignore cache set errors */ }
         this.publishResults(response);
         this.setLoading(false);
         if (!response.docs || response.docs.length === 0) {
           this.setError('No se encontraron libros. Intenta con otra búsqueda.');
         }
+        // prefetch next page in background
+        this.prefetchPage(this.currentQuery, limit, offset + limit);
       },
       error: (err) => {
         console.error('Error buscando libros (service):', err);
@@ -302,6 +321,19 @@ export class BookSearchService {
         }
         this.setLoading(false);
       }
+    });
+  }
+
+  private prefetchPage(query: string, limit: number, offset: number): void {
+    if (!query || offset < 0) return;
+    const cacheKey = `${query}::${limit}::${offset}`;
+    if (this.pageCache.has(cacheKey)) return;
+    // don't block UI; subscribe and store in cache
+    this.searchBooks(query, limit, offset).subscribe({
+      next: (response) => {
+        try { this.pageCache.set(cacheKey, response); } catch (e) { /* ignore */ }
+      },
+      error: () => { /* ignore prefetch errors */ }
     });
   }
 

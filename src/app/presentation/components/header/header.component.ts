@@ -152,6 +152,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }));
   }
 
+  // Helper to render skeleton placeholders while loading
+  get skeletonArray(): any[] {
+    return Array.from({ length: this.limit });
+  }
+
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
   }

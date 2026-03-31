@@ -97,7 +97,18 @@
 
   <!-- VISTA DE BÚSQUEDA SIMPLIFICADA -->
   <div *ngIf="searchResults.length > 0 && !selectedBook" class="results-section">
-    <div class="books-grid-simple">
+    <!-- Skeletons while loading -->
+    <div *ngIf="loading" class="books-grid-simple skeleton-grid">
+      <div *ngFor="let _ of skeletonArray" class="book-card-simple skeleton-card">
+        <div class="book-cover-simple skeleton-cover"></div>
+        <div class="book-info-simple">
+          <div class="skeleton-line title"></div>
+          <div class="skeleton-line author"></div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!loading" class="books-grid-simple">
       <div *ngFor="let book of searchResults | slice:0:limit" class="book-card-simple" (click)="selectBook(book)">
         <!-- Portada -->
         <div class="book-cover-simple">

@@ -416,17 +416,20 @@
 
 /* Información de resultados */
 .results-info {
-  color: #ff0000;
-  background-color: #f9f9f9;
-  padding: 15px;
-  border-radius: 5px;
+  color: #080808;
+  background-color: #ffffff;
+  padding: 18px 20px;
+  border-radius: 8px;
   text-align: center;
-  border-left: 4px solid #ccc;
+  border-left: 6px solid #9d4edd;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  margin: 12px 0 18px;
 }
 
 .results-info p {
-  margin: 5px 0;
-  font-size: 14px;
+  margin: 6px 0;
+  font-size: 15px;
+  color: #444;
 }
 
 /* Alertas */
@@ -480,6 +483,15 @@
   gap: 20px;
   margin-bottom: 30px;
 }
+
+/* Skeleton styles for loading state */
+.skeleton-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+.skeleton-card { background: #fff; border-radius: 8px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display:flex; flex-direction:column; gap:12px; }
+.skeleton-cover { height:200px; background: linear-gradient(90deg,#f0f0f0,#e8e8e8,#f0f0f0); background-size:200% 100%; animation: shimmer 1.2s linear infinite; border-radius:6px; }
+.skeleton-line { height:14px; background: linear-gradient(90deg,#f0f0f0,#e8e8e8,#f0f0f0); background-size:200% 100%; animation: shimmer 1.2s linear infinite; border-radius:4px; }
+.skeleton-line.title { width:70%; height:18px; margin-top:6px; }
+.skeleton-line.author { width:40%; height:14px; margin-top:6px; }
+@keyframes shimmer { 0% { background-position:200% 0 } 100% { background-position:-200% 0 } }
 
 .book-card {
   background: white;
