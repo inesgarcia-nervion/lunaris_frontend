@@ -722,6 +722,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
           console.error('Error creando reseña:', err);
           this.reviewError = 'Error al publicar la reseña';
           this.clearReviewAlertAfterDelay();
+          
         }
       });
     }
@@ -746,6 +747,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         console.error('Error eliminando reseña:', err);
         this.reviewError = 'Error al eliminar la reseña';
         this.clearReviewAlertAfterDelay();
+        
       }
     });
   }
@@ -770,6 +772,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         console.error('Error eliminando reseña:', err);
         this.reviewError = 'Error al eliminar la reseña';
         this.clearReviewAlertAfterDelay();
+        
       }
     });
   }
