@@ -1,7 +1,7 @@
 .lista-detalle-container {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 40px auto;
-  padding: 32px 24px;
+  padding: 40px 32px; /* increase padding so cards don't touch edges */
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 2px 12px #0001;
@@ -41,10 +41,12 @@
 }
 .libros-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 45px; /* increased spacing between cards */
   margin-top: 12px;
-}
+  align-items: stretch;
+  grid-auto-rows: 1fr; /* make rows equal height so cards match */
+  padding: 12px; /* inner padding so items don't sit flush to container edges */}
 .libro-item {
   text-align: center;
 }
@@ -52,8 +54,8 @@
   width: 100%;
   height: 200px;
   object-fit: cover;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(22,31,84,0.08);
   cursor: pointer;
   transition: transform 0.12s ease;
 }
@@ -106,23 +108,75 @@
 }
 .btn-delete-like-news:active { transform: translateY(0); }
 
-.libro-title { font-size: 1rem; margin: 8px 0 4px; cursor: pointer; }
-.libro-author { font-size: 0.85rem; color:#666; margin-bottom: 8px; }
+.libro-title { 
+  font-size: 1rem; 
+  margin: 8px 0 4px; 
+  cursor: pointer; 
+  display: -webkit-box; 
+  -webkit-line-clamp: 2; /* limit to 2 lines */
+  -webkit-box-orient: vertical; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  line-height: 1.2em; 
+  max-height: 2.4em; 
+}
+.libro-author { 
+  font-size: 0.9rem; 
+  color:#666; 
+  margin-bottom: 8px; 
+  display: -webkit-box; 
+  -webkit-line-clamp: 1; /* single line for author */
+  -webkit-box-orient: vertical; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  white-space: normal; 
+}
 .btn-delete-list { background:#e53935; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; display:inline-block; }
 .btn-delete-list:hover { opacity:0.95 }
 
 .libro-card-box {
   background: #fff;
-  padding: 10px;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #e6e9f2; /* same border as noticias */
+  box-shadow: 0 8px 20px rgba(22,31,84,0.04);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
   width: 100%;
+  height: 100%; /* fill grid cell so cards match height */
+  min-height: 320px; /* visual consistency */
+  overflow: hidden;
 }
-.libro-card-box:hover { transform: translateY(-4px); transition: transform 0.12s ease; }
+.libro-card-box:hover { transform: translateY(-4px); transition: transform 0.12s ease; box-shadow: 0 10px 28px rgba(22,31,84,0.06); }
 
 /* .delete-box removed: delete button displays inline without extra container */
+
+/* Make the inline 'Eliminar' button inside each book card match the main red delete style */
+.libro-card-box .btn-delete {
+  background: #e53935;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Ensure the muted modifier does not override the red appearance inside cards */
+.libro-card-box .btn-delete.btn-delete--muted,
+.libro-card-box .btn-delete--muted {
+  background: #e53935 !important;
+  color: white !important;
+  border: none !important;
+}
+
+/* If you want the card buttons to be smaller, adjust the small modifier here */
+.libro-card-box .btn-delete--small {
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+/* Responsive tweak: ensure button width doesn't overflow card on tiny screens */
+.libro-card-box .btn-delete { max-width: 100%; }

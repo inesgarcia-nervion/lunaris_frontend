@@ -98,17 +98,19 @@
   gap: 16px;
 }
 .lista-card {
-  background: linear-gradient(180deg,#ffffff,#fbfbff);
-  border-radius: 12px;
-  padding: 18px;
-  box-shadow: 0 8px 20px rgba(20,16,35,0.04);
+  background: #fff;
+  border: 1px solid #ddd; /* match .news-card */
+  padding: 12px;
+  border-radius: 6px; /* match .news-card */
+  box-shadow: none;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   position: relative;
+  overflow: hidden; /* ensure children don't overflow rounded corners */
   transition: transform .14s ease, box-shadow .14s ease;
 }
-.lista-card:hover { transform: translateY(-6px); box-shadow: 0 20px 48px rgba(20,16,35,0.08); }
+.lista-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(20,16,35,0.06); }
 .lista-nombre {
   font-size: 1.15rem;
   margin: 8px 0 6px;
@@ -170,12 +172,14 @@
 
 /* Bloque destacado para la última lista (pone la más reciente arriba) */
 .lista-featured {
-  background: #f9f7f4;
-  border-radius: 12px;
-  padding: 24px 18px;
-  box-shadow: 0 1px 6px #0001;
+  background: #fff;
+  border: 1px solid #ddd; /* match .news-card */
+  border-radius: 6px;
+  padding: 12px;
+  box-shadow: none;
   margin-bottom: 20px;
   position: relative; /* allow absolute positioning of the action button */
+  overflow: hidden;
 }
 
 
@@ -198,9 +202,7 @@
   z-index: 10;
 }
 
-.lista-card {
-  position: relative;
-}
+/* .lista-card already defines position and overflow above */
 
 /* Favorite button inside list card */
 .btn-favorite {
@@ -245,7 +247,7 @@
   align-items: center;
   margin-top: 12px;
   overflow: hidden;
-  justify-content: center;
+  justify-content: flex-start; /* align previews to the left */
 }
 .preview-img {
   width: 56px;
