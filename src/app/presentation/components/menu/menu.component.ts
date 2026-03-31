@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { PaginationComponent } from '../../shared/pagination/pagination.component';
 import { BookSearchService, OpenLibraryBook, OpenLibrarySearchResponse } from '../../../domain/services/book-search.service';
 import { AuthService } from '../../../domain/services/auth.service';
 import { PeticionesService, BookRequestDto } from '../../../domain/services/peticiones.service';
@@ -12,7 +13,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PaginationComponent],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.css'
 })
@@ -300,6 +301,15 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   reviewPagePrev(): void {
     if (this.reviewPageIndex > 0) this.reviewPageIndex--;
+  }
+
+  // Handlers for numeric pagination component (1-based)
+  onListPageChange(page: number): void {
+    this.listPageIndex = Math.max(0, page - 1);
+  }
+
+  onReviewPageChange(page: number): void {
+    this.reviewPageIndex = Math.max(0, page - 1);
   }
 
   getReviewCoverUrl(review: ReviewDto): string {

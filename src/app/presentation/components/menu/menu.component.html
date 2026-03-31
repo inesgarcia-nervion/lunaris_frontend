@@ -103,11 +103,12 @@
         </div>
       </div>
       <div class="user-lists-footer">
-        <span class="list-page-info">{{ currentListPageDisplay }} de {{ listTotalPagesDisplay }}</span>
-        <div class="list-page-arrows">
-          <button class="arrow-btn" (click)="listPagePrev()" [disabled]="listPageIndex === 0">&#8592;</button>
-          <button class="arrow-btn" (click)="listPageNext()" [disabled]="listPageIndex >= listTotalPages - 1">&#8594;</button>
-        </div>
+        <app-pagination
+          [totalItems]="userLists.length"
+          [pageSize]="listsPerPage"
+          [currentPage]="listPageIndex + 1"
+          (pageChange)="onListPageChange($event)">
+        </app-pagination>
       </div>
     </div>
 
@@ -142,11 +143,12 @@
         </div>
       </div>
       <div class="user-lists-footer">
-        <span class="list-page-info">{{ currentReviewPageDisplay }} de {{ reviewTotalPagesDisplay }}</span>
-        <div class="list-page-arrows">
-          <button class="arrow-btn" (click)="reviewPagePrev()" [disabled]="reviewPageIndex === 0">&#8592;</button>
-          <button class="arrow-btn" (click)="reviewPageNext()" [disabled]="reviewPageIndex >= reviewTotalPages - 1">&#8594;</button>
-        </div>
+        <app-pagination
+          [totalItems]="allReviews.length"
+          [pageSize]="reviewsPerPage"
+          [currentPage]="reviewPageIndex + 1"
+          (pageChange)="onReviewPageChange($event)">
+        </app-pagination>
       </div>
     </div>
 

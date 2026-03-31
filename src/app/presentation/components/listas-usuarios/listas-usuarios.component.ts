@@ -6,11 +6,12 @@ import { ConfirmService } from '../../shared/confirm.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
 @Component({
   selector: 'app-listas-usuarios',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: './listas-usuarios.component.html',
   styleUrls: ['./listas-usuarios.component.css']
 })
@@ -18,6 +19,10 @@ export class ListasUsuariosComponent implements OnInit {
   search: string = '';
   listas: any[] = [];
   filteredListas: any[] = [];
+  // Pagination (client-side)
+  pageSize = 8;
+  currentPage = 1;
+  pagedListas: any[] = [];
   showCreateInput: boolean = false;
   newListName: string = '';
   newListPrivate: boolean = false;
@@ -36,8 +41,9 @@ export class ListasUsuariosComponent implements OnInit {
     // Cargar listas desde servicio (localStorage por ahora)
     this.listas = this.filterOutProfileLists(this.listasService.getAll());
     this.filteredListas = this.listas;
+    this.updatePagination();
     this.currentUser = this.listasService.getCurrentUser();
-    this.listasService.listas$.subscribe(l => { this.listas = this.filterOutProfileLists(l || []); this.filteredListas = this.listas; this.cdr.markForCheck(); });
+    this.listasService.listas$.subscribe(l => { this.listas = this.filterOutProfileLists(l || []); this.filteredListas = this.listas; this.updatePagination(); this.cdr.markForCheck(); });
     this.listasService.favorites$.subscribe(() => { this.cdr.markForCheck(); });
     console.log('ListasUsuariosComponent initialized; current searchQuery:', this.bookSearchService.getSearchQuery());
   }
@@ -73,6 +79,20 @@ export class ListasUsuariosComponent implements OnInit {
   onSearch(): void {
     const term = this.search.toLowerCase();
     this.filteredListas = this.listas.filter(l => l.nombre.toLowerCase().includes(term));
+    this.currentPage = 1;
+    this.updatePagination();
+  }
+
+  updatePagination(): void {
+    const rest = this.filteredListas.slice(1);
+    const start = (this.currentPage - 1) * this.pageSize;
+    this.pagedListas = rest.slice(start, start + this.pageSize);
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.updatePagination();
+    this.cdr.markForCheck();
   }
 
   private filterOutProfileLists(listas: any[]): any[] {

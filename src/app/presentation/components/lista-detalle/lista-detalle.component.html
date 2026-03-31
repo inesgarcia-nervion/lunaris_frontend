@@ -17,12 +17,11 @@
         <button *ngIf="lista.owner && lista.owner !== currentUser && isFavorited()" class="btn-delete-like-news" (click)="$event.stopPropagation(); confirmAndRemoveFavorite()">Eliminar favorito</button>
       </div>
     </div>
-    <div *ngIf="lista.libros.length === 0" class="lista-empty">
+    <div *ngIf="(lista.libros || []).length === 0" class="lista-empty">
       <p>Esta lista está vacía. Añade libros desde la búsqueda.</p>
     </div>
-
-    <div *ngIf="lista.libros.length > 0" class="libros-grid">
-      <div *ngFor="let book of lista.libros" class="libro-item">
+    <div *ngIf="(lista.libros || []).length > 0" class="libros-grid">
+      <div *ngFor="let book of pagedLibros" class="libro-item">
         <div class="libro-card-box" (click)="openFromDetail(book)">
           <img class="libro-cover" [src]="getCover(book)" alt="portada" />
           <h3 class="libro-title">{{ book.title }}</h3>
@@ -31,6 +30,12 @@
         </div>
       </div>
     </div>
+    <app-pagination *ngIf="(lista.libros || []).length > pageSize"
+      [totalItems]="(lista.libros || []).length"
+      [pageSize]="pageSize"
+      [currentPage]="currentPage"
+      (pageChange)="onPageChange($event)">
+    </app-pagination>
   </div>
 
   <ng-template #notFound>

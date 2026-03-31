@@ -47,6 +47,11 @@
   align-items: stretch;
   grid-auto-rows: 1fr; /* make rows equal height so cards match */
   padding: 12px; /* inner padding so items don't sit flush to container edges */}
+
+/* spacing for pagination below the grid */
+.lista-detalle-container app-pagination {
+  margin-top: 40px;
+}
 .libro-item {
   text-align: center;
 }

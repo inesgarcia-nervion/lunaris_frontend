@@ -6,16 +6,21 @@ import { ListasService, ListaItem } from '../../../domain/services/listas.servic
 import { ConfirmService } from '../../shared/confirm.service';
 import { Subscription } from 'rxjs';
 import { BookSearchService, OpenLibraryBook } from '../../../domain/services/book-search.service';
+import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
 @Component({
   selector: 'app-lista-detalle',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PaginationComponent],
   templateUrl: './lista-detalle.component.html',
   styleUrls: ['./lista-detalle.component.css']
 })
 export class ListaDetalleComponent implements OnInit, OnDestroy {
   lista: ListaItem | undefined;
+  // Pagination for libros within a list (client-side)
+  pageSize = 12;
+  currentPage = 1;
+  pagedLibros: any[] = [];
   private subs: Subscription[] = [];
   private currentId: string = '';
   currentUser: string | null = null;
@@ -25,11 +30,25 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.currentId = this.route.snapshot.paramMap.get('id') || '';
     this.lista = this.listas.getById(this.currentId);
+    this.updatePagination();
     this.currentUser = this.listas.getCurrentUser();
     // Subscribe to updates so new books show up live
     this.subs.push(this.listas.listas$.subscribe(() => {
       this.lista = this.listas.getById(this.currentId);
+      this.currentPage = 1;
+      this.updatePagination();
     }));
+  }
+
+  updatePagination(): void {
+    const libros = this.lista?.libros || [];
+    const start = (this.currentPage - 1) * this.pageSize;
+    this.pagedLibros = libros.slice(start, start + this.pageSize);
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.updatePagination();
   }
 
   openFromDetail(book: any): void {

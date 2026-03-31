@@ -9,11 +9,12 @@ import { AuthService } from '../../../domain/services/auth.service';
 import { ListasService } from '../../../domain/services/listas.service';
 import { ReviewService } from '../../../domain/services/review.service';
 import { ConfirmService } from '../../shared/confirm.service';
+import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
@@ -270,6 +271,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.bookSearchService.searchCurrent(this.limit);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  }
+
+  onPageChange(page: number): void {
+    if (page === this.currentPage) return;
+    this.currentPage = page;
+    this.bookSearchService.setCurrentPage(page);
+    this.bookSearchService.searchCurrent(this.limit);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   getTotalPages(): number {

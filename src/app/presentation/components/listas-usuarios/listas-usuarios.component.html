@@ -62,7 +62,7 @@
   </div>
 
   <div *ngIf="filteredListas.length > 1" class="listas-grid">
-    <div *ngFor="let lista of filteredListas | slice:1" class="lista-card">
+    <div *ngFor="let lista of pagedListas" class="lista-card">
       <div class="lista-header">
         <div class="list-author">
           <ng-container *ngIf="getOwnerAvatar(lista.owner) as avatarUrl; else letterAvatarCard">
@@ -89,4 +89,10 @@
       <!-- Aquí puedes mostrar más info de la lista -->
     </div>
   </div>
+  <app-pagination *ngIf="filteredListas.length > 1"
+    [totalItems]="filteredListas.length > 1 ? (filteredListas.length - 1) : 0"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage"
+    (pageChange)="onPageChange($event)">
+  </app-pagination>
 </div>

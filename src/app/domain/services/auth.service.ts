@@ -99,7 +99,11 @@ export class AuthService {
 
   /** Development shortcut: create a local admin session without contacting backend */
   devAdminLogin(rememberMe: boolean = false): Observable<string> {
-    const token = 'dev-admin-token';
+    // Create a minimal dummy JWT (header.payload.signature) so frontend
+    // treats this as a JWT and the AuthInterceptor will attach it to requests.
+    // Payload grants ADMIN role and subject 'admin'. No signature verification
+    // is performed on the frontend; backend should reject if signature required.
+    const token = 'eyJhbGciOiJub25lIn0.eyJyb2xlcyI6WyJBRE1JTiJdLCJzdWIiOiJhZG1pbiJ9.';
     this.saveToken(token, rememberMe);
     try {
       if (rememberMe) localStorage.setItem('lunaris_current_user', 'admin');

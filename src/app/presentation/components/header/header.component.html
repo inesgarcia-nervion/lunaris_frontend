@@ -120,29 +120,13 @@
 
 
     <!-- Paginación -->
-    <div class="pagination">
-      <button
-        (click)="previousPage()"
-        [disabled]="!hasPreviousPage() || loading"
-        class="btn btn-pagination"
-      >
-        ← Anterior
-      </button>
-
-
-      <div class="page-info">
-        Página <strong>{{ currentPage }}</strong> de <strong>{{ getTotalPages() }}</strong>
-      </div>
-
-
-      <button
-        (click)="nextPage()"
-        [disabled]="!hasNextPage() || loading"
-        class="btn btn-pagination"
-      >
-        Siguiente →
-      </button>
-    </div>
+    <app-pagination *ngIf="totalResults > 0"
+      [totalItems]="totalResults"
+      [pageSize]="limit"
+      [currentPage]="currentPage"
+      [leadingPages]="3"
+      (pageChange)="onPageChange($event)">
+    </app-pagination>
   </div>
 
 
