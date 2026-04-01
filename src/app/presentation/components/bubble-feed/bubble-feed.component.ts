@@ -40,6 +40,8 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
   constructor(public auth: AuthService, private zone: NgZone, private cdr: ChangeDetectorRef, private route: ActivatedRoute, private router: Router, private location: Location, private confirm: ConfirmService) {}
 
   ngOnInit(): void {
+    // Load persisted posts from localStorage
+    this.loadPosts();
     // If route contains an id param, open that post when posts are available
     this.route.params.subscribe(params => {
       const id = params['id'];
@@ -57,6 +59,7 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     if (!p) return;
     p.liked = !p.liked;
     p.likes += p.liked ? 1 : -1;
+    this.savePosts();
   }
 
 
@@ -87,6 +90,7 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     this.newCommentText = '';
     // clear editor content
     try { if (this.commentEditorRef?.nativeElement) this.commentEditorRef.nativeElement.innerHTML = ''; } catch (_) {}
+    this.savePosts();
   }
 
   async deleteComment(commentId: number) {
@@ -107,6 +111,7 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     const p = this.posts.find(x => x.id === this.selected!.id);
     if (p) p.comments = this.selected.comments;
     try { this.cdr.detectChanges(); } catch (_) {}
+    this.savePosts();
   }
 
   // ---- Post deletion (inline confirm like Noticias) ----
@@ -127,6 +132,7 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     this.posts = this.posts.filter(x => x.id !== id);
     if (this.selected && this.selected.id === id) this.selected = undefined;
     if (this.pendingDeleteId === id) this.pendingDeleteId = null;
+    this.savePosts();
   }
 
   
@@ -254,6 +260,7 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
       this.editingId = null;
       this.clearForm();
       this.creating = false;
+      this.savePosts();
       return;
     }
 
@@ -270,6 +277,32 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     this.posts.unshift(post);
     this.clearForm();
     this.creating = false;
+    this.savePosts();
+  }
+
+  // Persist posts to localStorage so they survive page reloads
+  private readonly STORAGE_KEY = 'lunaris.bubble.posts.v1';
+
+  private savePosts() {
+    try {
+      const serialized = JSON.stringify(this.posts || []);
+      localStorage.setItem(this.STORAGE_KEY, serialized);
+    } catch (e) {
+      // ignore storage errors
+    }
+  }
+
+  private loadPosts() {
+    try {
+      const raw = localStorage.getItem(this.STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as BubblePost[];
+      if (Array.isArray(parsed)) {
+        this.posts = parsed;
+      }
+    } catch (e) {
+      // ignore parse errors
+    }
   }
 
   startEdit(postId: number) {
