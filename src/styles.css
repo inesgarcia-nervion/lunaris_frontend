@@ -1,5 +1,21 @@
 /* You can add global styles to this file, and also import other style files */
 
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;600;700;800&display=swap');
+
+/* Global font settings: use a single font across the whole app */
+:root {
+  --app-font: "Urbanist", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+html, body {
+  font-family: var(--app-font);
+}
+/* Force the application font for all elements (overrides component-local fonts) */
+body * {
+  font-family: var(--app-font) !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 /* Prevent page scrolling when `no-scroll` class is applied to body */
 .no-scroll {
 	overflow: hidden !important;

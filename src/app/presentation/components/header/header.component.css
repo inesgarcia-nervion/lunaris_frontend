@@ -1731,13 +1731,13 @@
 }
 
 .btn-delete {
-  background: #f0f0f0;
-  color: #333;
-  border: 1px solid #ddd;
+  background: #e53935; /* red */
+  color: #fff;
+  border: 1px solid #d32f2f;
 }
 
 .btn-delete:hover {
-  background: #e0e0e0;
+  background: #d32f2f;
 }
 
 .review-textinput,
@@ -1799,6 +1799,19 @@
   margin-bottom: 15px;
 }
 
+/* Caja para cada comentario (template usa .user-review-item) */
+.user-review-item {
+  background: #ffffff;
+  border: 1px solid #e6e6e6;
+  padding: 14px 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.user-review-item .review-header-example {
+  margin-bottom: 8px;
+}
 .review-header-example {
   display: flex;
   justify-content: space-between;
