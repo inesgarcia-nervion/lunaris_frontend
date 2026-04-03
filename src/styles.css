@@ -78,12 +78,15 @@ body * {
    Note: .ruleta-container, .noticias-container and .bubble-container manage their
    own margin in their component CSS to match the white-card layout used by listas. */
 .book-search-container,
-.admin-create-book-container,
 .config-container,
 .peticiones-container,
 .perfil-container,
 .app-container {
   margin-top: 120px;
+}
+
+.admin-create-book-container {
+  margin-top: 50px;
 }
 
 /* All page-level containers inherit the active theme background */
