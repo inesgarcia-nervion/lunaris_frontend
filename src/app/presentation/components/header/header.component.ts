@@ -3,7 +3,7 @@ import { Component, ChangeDetectorRef, OnInit, OnDestroy, ElementRef, HostListen
 import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BookSearchService, OpenLibraryBook, OpenLibrarySearchResponse } from '../../../domain/services/book-search.service';
+import { BookSearchService, OpenLibraryBook, OpenLibrarySearchResponse, SagaScraped, SagaBookEntry } from '../../../domain/services/book-search.service';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../../domain/services/auth.service';
 import { ListasService } from '../../../domain/services/listas.service';
@@ -57,6 +57,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
   reviewError: string | null = null;
   isMenuRoute: boolean = false;
   @ViewChild('reviewEditor') reviewEditor?: ElementRef<HTMLElement>;
+
+  // Saga scraping
+  sagaData: SagaScraped | null = null;
+  sagaLoading: boolean = false;
+  sagaExpanded: boolean = false;
+  sagaNavigationError: string | null = null;
+  private navigatingSagaBook: boolean = false;
 
   constructor(
     private bookSearchService: BookSearchService,
@@ -146,6 +153,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.currentUserReview = null;
       // load reviews for the selected book (if any)
       this.loadReviewsForSelectedBook();
+      // load saga data from scraping
+      this.loadSagaData(b);
+      // auto-import book to DB for caching
+      if (b) {
+        this.bookSearchService.importBook(b).subscribe({
+          next: () => {},
+          error: () => {}
+        });
+      }
     }));
     // subscribe to avatar changes so header shows the current avatar immediately
     this.subs.push(this.auth.avatar$.subscribe(a => { this.avatar = a; this.cdr.markForCheck(); }));
@@ -396,6 +412,29 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return this.getSagaName(book) !== null;
   }
 
+  private loadSagaData(book: OpenLibraryBook | null): void {
+    // No resetear si estamos navegando entre libros de la saga
+    if (this.navigatingSagaBook) return;
+    this.sagaData = null;
+    this.sagaLoading = false;
+    this.sagaExpanded = false;
+    if (!book) return;
+
+    this.sagaLoading = true;
+    const author = this.bookSearchService.getFirstAuthor(book);
+    this.bookSearchService.scrapeSaga(book.title, author !== 'Autor desconocido' ? author : undefined).subscribe({
+      next: (data) => {
+        this.sagaData = data;
+        this.sagaLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.sagaLoading = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
   getEditionCount(book: OpenLibraryBook): string {
     return book.editionCount?.toString() || book.edition_count?.toString() || '0';
   }
@@ -624,6 +663,53 @@ export class HeaderComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error cargando reseñas:', err);
+      }
+    });
+  }
+
+  openSagaBook(sagaBook: SagaBookEntry): void {
+    if (!sagaBook.title) return;
+    const previousBook = this.selectedBook;
+    // Mostrar pantalla de carga
+    this.navigatingSagaBook = true;
+    this.sagaLoading = true;
+    this.sagaNavigationError = null;
+    this.sagaData = null;
+    this.selectedBook = null;
+    this.bookSearchService.setSelectedBook(null);
+    this.cdr.markForCheck();
+
+    this.bookSearchService.searchBooks(sagaBook.title, 1).subscribe({
+      next: (response) => {
+        this.navigatingSagaBook = false;
+        if (response.docs && response.docs.length > 0) {
+          this.sagaLoading = false;
+          this.selectBook(response.docs[0]);
+        } else {
+          this.sagaNavigationError = 'No se encontró el libro "' + sagaBook.title + '"';
+          this.cdr.markForCheck();
+          setTimeout(() => {
+            this.sagaNavigationError = null;
+            this.sagaLoading = false;
+            if (previousBook) {
+              this.selectBook(previousBook);
+            }
+            this.cdr.markForCheck();
+          }, 2000);
+        }
+      },
+      error: () => {
+        this.navigatingSagaBook = false;
+        this.sagaNavigationError = 'Error al buscar el libro';
+        this.cdr.markForCheck();
+        setTimeout(() => {
+          this.sagaNavigationError = null;
+          this.sagaLoading = false;
+          if (previousBook) {
+            this.selectBook(previousBook);
+          }
+          this.cdr.markForCheck();
+        }, 2000);
       }
     });
   }

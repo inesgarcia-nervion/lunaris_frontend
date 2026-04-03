@@ -99,7 +99,7 @@
 
 
   <!-- VISTA DE BÚSQUEDA SIMPLIFICADA -->
-  <div *ngIf="searchResults.length > 0 && !selectedBook" class="results-section">
+  <div *ngIf="searchResults.length > 0 && !selectedBook && !sagaLoading" class="results-section">
     <!-- Skeletons while loading -->
     <div *ngIf="loading" class="books-grid-simple skeleton-grid">
       <div *ngFor="let _ of skeletonArray" class="book-card-simple skeleton-card">
@@ -145,12 +145,21 @@
 
 
   <!-- VISTA DE DETALLE DEL LIBRO -->
-  <div *ngIf="selectedBook" class="book-detail-view">
+  <div *ngIf="selectedBook || sagaLoading" class="book-detail-view">
     <!-- Botón volver -->
     <div class="detail-top-actions">
       <button (click)="backToSearch()" class="btn btn-back">{{ backButtonLabel }}</button>
     </div>
 
+    <!-- Loading mientras se carga la saga -->
+    <div *ngIf="sagaLoading" class="detail-loading-container">
+      <div *ngIf="!sagaNavigationError" class="detail-loading-spinner"></div>
+      <p *ngIf="!sagaNavigationError" class="detail-loading-text">Cargando información del libro...</p>
+      <p *ngIf="sagaNavigationError" class="detail-loading-error">{{ sagaNavigationError }}</p>
+    </div>
+
+    <!-- Contenido del detalle (oculto mientras carga) -->
+    <ng-container *ngIf="!sagaLoading && selectedBook">
     <div class="detail-container">
       <!-- Izquierda: Portada -->
       <div class="detail-left">
@@ -168,8 +177,9 @@
       <div class="detail-info-right">
         <!-- Título y saga -->
         <h1 class="detail-title">{{ selectedBook.title }}</h1>
-        <p class="detail-saga" *ngIf="isSaga(selectedBook)">
-          Saga: {{ getSagaName(selectedBook) }}
+        <p class="detail-saga" *ngIf="sagaData || sagaLoading || isSaga(selectedBook)">
+          Saga: {{ sagaData?.sagaName || getSagaName(selectedBook) || '' }}
+          <span *ngIf="sagaLoading" class="saga-loading">cargando libros...</span>
         </p>
         <!-- Año y autor -->
         <p class="detail-meta">
@@ -243,6 +253,28 @@
         <p class="description-text">{{ selectedBook.description }}</p>
       </div>
 
+      <!-- Libros de la saga -->
+      <div *ngIf="sagaData && sagaData.books.length > 0" class="saga-books-section">
+        <strong>Libros de la saga "{{ sagaData.sagaName }}"</strong>
+        <div class="saga-books-list">
+          <div *ngFor="let sagaBook of (sagaExpanded ? sagaData.books : sagaData.books.slice(0, 2))" class="saga-book-item saga-book-clickable" (click)="openSagaBook(sagaBook)">
+            <span class="saga-book-number">#{{ sagaBook.orderNumber || '?' }}</span>
+            <div class="saga-book-info">
+              <span class="saga-book-title">{{ sagaBook.title }}</span>
+              <span class="saga-book-meta" *ngIf="sagaBook.author || sagaBook.year || sagaBook.pages">
+                <span *ngIf="sagaBook.author">{{ sagaBook.author }}</span>
+                <span *ngIf="sagaBook.year"> · {{ sagaBook.year }}</span>
+                <span *ngIf="sagaBook.pages"> · {{ sagaBook.pages }} págs.</span>
+              </span>
+            </div>
+          </div>
+        </div>
+        <button *ngIf="sagaData.books.length > 2" class="saga-toggle-btn" (click)="sagaExpanded = !sagaExpanded">
+          <span *ngIf="!sagaExpanded">Ver los {{ sagaData.books.length - 2 }} libros restantes ▼</span>
+          <span *ngIf="sagaExpanded">Mostrar menos ▲</span>
+        </button>
+      </div>
+
 
       <!-- Tu review -->
       <div class="review-section">
@@ -307,6 +339,7 @@
         </div>
       </div>
     </div>
+    </ng-container>
   </div>
 
 

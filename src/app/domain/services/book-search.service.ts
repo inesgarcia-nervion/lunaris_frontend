@@ -41,6 +41,26 @@ export interface OpenLibrarySearchResponse {
 }
 
 /**
+ * Interfaz para un libro de una saga scrapeada
+ */
+export interface SagaBookEntry {
+  title: string;
+  author: string;
+  orderNumber: string;
+  pages: number | null;
+  year: number | null;
+  storygraphUrl: string | null;
+}
+
+/**
+ * Interfaz para la saga scrapeada
+ */
+export interface SagaScraped {
+  sagaName: string;
+  books: SagaBookEntry[];
+}
+
+/**
  * Servicio para interactuar con la API de Open Library integrada en el backend
  */
 @Injectable({
@@ -568,5 +588,18 @@ export class BookSearchService {
       }
     }
     return stars;
+  }
+
+  /**
+   * Scrapea la información de la saga de un libro desde Goodreads
+   */
+  scrapeSaga(title: string, author?: string): Observable<SagaScraped | null> {
+    let params = new HttpParams().set('title', title);
+    if (author) {
+      params = params.set('author', author);
+    }
+    return this.http.get<SagaScraped>(`${this.apiUrl}/api/saga/scrape`, { params }).pipe(
+      rxCatchError(() => of(null))
+    );
   }
 }
