@@ -56,9 +56,22 @@ export class ConfiguracionComponent implements OnInit {
     if (!input.files || input.files.length === 0) return;
     const f = input.files[0];
     this.useFile = f;
+    // clear URL when a file is selected
+    this.avatarUrl = '';
+    this.avatarPreview = null;
     const reader = new FileReader();
     reader.onload = () => { this.filePreviewDataUrl = reader.result as string; };
     reader.readAsDataURL(f);
+  }
+
+  onUrlChange() {
+    // clear file selection when URL is typed
+    if (this.avatarUrl) {
+      this.useFile = null;
+      this.filePreviewDataUrl = null;
+      this.avatarPreview = null;
+      if (this.fileInput?.nativeElement) this.fileInput.nativeElement.value = '';
+    }
   }
 
   setAvatarFromUrl() {
@@ -72,7 +85,6 @@ export class ConfiguracionComponent implements OnInit {
       this.useFile = null;
       this.filePreviewDataUrl = null;
     }
-    this.success = this.avatarPreview ? 'Vista previa actualizada' : null;
     if (this.success) setTimeout(() => this.success = null, 3000);
   }
 
@@ -135,6 +147,24 @@ export class ConfiguracionComponent implements OnInit {
     // clear visible preview after applying (user requested)
     this.avatarPreview = null;
     this.initialAvatar = toApply;
+  }
+
+  /** Unified preview: uses URL if filled, otherwise the selected file */
+  previewAvatar() {
+    if (this.avatarUrl) {
+      this.setAvatarFromUrl();
+    } else if (this.useFile) {
+      this.toggleFilePreview();
+    }
+  }
+
+  /** Unified apply: applies URL if filled, otherwise the selected file */
+  applyAvatarUnified() {
+    if (this.avatarUrl) {
+      this.applyUrlAvatar();
+    } else if (this.filePreviewDataUrl || this.useFile) {
+      this.applyFileAvatar();
+    }
   }
 
   private saveAppliedAvatar(toApply: string) {

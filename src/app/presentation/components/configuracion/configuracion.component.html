@@ -5,7 +5,7 @@
     <h2>Cambiar nombre de usuario</h2>
     <div class="row">
       <input [(ngModel)]="newUsername" placeholder="Nuevo nombre de usuario" />
-      <button (click)="submitChanges()" [disabled]="isSaving || !hasChanges">{{ isSaving ? 'Guardando...' : 'Cambiar nombre' }}</button>
+      <button class="btn btn-primary" (click)="submitChanges()" [disabled]="isSaving || !hasChanges">{{ isSaving ? 'Guardando...' : 'Cambiar nombre' }}</button>
     </div>
     <p class="hint">Al cambiar de nombre, se te pedirá que inicies sesión de nuevo.</p>
   </section>
@@ -13,17 +13,17 @@
   <section class="section">
     <h2>Foto de perfil</h2>
     <div class="row input-group">
-      <input class="control" [(ngModel)]="avatarUrl" placeholder="Pegar URL de imagen" />
-      <button class="btn" (click)="setAvatarFromUrl()" [disabled]="isSaving || !avatarUrl">Vista previa</button>
-      <button class="btn" (click)="applyUrlAvatar()" [disabled]="isSaving || !avatarUrl">Aplicar imagen</button>
+      <input class="control" [(ngModel)]="avatarUrl" (ngModelChange)="onUrlChange()" placeholder="Pegar URL de imagen" />
     </div>
     <div class="row input-group">
       <label class="file-drop control">
         <input #fileInput type="file" (change)="onFileChange($event)" />
         <span>Arrastra o selecciona una imagen</span>
       </label>
-      <button class="btn" (click)="toggleFilePreview()" [disabled]="isSaving || !useFile">Vista previa</button>
-      <button class="btn" (click)="applyFileAvatar()" [disabled]="isSaving || !useFile">Aplicar imagen</button>
+    </div>
+    <div class="avatar-actions">
+      <button class="btn" (click)="previewAvatar()" [disabled]="isSaving || (!avatarUrl && !useFile)">Vista previa</button>
+      <button class="btn btn-primary" (click)="applyAvatarUnified()" [disabled]="isSaving || (!avatarUrl && !useFile)">Aplicar imagen</button>
     </div>
     <div *ngIf="avatarPreview" class="preview">
       <p>Previsualización:</p>
