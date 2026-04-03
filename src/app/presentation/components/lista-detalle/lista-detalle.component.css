@@ -1,10 +1,11 @@
 .lista-detalle-container {
   max-width: 1000px;
   margin: 40px auto;
-  padding: 40px 32px; /* increase padding so cards don't touch edges */
-  background: #fff;
+  padding: 40px 32px;
+  background: var(--bg-card);
   border-radius: 16px;
-  box-shadow: 0 2px 12px #0001;
+  box-shadow: 0 2px 12px var(--shadow-sm);
+  color: var(--text-primary);
 }
 .lista-title {
   font-size: 2.2rem;
@@ -29,14 +30,14 @@
   border: 1px solid transparent;
   cursor: pointer;
 }
-.btn-edit-list { background:#fff; color:#333; border-color:#e6e6e6 }
-.btn-edit-list:hover { background:#f7f7f7 }
+.btn-edit-list { background:var(--bg-card); color:var(--text-primary); border-color:var(--border-color) }
+.btn-edit-list:hover { background:var(--bg-hover) }
 .btn-delete-list { background:#ffeded; color:#b71c1c; border-color:#f3c6c6 }
 .btn-delete-list:hover { background:#ffdede }
 .lista-empty {
-  color: #666;
+  color: var(--text-secondary);
   padding: 24px;
-  background: #fbfbfb;
+  background: var(--bg-secondary);
   border-radius: 8px;
 }
 .libros-grid {
@@ -69,7 +70,7 @@
   display: inline-block;
   background: none;
   border: none;
-  color: #333;
+  color: var(--text-primary);
   cursor: pointer;
   margin: 0 0 16px 0;
   padding: 6px 10px;

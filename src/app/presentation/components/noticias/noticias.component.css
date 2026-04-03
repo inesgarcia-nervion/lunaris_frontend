@@ -2,14 +2,15 @@
   max-width: 900px;
   margin: 40px auto;
   padding: 32px 24px;
-  background: #fff;
+  background: var(--bg-card);
   border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 12px var(--shadow-sm);
+  color: var(--text-primary);
 }
 .admin-news-form { margin-bottom: 20px; display:flex; flex-direction:column; gap:8px; max-width:600px; }
 .admin-news-form input { padding:8px; font-size:14px; }
 .news-list { display:flex; flex-direction:column; gap:12px; }
-.news-card { border:1px solid #ddd; padding:12px; border-radius:6px; max-width:800px; cursor: pointer; }
+.news-card { border:1px solid var(--border-color); padding:12px; border-radius:6px; max-width:800px; cursor: pointer; background:var(--bg-card); color:var(--text-primary); }
 .news-image { max-width:160px; margin-top:8px; }
 .news-image img { width:160px; height:200px; object-fit:cover; border-radius:4px; display:block }
 .news-meta { display:flex; justify-content:space-between; align-items:center; }
@@ -37,7 +38,7 @@
   transform: translateY(-1px);
 }
 .news-actions > button:not(.confirm-yes):not(.confirm-no):active { transform: translateY(0); }
-.empty-news { color:#666; }
+.empty-news { color:var(--text-secondary); }
 
 .inline-confirm { display:inline-flex; gap:8px; align-items:center; }
 .inline-confirm .confirm-yes {
@@ -81,7 +82,7 @@
 }
 
 .create-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; z-index:1000 }
-.create-modal { width:100%; max-width:720px; background:#fff; border-radius:12px; padding:18px; box-sizing:border-box; position:relative }
+.create-modal { width:100%; max-width:720px; background:var(--bg-card); border-radius:12px; padding:18px; box-sizing:border-box; position:relative }
 .create-modal .close-modal { position:absolute; right:12px; top:12px; border:none; background:transparent; font-size:18px; cursor:pointer }
 /* make the close '✕' white and more visible */
 .create-modal .close-modal { color:#fff; background:rgba(0,0,0,0.6); width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
@@ -89,7 +90,7 @@
 .create-modal { overflow:hidden; }
 .create-modal *, .create-modal *:before, .create-modal *:after { box-sizing: border-box; }
 .create-modal input { display:block; width:100%; max-width:100%; margin-bottom:10px; padding:8px; box-sizing:border-box; word-break:break-word; }
-  .create-modal .news-body-editor { min-height:200px; margin-bottom:10px; width:100%; max-width:100%; box-sizing:border-box; overflow:auto; word-break:break-word; white-space:pre-wrap; border:1px solid #ddd; border-radius:6px; padding:8px }
+.create-modal .news-body-editor { min-height:200px; margin-bottom:10px; width:100%; max-width:100%; box-sizing:border-box; overflow:auto; word-break:break-word; white-space:pre-wrap; border:1px solid var(--border-color); border-radius:6px; padding:8px; background:var(--bg-input); color:var(--text-primary) }
 .create-modal .create-modal-preview { width:96px; height:96px; overflow:hidden; border-radius:10px; margin-bottom:10px; position:relative; box-shadow: 0 2px 6px rgba(0,0,0,0.08) }
 .create-modal .create-modal-preview img { width:100%; height:100%; object-fit:cover; display:block }
 .create-modal .create-modal-preview .preview-remove { position:absolute; right:6px; top:6px; background:rgba(0,0,0,0.6); color:#fff; border:none; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; line-height:1 }
@@ -99,7 +100,7 @@
 
 .news-summary {
   margin: 8px 0 12px 0;
-  color: #555;
+  color: var(--text-secondary);
   font-size: 0.95rem;
   line-height: 1.4;
   max-width: 100%;

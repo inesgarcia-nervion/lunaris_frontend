@@ -3,9 +3,9 @@
   max-width: 900px;
   margin: 40px auto;
   padding: 32px 24px;
-  background: #fff;
+  background: var(--bg-card);
   border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 12px var(--shadow-sm);
 }
 .card { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 .big-box { min-height: 560px; display:flex; align-items:center; justify-content:center; background: transparent; color:var(--text-color, #000); position:relative; margin-bottom: 8px; }
@@ -60,7 +60,7 @@ button { padding:8px 12px; }
 
 /* Result card styling */
 .result-card { display:flex; align-items:center; gap:16px; padding:14px; border-radius:10px; background: linear-gradient(180deg, #ffffff, #f7f7f9); box-shadow: 0 14px 40px rgba(18,18,18,0.12); max-width: 720px; margin: 0 auto; animation: popIn 300ms ease both; border: 1px solid rgba(0,0,0,0.06); }
-.cover-wrap { flex: 0 0 auto; width: 170px; height: 255px; display:flex; align-items:center; justify-content:center; border-radius:8px; background: #ffffff; box-shadow: 0 6px 18px rgba(18,18,18,0.06); border: 1px solid rgba(0,0,0,0.04); }
+.cover-wrap { flex: 0 0 auto; width: 170px; height: 255px; display:flex; align-items:center; justify-content:center; border-radius:8px; background: var(--bg-card); box-shadow: 0 6px 18px rgba(18,18,18,0.06); border: 1px solid var(--border-light); }
 .result-cover { width: 150px; height: 225px; object-fit: cover; border-radius:6px; box-shadow: 0 8px 22px rgba(18,18,18,0.08); border:1px solid rgba(0,0,0,0.06); transform: translateY(0); transition: transform 320ms cubic-bezier(.2,.9,.2,1); }
 .result-info { display:flex; flex-direction:column; gap:12px; color: #111111; flex:1 1 auto; }
 .title-row { display:flex; align-items:flex-start; gap:12px; }

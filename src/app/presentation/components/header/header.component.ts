@@ -37,6 +37,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   avatar: string | null = null;
   isAdmin: boolean = false;
   username: string | null = null;
+  isDarkTheme: boolean = document.documentElement.classList.contains('theme-dark');
+  private themeObserver?: MutationObserver;
 
   // Return only the user's custom lists (exclude reserved profile lists)
   get customLists(): any[] {
@@ -97,6 +99,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private updatingStatusOrList = false;
 
   ngOnInit(): void {
+    // Track theme changes on <html>
+    this.themeObserver = new MutationObserver(() => {
+      this.isDarkTheme = document.documentElement.classList.contains('theme-dark');
+      this.cdr.markForCheck();
+    });
+    this.themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     // reflect current admin state immediately
     this.isAdmin = this.auth.isAdmin();
     this.username = this.auth.getCurrentUsername();
@@ -576,6 +584,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe());
+    this.themeObserver?.disconnect();
   }
   
   // Handler for contenteditable review editor. Receives the element reference from template.

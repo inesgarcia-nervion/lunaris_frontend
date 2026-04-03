@@ -2,9 +2,10 @@
   max-width: 900px;
   margin: 40px auto;
   padding: 32px 24px;
-  background: #fff;
+  background: var(--bg-card);
   border-radius: 16px;
-  box-shadow: 0 2px 12px #0001;
+  box-shadow: 0 2px 12px var(--shadow-sm);
+  color: var(--text-primary);
 }
 .listas-title {
   font-size: 2.5rem;
@@ -35,9 +36,11 @@
 .input-crear-lista {
   flex: 1;
   padding: 10px 12px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 1rem;
+  background: var(--bg-input);
+  color: var(--text-primary);
 }
 
 .btn-confirm {
@@ -50,8 +53,8 @@
 }
 
 .btn-cancel {
-  background: #f0f0f0;
-  color: #333;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   border: none;
   border-radius: 8px;
   padding: 8px 12px;
@@ -82,13 +85,15 @@
 .input-buscar-lista {
   flex: 1;
   padding: 10px 16px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 1rem;
+  background: var(--bg-input);
+  color: var(--text-primary);
 }
 .listas-vacio {
   text-align: center;
-  color: #888;
+  color: var(--text-muted);
   font-size: 1.2rem;
   margin-top: 48px;
 }
@@ -98,16 +103,16 @@
   gap: 16px;
 }
 .lista-card {
-  background: #fff;
-  border: 1px solid #ddd; /* match .news-card */
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   padding: 12px;
-  border-radius: 6px; /* match .news-card */
+  border-radius: 6px;
   box-shadow: none;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   position: relative;
-  overflow: hidden; /* ensure children don't overflow rounded corners */
+  overflow: hidden;
   transition: transform .14s ease, box-shadow .14s ease;
 }
 .lista-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(20,16,35,0.06); }
@@ -115,7 +120,7 @@
   font-size: 1.15rem;
   margin: 8px 0 6px;
   font-weight: 700;
-  color: #1f2230;
+  color: var(--text-primary);
 }
 
 .lista-header {
@@ -156,11 +161,11 @@
   cursor: pointer;
 }
 .btn-edit-list {
-  background: #fff;
-  color: #333;
-  border-color: #dcdcdc;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--border-color);
 }
-.btn-edit-list:hover { background:#f5f5f5 }
+.btn-edit-list:hover { background:var(--bg-hover) }
 .btn-delete-list {
   background: #ffebe9;
   color: #c62828;
@@ -172,13 +177,13 @@
 
 /* Bloque destacado para la última lista (pone la más reciente arriba) */
 .lista-featured {
-  background: #fff;
-  border: 1px solid #ddd; /* match .news-card */
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   padding: 12px;
   box-shadow: none;
   margin-bottom: 20px;
-  position: relative; /* allow absolute positioning of the action button */
+  position: relative;
   overflow: hidden;
 }
 
@@ -213,17 +218,17 @@
   height: 44px;
   border-radius: 12px;
   border: none;
-  background: #ffffff;
+  background: var(--bg-card);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 8px 18px rgba(20,16,35,0.06);
+  box-shadow: 0 8px 18px var(--shadow-sm);
   transition: transform .12s ease, box-shadow .12s ease, background .12s ease, color .12s ease;
   font-size: 1.4rem;
-  color: #9aa0a6;
+  color: var(--text-muted);
   z-index: 20;
-  border: 1px solid #f0f0f0;
+  border: 1px solid var(--border-light);
 }
 .btn-favorite .star { pointer-events: none; font-size: 1.1rem; line-height:1 }
 .btn-favorite:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,16,35,0.10); background: #fbfbfb; color: #6b6f76 }
@@ -305,7 +310,7 @@
 .list-username {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
 }
 
 /* Slightly increase spacing between avatar and username for clarity */

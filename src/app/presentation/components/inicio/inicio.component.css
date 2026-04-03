@@ -1,4 +1,4 @@
-.inicio-root{font-family: 'Montserrat', Arial, sans-serif;color:#444}
+.inicio-root{font-family: 'Montserrat', Arial, sans-serif;color:var(--text-primary)}
 .inicio-root{
   margin-top: -120px;
 }
@@ -18,14 +18,14 @@
 .hero-right{width:50%;display:flex;align-items:center;justify-content:center;background:#f9f3ec;padding:0}
 .hero-right img{width:100%;height:100%;object-fit:contain}
 .intro-slogan{padding:40px 10%;text-align:center}
-.intro-slogan p{font-size:18px;color:#444;margin:0; font-family: 'Poppins'; font-size:30px;}
+.intro-slogan p{font-size:18px;color:var(--text-primary);margin:0; font-family: 'Poppins'; font-size:30px;}
 .showcase{padding:30px 10%}
 .showcase h2{text-align:center;color:#888;margin-bottom:30px; font-family: 'Poppins'; font-size:40px; font-weight:800;}
 .cards{display:flex;gap:30px;justify-content:center;margin-top:20px;flex-wrap:wrap}
-.card{width:280px;border-radius:12px;border:1px solid #d0d0d0;padding:15px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.08);display:flex;flex-direction:column}
+.card{width:280px;border-radius:12px;border:1px solid var(--border-color);padding:15px;background:var(--bg-card);box-shadow:0 2px 8px var(--shadow-sm);display:flex;flex-direction:column}
 .card img{width:100%;height:320px;object-fit:cover;border-radius:8px;margin-bottom:15px}
 .book-cover{height:380px !important}
-.description{font-size:18px;color:#555;line-height:1.6;margin:0 0 15px 0;flex:1;text-align:justify; font-family: 'Urbanist'}
+.description{font-size:18px;color:var(--text-secondary);line-height:1.6;margin:0 0 15px 0;flex:1;text-align:justify; font-family: 'Urbanist'}
 .badge{background:#1a1a1a;color:#fff;border-radius:6px;padding:6px 16px;font-size:17px;font-weight:600;align-self:center;margin-bottom:15px;display:inline-block}
 .stars{display:flex;gap:5px;justify-content:center}
 .star{font-size:50px;color:#d0d0d0}
@@ -36,17 +36,17 @@
 .lists-col{display:flex;flex-direction:column;gap:20px;flex:2}
 .lists-col h3{color:#888;font-size:20px;margin:0 0 2px 0;text-align:center; font-family: 'Poppins'; font-size:40px; font-weight:800;}
 .lists-wrapper{display:flex;gap:20px;flex:1}
-.list-item{border:2px solid #d0d0d0;border-radius:12px;padding:20px;background:#fff;flex:1;display:flex;flex-direction:column}
+.list-item{border:2px solid var(--border-color);border-radius:12px;padding:20px;background:var(--bg-card);flex:1;display:flex;flex-direction:column}
 .list-books-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px}
 .list-book{width:100%;height:250px;object-fit:cover;border-radius:8px}
-.list-item h4{font-size:16px;color:#000;margin:0 0 8px 0;font-weight:700; font-family: 'Urbanist'}
-.list-desc{font-size:13px;color:#666;margin:0 0 15px 0;line-height:1.5;flex:1}
+.list-item h4{font-size:16px;color:var(--text-primary);margin:0 0 8px 0;font-weight:700; font-family: 'Urbanist'}
+.list-desc{font-size:13px;color:var(--text-secondary);margin:0 0 15px 0;line-height:1.5;flex:1}
 .badge-discover{background:#6b3bff;color:#fff;border-radius:8px;padding:12px 24px;font-size:15px;font-weight:600;align-self:center;display:inline-block;margin-bottom:15px}
 .btn-discover{background:#6b3bff;color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:15px;font-weight:600;cursor:pointer;width:100%}
 .btn-discover:hover{background:#5a2dcc}
 .community-col{flex:1;display:flex;flex-direction:column}
 .community-col h3{color:#999;font-size:20px;margin:0 0 20px 0;text-align:center; font-family: 'Poppins'; font-size:40px; font-weight:800;}
-.community-post{border:2px solid #d0d0d0;border-radius:12px;padding:20px;background:#fff;display:flex;flex-direction:column;flex:1}
+.community-post{border:2px solid var(--border-color);border-radius:12px;padding:20px;background:var(--bg-card);display:flex;flex-direction:column;flex:1}
 .post-header{display:flex;align-items:center;gap:12px;margin-bottom:15px}
 .user-avatar{width:50px;height:50px;border-radius:50%;object-fit:cover}
 .user-name{font-weight:600;color:#000;margin:0;font-size:15px}

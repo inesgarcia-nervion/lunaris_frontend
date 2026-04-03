@@ -16,8 +16,8 @@ html, body {
   flex-direction: column;
   align-items: center;
   padding: 32px 16px 64px;
-  background: #fafafa;
-  color: #2b1b1b;
+  background: var(--bg-page);
+  color: var(--text-primary);
   overflow: hidden;
   position: fixed;
   top: 0;
@@ -29,7 +29,7 @@ html, body {
   left: 18px;
   top: 18px;
   font-size: 48px;
-  color: #222;
+  color: var(--text-primary);
   text-decoration: none;
   cursor: pointer;
   display: inline-block;
@@ -54,21 +54,22 @@ html, body {
 .card {
   width: 520px;
   max-width: calc(100% - 40px);
-  background: white;
+  background: var(--bg-card);
   border-radius: 8px;
   padding: 28px 36px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 20px var(--shadow-md);
 }
 
 .login-form { display: flex; flex-direction: column; }
 .field { margin-bottom: 18px; }
-.label { display:block; font-weight:700; margin-bottom:10px; color:#373026; font-family: "Poppins", sans-serif; font-size: 16px; }
+.label { display:block; font-weight:700; margin-bottom:10px; color:var(--text-primary); font-family: "Poppins", sans-serif; font-size: 16px; }
 .input {
   width:100%;
   padding: 16px 8px;
   border-radius: 10px;
   border: none;
-  background: #f1f1f1;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   box-shadow: inset 0 2px 0 rgba(0,0,0,0.02), 0 6px 14px rgba(0,0,0,0.04);
   font-size: 18px;
   outline: none;

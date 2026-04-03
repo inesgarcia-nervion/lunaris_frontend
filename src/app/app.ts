@@ -26,6 +26,21 @@ export class App implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Apply saved theme immediately so dark mode persists across all routes
+    const savedTheme = localStorage.getItem('lunaris_theme');
+    if (savedTheme === 'dark') {
+      document.body.classList.add('theme-dark');
+      document.documentElement.classList.add('theme-dark');
+    } else if (!savedTheme) {
+      // If no preference saved, respect the OS preference (article step 4)
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+      if (prefersDark.matches) {
+        document.body.classList.add('theme-dark');
+        document.documentElement.classList.add('theme-dark');
+        localStorage.setItem('lunaris_theme', 'dark');
+      }
+    }
+
     // If user already logged in, assign ownership to any lists created before owner support
     try {
       const current = this.listasService.getCurrentUser();

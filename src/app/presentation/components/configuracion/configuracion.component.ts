@@ -43,6 +43,7 @@ export class ConfiguracionComponent implements OnInit {
     // Apply theme immediately on init so the UI matches stored preference
     try {
       document.body.classList.toggle('theme-dark', this.theme === 'dark');
+      document.documentElement.classList.toggle('theme-dark', this.theme === 'dark');
     } catch (e) {
       console.warn('Unable to apply theme class on init', e);
     }
@@ -88,8 +89,13 @@ export class ConfiguracionComponent implements OnInit {
     this.theme = this.theme === 'light' ? 'dark' : 'light';
     localStorage.setItem('lunaris_theme', this.theme);
     try {
-      if (this.theme === 'dark') document.body.classList.add('theme-dark');
-      else document.body.classList.remove('theme-dark');
+      if (this.theme === 'dark') {
+        document.body.classList.add('theme-dark');
+        document.documentElement.classList.add('theme-dark');
+      } else {
+        document.body.classList.remove('theme-dark');
+        document.documentElement.classList.remove('theme-dark');
+      }
     } catch (e) {
       console.warn('Unable to toggle theme class', e);
     }
