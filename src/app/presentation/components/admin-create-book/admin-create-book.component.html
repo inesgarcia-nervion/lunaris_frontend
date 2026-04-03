@@ -15,42 +15,46 @@
       <!-- Título -->
       <div class="form-group">
         <label for="title">Título *</label>
-        <input
-          type="text"
+        <div
           id="title"
+          class="input-editable"
+          contenteditable="true"
           [(ngModel)]="title"
           name="title"
-          placeholder="Título del libro"
+          data-placeholder="Título del libro"
           required
-          [disabled]="loading"
-        />
+          [class.disabled-editable]="loading"
+        ></div>
       </div>
 
       <!-- Autor -->
       <div class="form-group">
         <label for="author">Autor *</label>
-        <input
-          type="text"
+        <div
           id="author"
+          class="input-editable"
+          contenteditable="true"
           [(ngModel)]="author"
           name="author"
-          placeholder="Nombre del autor"
+          data-placeholder="Nombre del autor"
           required
-          [disabled]="loading"
-        />
+          [class.disabled-editable]="loading"
+        ></div>
       </div>
 
       <!-- Descripción -->
       <div class="form-group">
         <label for="description">Descripción</label>
-        <input
-          type="text"
+        <div
           id="description"
+          class="input-editable"
+          contenteditable="true"
+          [multiline]="true"
           [(ngModel)]="description"
           name="description"
-          placeholder="Descripción del libro (opcional)"
-          [disabled]="loading"
-        />
+          data-placeholder="Descripción del libro (opcional)"
+          [class.disabled-editable]="loading"
+        ></div>
       </div>
 
       <!-- Año de lanzamiento -->
@@ -118,14 +122,15 @@
       <div class="form-group">
         <label for="coverImage">Portada (URL o imagen)</label>
         <div class="cover-input-group">
-          <input
-            type="text"
+          <div
             id="coverImage"
+            class="input-editable"
+            contenteditable="true"
             [(ngModel)]="coverImage"
             name="coverImage"
-            placeholder="URL de la portada o carga una imagen"
-            [disabled]="loading"
-          />
+            data-placeholder="URL de la portada o carga una imagen"
+            [class.disabled-editable]="loading"
+          ></div>
           <button
             type="button"
             (click)="fileInput.click()"

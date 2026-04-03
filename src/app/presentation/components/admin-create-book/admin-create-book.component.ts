@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BookSearchService } from '../../../domain/services/book-search.service';
 import { AuthService } from '../../../domain/services/auth.service';
+import { ContenteditableDirective } from '../../shared/contenteditable.directive';
 
 @Component({
   selector: 'app-admin-create-book',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ContenteditableDirective],
   templateUrl: './admin-create-book.component.html',
   styleUrl: './admin-create-book.component.css'
 })

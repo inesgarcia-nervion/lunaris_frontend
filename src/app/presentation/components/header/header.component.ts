@@ -393,47 +393,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   getCategories(book: any): string[] {
-    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-    const raw: any[] = book.subject || book.subjects || book.categories || [];
-    if (Array.isArray(raw) && raw.length > 0) {
-      const seen = new Set<string>();
-      const result: string[] = [];
-      for (const s of raw) {
-        if (typeof s !== 'string' || s.includes('=') || /^[A-Za-z_]+:/.test(s)) continue;
-        // Split on commas to separate compound values like "Fiction, fantasy, general"
-        const parts = s.split(',').map((p: string) => p.trim()).filter(Boolean);
-        for (const part of parts) {
-          const key = part.toLowerCase();
-          if (!seen.has(key)) {
-            seen.add(key);
-            result.push(capitalize(part));
-          }
-        }
-      }
-      if (result.length > 0) return result;
-    }
-    return this.inferCategories(book);
-  }
-
-  private inferCategories(book: any): string[] {
-    const categories: string[] = [];
-    const titleAndDesc = ((book.title || '') + (book.description || '')).toLowerCase();
-    const categoryKeywords: { [key: string]: string[] } = {
-      'Ficción': ['fiction', 'novela', 'novel'],
-      'Fantasía': ['fantasy', 'fantasia', 'magic', 'mágic'],
-      'Ciencia Ficción': ['science fiction', 'sci-fi', 'future'],
-      'Romance': ['romance', 'love', 'amour'],
-      'Misterio': ['mystery', 'detective', 'misterio'],
-      'Thriller': ['thriller', 'suspense', 'suspenseful'],
-      'Aventura': ['adventure', 'aventura', 'quest'],
-      'Histórico': ['historical', 'histórico', 'history']
-    };
-    for (const [category, keywords] of Object.entries(categoryKeywords)) {
-      if (keywords.some(keyword => titleAndDesc.includes(keyword))) {
-        categories.push(category);
-      }
-    }
-    return categories.length > 0 ? categories : ['Ficción'];
+    return this.bookSearchService.getCategories(book);
   }
 
   generateRatingArray(rating: number | undefined): string[] {

@@ -74,7 +74,19 @@ export class BookSearchService {
   currentPage$ = this.currentPageSubject.asObservable();
   private currentQuery: string = '';
 
-  constructor(private http: HttpClient) { }
+  private cachedGenreNames: Set<string> = new Set();
+
+  constructor(private http: HttpClient) {
+    this.loadGenreCache();
+  }
+
+  private loadGenreCache(): void {
+    this.getGenres().pipe(
+      rxCatchError(() => of([] as { id: number; name: string }[]))
+    ).subscribe(genres => {
+      this.cachedGenreNames = new Set(genres.map(g => g.name.toLowerCase()));
+    });
+  }
 
   /**
    * Mapea la respuesta del backend al formato esperado
@@ -208,30 +220,6 @@ export class BookSearchService {
 
   setSelectedBook(book: OpenLibraryBook | null): void {
     this.selectedBookSubject.next(book);
-    if (book) {
-      this.syncBookGenres(book);
-    }
-  }
-
-  /**
-   * Sincroniza las categorías del libro con la tabla de géneros del backend.
-   * Crea únicamente los géneros que todavía no existen (el backend es idempotente).
-   */
-  private syncBookGenres(book: OpenLibraryBook): void {
-    const categories = this.getCategories(book);
-    if (categories.length === 0) return;
-
-    this.getGenres().pipe(
-      rxCatchError(() => of([] as { id: number; name: string }[]))
-    ).subscribe(existing => {
-      const existingNames = new Set(existing.map(g => g.name.toLowerCase()));
-      const toCreate = categories.filter(c => !existingNames.has(c.toLowerCase()));
-      toCreate.forEach(name => {
-        this.http.post(`${this.apiUrl}/genres`, { name })
-          .pipe(rxCatchError(() => of(null)))
-          .subscribe();
-      });
-    });
   }
 
   setNavigationOrigin(origin: { type: 'search' | 'list' | 'other' | 'profile' | 'menu' | 'listas'; listId?: string } | null): void {
@@ -524,7 +512,7 @@ export class BookSearchService {
       }
       if (result.length > 0) return result;
     }
-    // Fallback: subjects de OpenLibrary, filtrar identificadores internos
+    // Fallback: subjects de OpenLibrary filtrados contra los géneros existentes en BD
     const raw: any[] = book.subject || book.subjects || book.categories || [];
     if (Array.isArray(raw)) {
       const seen = new Set<string>();
@@ -535,6 +523,7 @@ export class BookSearchService {
         const parts = s.split(',').map((p: string) => p.trim()).filter(Boolean);
         for (const part of parts) {
           const key = part.toLowerCase();
+          if (!this.cachedGenreNames.has(key)) continue;
           if (!seen.has(key)) { seen.add(key); result.push(capitalize(part)); }
           if (result.length >= 5) break;
         }
