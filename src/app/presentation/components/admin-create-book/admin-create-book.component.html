@@ -2,15 +2,6 @@
   <div class="form-wrapper">
     <h2>Crear Nuevo Libro</h2>
     
-    <!-- Mensajes de error/éxito -->
-    <div *ngIf="error" class="alert alert-error">
-      {{ error }}
-    </div>
-    
-    <div *ngIf="success" class="alert alert-success">
-      {{ success }}
-    </div>
-
     <form (ngSubmit)="submit()" *ngIf="isAdmin">
       <!-- Título -->
       <div class="form-group">
@@ -174,6 +165,15 @@
         >
           Cancelar
         </button>
+      </div>
+
+      <!-- Mensajes de error/éxito -->
+      <div *ngIf="error" class="form-message form-message-error">
+        {{ error }}
+      </div>
+
+      <div *ngIf="success" class="form-message form-message-success">
+        {{ success }}
       </div>
     </form>
 
