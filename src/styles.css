@@ -124,8 +124,8 @@ body * {
 /* Muted / grey variant for less-destructive actions */
 .btn-delete--muted {
   background: transparent;
-  color: #50555a;
-  border: 1px solid #cfcfcf;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
 }
 
 /* Hover: darker tone of the base color */
@@ -137,9 +137,9 @@ body * {
 }
 .btn-delete--muted:hover,
 .btn-delete--muted:focus {
-  background: rgba(60,64,67,0.06);
-  border-color: #9aa0a6;
-  color: #333;
+  background: var(--bg-hover);
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
 }
 
 /* Make disabled state subtle */
@@ -196,6 +196,6 @@ body * {
   background: #d32f2f; color: white; border: none; padding: 8px 12px; border-radius:8px; cursor:pointer; font-weight:700
 }
 .confirm-no {
-  background: transparent; color: #555; border: 1px solid #ddd; padding: 8px 12px; border-radius:8px; cursor:pointer; font-weight:600
+  background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 12px; border-radius:8px; cursor:pointer; font-weight:600
 }
 

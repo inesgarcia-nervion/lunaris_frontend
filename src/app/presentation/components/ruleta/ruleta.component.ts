@@ -16,6 +16,7 @@ export class RuletaComponent implements OnInit {
   selectedListId: string | null = null;
   loading: boolean = false;
   spinning: boolean = false;
+  revealing: boolean = false;
   resultBook: OpenLibraryBook | null = null;
   currentUser: string | null = null;
   titles: string[] = [];
@@ -252,6 +253,7 @@ export class RuletaComponent implements OnInit {
     this.ngZone.run(() => {
       // Stop the spinning visual immediately and highlight the selected slice
       this.spinning = false;
+      this.revealing = true;
       this.rotationDeg = ((finalRotation % 360) + 360) % 360;
       this.selectedIndex = idx;
       try { this.cdr.detectChanges(); } catch (e) { /* ignore */ }
@@ -260,6 +262,7 @@ export class RuletaComponent implements OnInit {
       this._revealTimeoutId = setTimeout(() => {
         this.ngZone.run(() => {
           try { this.resultBook = lista.libros[idx]; } catch { this.resultBook = null; }
+          this.revealing = false;
           try { this.cdr.detectChanges(); } catch (e) { /* ignore */ }
           this._revealTimeoutId = null;
         });
@@ -279,6 +282,15 @@ export class RuletaComponent implements OnInit {
   quitarLibro(): void {
     if (!this.selectedListId || !this.resultBook) return;
     const toRemove = this.resultBook;
+    // Add to "Leyendo" list before removing from current list
+    const currentUser = this.listasService.getCurrentUser();
+    this.listasService.ensureProfileSections(currentUser);
+    const leyendoLista = this.listasService.getAll().find(
+      l => l.owner === currentUser && l.nombre.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '') === 'leyendo'
+    );
+    if (leyendoLista) {
+      this.listasService.addBookToList(leyendoLista.id, toRemove);
+    }
     this.listasService.removeBookFromList(this.selectedListId, toRemove);
     this.resultBook = null;
     this.selectedIndex = null;
