@@ -26,4 +26,4 @@ label{color:var(--text-secondary)}
 .theme-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .theme-label{font-size:1rem;font-weight:600;color:var(--text-primary)}
 .btn-theme{padding:8px 18px;border-radius:8px;border:1px solid #5b6ef6;background:#5b6ef6;color:#fff;cursor:pointer;font-size:0.95rem;font-weight:600;transition:background 0.2s ease}
-.btn-theme:hover{background:#4a5de0;border-color:#4a5de0}
+.btn-theme:hover:not([disabled]){background:#4a5de0;border-color:#4a5de0}

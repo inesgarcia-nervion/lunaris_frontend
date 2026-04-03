@@ -606,8 +606,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (!this.selectedBook || !this.selectedBook.key) return;
     this.reviewService.getByBookApiId(this.selectedBook.key).subscribe({
       next: (res) => {
-        this.reviews = (res || []).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
         const currentUser = this.auth.getCurrentUsername() || this.listasService.getCurrentUser();
+        this.reviews = (res || []).sort((a, b) => {
+          const aIsMe = a.username === currentUser ? 1 : 0;
+          const bIsMe = b.username === currentUser ? 1 : 0;
+          if (aIsMe !== bIsMe) return bIsMe - aIsMe;
+          return (b.date || '').localeCompare(a.date || '');
+        });
         this.currentUserReview = this.reviews.find(r => r.username === currentUser) || null;
         if (this.currentUserReview) {
           this.userReview = this.currentUserReview.comment || '';
