@@ -24,7 +24,7 @@ export class ConfiguracionComponent implements OnInit {
   private initialUsername: string = '';
   private initialAvatar: string | null = null;
   useFile: File | null = null;
-  theme: 'light' | 'dark' = (localStorage.getItem('lunaris_theme') as 'light' | 'dark') || 'light';
+  theme: 'light' | 'dark' = 'light';
   error: string | null = null;
   success: string | null = null;
   isSaving: boolean = false;
@@ -40,6 +40,8 @@ export class ConfiguracionComponent implements OnInit {
     // do not show existing avatar as a preview on load; only use it as the initial snapshot
     this.initialUsername = this.username || '';
     this.initialAvatar = storedAvatar || null;
+    // Load per-user theme
+    this.theme = this.auth.getUserTheme();
     // Apply theme immediately on init so the UI matches stored preference
     try {
       document.body.classList.toggle('theme-dark', this.theme === 'dark');
@@ -87,7 +89,7 @@ export class ConfiguracionComponent implements OnInit {
 
   toggleTheme() {
     this.theme = this.theme === 'light' ? 'dark' : 'light';
-    localStorage.setItem('lunaris_theme', this.theme);
+    this.auth.setUserTheme(this.theme);
     try {
       if (this.theme === 'dark') {
         document.body.classList.add('theme-dark');

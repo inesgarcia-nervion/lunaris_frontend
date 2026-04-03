@@ -26,18 +26,13 @@ export class App implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Apply saved theme immediately so dark mode persists across all routes
-    const savedTheme = localStorage.getItem('lunaris_theme');
-    if (savedTheme === 'dark') {
-      document.body.classList.add('theme-dark');
-      document.documentElement.classList.add('theme-dark');
-    } else if (!savedTheme) {
-      // If no preference saved, respect the OS preference (article step 4)
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-      if (prefersDark.matches) {
+    // Apply saved theme for the logged-in user
+    const currentUser = this.auth.getCurrentUsername();
+    if (currentUser) {
+      const savedTheme = this.auth.getUserTheme(currentUser);
+      if (savedTheme === 'dark') {
         document.body.classList.add('theme-dark');
         document.documentElement.classList.add('theme-dark');
-        localStorage.setItem('lunaris_theme', 'dark');
       }
     }
 
@@ -72,7 +67,8 @@ export class App implements OnInit, OnDestroy {
       document.body.classList.remove('theme-dark');
       document.documentElement.classList.remove('theme-dark');
     } else {
-      const savedTheme = localStorage.getItem('lunaris_theme');
+      const currentUser = this.auth.getCurrentUsername();
+      const savedTheme = currentUser ? this.auth.getUserTheme(currentUser) : 'light';
       if (savedTheme === 'dark') {
         document.body.classList.add('theme-dark');
         document.documentElement.classList.add('theme-dark');

@@ -193,8 +193,8 @@
   right: 18px;
   top: 50%;
   transform: translateY(-50%);
-  background: #222;
-  color: #fff;
+  background: var(--text-primary);
+  color: var(--bg-card);
   border: none;
   width: 48px;
   height: 48px;
@@ -213,30 +213,29 @@
 .btn-favorite {
   position: absolute;
   top: 10px;
-  right: 16px;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   border: none;
-  background: var(--bg-card);
+  background: var(--bg-secondary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 8px 18px var(--shadow-sm);
+  box-shadow: 0 4px 10px var(--shadow-sm);
   transition: transform .12s ease, box-shadow .12s ease, background .12s ease, color .12s ease;
-  font-size: 1.4rem;
+  font-size: 1.1rem;
   color: var(--text-muted);
   z-index: 20;
   border: 1px solid var(--border-light);
 }
 .btn-favorite .star { pointer-events: none; font-size: 1.1rem; line-height:1 }
-.btn-favorite:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,16,35,0.10); background: #fbfbfb; color: #6b6f76 }
+.btn-favorite:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,16,35,0.10); background: var(--bg-hover); color: var(--text-secondary); }
 .btn-favorite:focus { outline: 2px solid rgba(108,99,255,0.18); outline-offset: 2px }
 .btn-favorite.favorited { color: #ffffff; background: linear-gradient(180deg,#ffcf5a,#ffb400); box-shadow: 0 8px 28px rgba(255,180,0,0.18); border-color: rgba(255,180,0,0.14) }
 
-/* Slight variant for featured card (position a bit left of go button) */
-.btn-favorite.featured { right: 78px; }
+/* Slight variant for featured card — same position, no override needed */
 
 .btn-unfavorite { /* fallback for perfil view button */
   background: #fff;

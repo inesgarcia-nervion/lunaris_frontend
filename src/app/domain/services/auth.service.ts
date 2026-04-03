@@ -92,6 +92,19 @@ export class AuthService {
         } catch (e) {
           console.warn('Unable to load user avatar on login', e);
         }
+        // Apply user-specific theme on login
+        try {
+          const theme = this.getUserTheme(username);
+          if (theme === 'dark') {
+            document.body.classList.add('theme-dark');
+            document.documentElement.classList.add('theme-dark');
+          } else {
+            document.body.classList.remove('theme-dark');
+            document.documentElement.classList.remove('theme-dark');
+          }
+        } catch (e) {
+          console.warn('Unable to apply theme on login', e);
+        }
       })
     );
   }
@@ -209,6 +222,21 @@ export class AuthService {
     this.avatarSubject.next(avatar);
   }
 
+  private getUserThemeKey(username?: string | null): string {
+    const u = username ?? this.getCurrentUsername();
+    return u ? `lunaris_theme_${u}` : 'lunaris_theme';
+  }
+
+  getUserTheme(username?: string | null): 'light' | 'dark' {
+    try {
+      return (localStorage.getItem(this.getUserThemeKey(username)) as 'light' | 'dark') || 'light';
+    } catch { return 'light'; }
+  }
+
+  setUserTheme(theme: 'light' | 'dark', username?: string | null): void {
+    try { localStorage.setItem(this.getUserThemeKey(username), theme); } catch {}
+  }
+
 
   logout(): void {
     // Read remember-me preference BEFORE removing anything
@@ -228,6 +256,11 @@ export class AuthService {
     }
     // Siempre limpiar la sesión
     sessionStorage.removeItem('lunaris_current_user');
+    // Eliminar modo oscuro al cerrar sesión
+    try {
+      document.body.classList.remove('theme-dark');
+      document.documentElement.classList.remove('theme-dark');
+    } catch {}
   }
 
 
