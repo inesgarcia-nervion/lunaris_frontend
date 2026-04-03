@@ -186,6 +186,8 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     const existingCount = (this.newImagePreviews && this.newImagePreviews.length) || 0;
     if (existingCount + selectedFiles.length > 3) {
       this.imageError = 'El máximo es 3 imágenes';
+      this.cdr.detectChanges();
+      setTimeout(() => { this.zone.run(() => { this.imageError = null; this.cdr.detectChanges(); }); }, 3000);
       return;
     }
 
