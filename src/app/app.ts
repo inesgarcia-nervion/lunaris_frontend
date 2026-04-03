@@ -49,9 +49,11 @@ export class App implements OnInit, OnDestroy {
       console.error('Error assigning ownership on app init', e);
     }
     this.showHeader = this.computeShowHeader(this.router.url);
+    this.applyThemeForRoute(this.router.url);
     this.subs.push(this.router.events.subscribe(e => {
       if (e instanceof NavigationEnd) {
         this.showHeader = this.computeShowHeader(e.urlAfterRedirects);
+        this.applyThemeForRoute(e.urlAfterRedirects);
       }
     }));
   }
@@ -60,6 +62,22 @@ export class App implements OnInit, OnDestroy {
     const clean = (url || '').split('?')[0].split('#')[0];
     const first = clean.replace(/^\/+/, '').split('/')[0] || '';
     return !this.publicFirstSegments.has(first);
+  }
+
+  private applyThemeForRoute(url: string): void {
+    const clean = (url || '').split('?')[0].split('#')[0];
+    const first = clean.replace(/^\/+/, '').split('/')[0] || '';
+    const isPublic = this.publicFirstSegments.has(first);
+    if (isPublic) {
+      document.body.classList.remove('theme-dark');
+      document.documentElement.classList.remove('theme-dark');
+    } else {
+      const savedTheme = localStorage.getItem('lunaris_theme');
+      if (savedTheme === 'dark') {
+        document.body.classList.add('theme-dark');
+        document.documentElement.classList.add('theme-dark');
+      }
+    }
   }
 
   ngOnDestroy(): void {
