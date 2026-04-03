@@ -52,15 +52,15 @@
 }
 .inline-confirm .confirm-yes:hover { filter:brightness(.97); }
 .inline-confirm .confirm-no {
-  background:#f3f4f6;
-  color:#333;
-  border:none;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
   padding:6px 12px;
   border-radius:6px;
   cursor:pointer;
 }
 .admin-news-form textarea { padding:8px; font-size:14px; resize:vertical; }
-.admin-news-form .news-body-editor { padding:8px; font-size:14px; min-height:140px; border:1px solid #ddd; border-radius:6px; box-sizing:border-box; white-space:pre-wrap; }
+.admin-news-form .news-body-editor { padding:8px; font-size:14px; min-height:140px; border:1px solid var(--border-color); border-radius:6px; box-sizing:border-box; white-space:pre-wrap; background: var(--bg-input); color: var(--text-primary); }
 
 /* Floating create button */
 .floating-create {
@@ -96,7 +96,7 @@
 .create-modal .create-modal-preview .preview-remove { position:absolute; right:6px; top:6px; background:rgba(0,0,0,0.6); color:#fff; border:none; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; line-height:1 }
 .create-modal .create-modal-preview .preview-remove:focus { outline:2px solid rgba(91,110,246,0.25) }
 .create-modal .modal-actions { display:flex; gap:8px; justify-content:flex-end }
-.create-modal .modal-actions .cancel { background:transparent; border:1px solid #ccc }
+.create-modal .modal-actions .cancel { background:transparent; border:1px solid var(--border-color); color: var(--text-primary); }
 
 .news-summary {
   margin: 8px 0 12px 0;

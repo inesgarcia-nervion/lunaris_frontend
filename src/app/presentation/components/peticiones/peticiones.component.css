@@ -1,8 +1,22 @@
 .peticiones-container { max-width:600px; margin:20px auto; padding:16px; }
 .form-row { margin-bottom:12px; display:flex; flex-direction:column; }
-.form-row label { font-weight:600; margin-bottom:6px; }
-.form-row input { padding:8px; font-size:14px; }
+.form-row label { font-weight:600; margin-bottom:6px; color: var(--text-primary); }
+.form-row input { padding:8px; font-size:14px; background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-color); border-radius:6px; outline:none; }
+.form-row input:focus { border-color: #5b6ef6; }
 .actions { margin-top:12px }
+.actions button {
+  background: #5b6ef6;
+  color: #fff;
+  border: none;
+  padding: 9px 20px;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, opacity 0.18s;
+}
+.actions button:hover:not(:disabled) { background: #4a5de0; }
+.actions button:disabled { opacity: 0.45; cursor: not-allowed; }
 .message { margin-top:12px; padding:8px; border-radius:4px }
-.message.success { background:#e6ffed; color:#1a7f37 }
-.message.error { background:#ffe6e6; color:#a12a2a }
+.message.success { background: rgba(26,127,55,0.15); color: #4caf82; border: 1px solid rgba(26,127,55,0.3); }
+.message.error { background: rgba(161,42,42,0.15); color: #e07070; border: 1px solid rgba(161,42,42,0.3); }

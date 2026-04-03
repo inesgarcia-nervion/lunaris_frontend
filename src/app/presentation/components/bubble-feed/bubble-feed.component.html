@@ -156,7 +156,7 @@
         </div>
 
         <div class="add-comment">
-          <div #commentEditor contenteditable="true" class="comment-input editable" (input)="onCommentInput(commentEditor)" (keydown)="onCommentKeydown($event, commentEditor)" aria-label="Escribe un comentario..."></div>
+          <div #commentEditor contenteditable="true" class="comment-input editable" data-placeholder="Escribe tu comentario aquí..." (input)="onCommentInput(commentEditor)" (keydown)="onCommentKeydown($event, commentEditor)" aria-label="Escribe un comentario..."></div>
           <div class="comment-actions"><button (click)="addComment()" [disabled]="!newCommentText.trim()">Enviar</button></div>
         </div>
       </div>

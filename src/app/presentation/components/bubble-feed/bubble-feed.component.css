@@ -98,6 +98,7 @@
 .comments .comment-meta .btn-delete:hover,
 .comments .comment-meta .btn-delete--muted:hover { background: #c62828 !important; }
 .add-comment .comment-input { width:100%; min-height:36px; padding:8px; border-radius:6px; border:1px solid var(--border-color); background:var(--bg-input); color:var(--text-primary); box-sizing:border-box; resize:vertical; white-space:pre-wrap; word-break:break-word; overflow-wrap:anywhere }
+.add-comment .comment-input:empty:before { content: attr(data-placeholder); color: var(--text-secondary); pointer-events: none; }
 .comment-actions { margin-top:6px; display:flex; justify-content:flex-end }
 .comment-actions button {
   padding: 6px 16px;

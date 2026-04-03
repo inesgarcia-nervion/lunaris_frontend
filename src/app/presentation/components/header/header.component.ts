@@ -707,6 +707,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.currentUserReview = null;
         this.userReview = '';
         this.userRating = 0;
+        try { if (this.reviewEditor?.nativeElement) this.reviewEditor.nativeElement.innerText = ''; } catch {}
         this.reviewSuccess = 'Reseña eliminada';
         this.clearReviewAlertAfterDelay();
         this.reviewService.refreshAll();
@@ -732,6 +733,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
           this.currentUserReview = null;
           this.userReview = '';
           this.userRating = 0;
+          try { if (this.reviewEditor?.nativeElement) this.reviewEditor.nativeElement.innerText = ''; } catch {}
         }
         this.reviewSuccess = 'Reseña eliminada';
         this.clearReviewAlertAfterDelay();
