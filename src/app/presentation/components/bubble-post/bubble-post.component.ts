@@ -17,6 +17,8 @@ export interface BubblePost {
   id: number;
   user: BubbleUser;
   imageUrl?: string;
+  /** Nuevo: soporte para varias imágenes (máx 3) */
+  imageUrls?: string[];
   text: string;
   likes: number;
   liked?: boolean;
@@ -39,6 +41,40 @@ export class BubblePostComponent {
   @Output() delete = new EventEmitter<number>();
 
   constructor(private confirmService: ConfirmService) {}
+
+  // Índice de imagen actualmente visible (por instancia)
+  currentImageIndex = 0;
+
+  get images(): string[] {
+    // compatibilidad: priorizamos imageUrls, si no existe usamos imageUrl como array de uno
+    if (Array.isArray(this.post.imageUrls) && this.post.imageUrls.length) return this.post.imageUrls;
+    if (this.post.imageUrl) return [this.post.imageUrl];
+    return [];
+  }
+
+  showNextImage(event?: Event) {
+    if (event) event.stopPropagation();
+    const imgs = this.images;
+    if (!imgs.length) return;
+    this.currentImageIndex = (this.currentImageIndex + 1) % imgs.length;
+  }
+
+  showPrevImage(event?: Event) {
+    if (event) event.stopPropagation();
+    const imgs = this.images;
+    if (!imgs.length) return;
+    this.currentImageIndex = (this.currentImageIndex - 1 + imgs.length) % imgs.length;
+  }
+
+  currentImageSrc(): string | undefined {
+    const imgs = this.images;
+    return imgs.length ? imgs[this.currentImageIndex] : undefined;
+  }
+
+  firstImageSrc(): string | undefined {
+    const imgs = this.images;
+    return imgs.length ? imgs[0] : undefined;
+  }
 
   async onDeleteConfirm() {
     const ok = await this.confirmService.confirm('¿Estás seguro de eliminar esta publicación?');

@@ -8,10 +8,10 @@
   </div>
 
   <div class="post-body">
-    <div *ngIf="post.imageUrl" class="post-image">
-      <img [src]="post.imageUrl" alt="post image">
+    <div *ngIf="images.length" class="post-image">
+      <img [src]="firstImageSrc()" alt="post image">
     </div>
-    <div class="post-text" [class.full]="!post.imageUrl">{{ post.text }}</div>
+    <div class="post-text" [class.full]="!images.length">{{ post.text }}</div>
   </div>
 
   <div class="post-actions">

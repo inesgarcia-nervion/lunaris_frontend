@@ -21,12 +21,19 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
   // Create form state
   creating = false;
   newText = '';
-  newImageFile: File | null = null;
-  newImagePreview: string | null = null;
+  // soporta hasta 3 imágenes
+  newImageFiles: File[] = [];
+  newImagePreviews: string[] = [];
+  newImagePreviewIndex = 0;
   // If editing, stores the id of the post being edited
   editingId: number | null = null;
+  // controls whether editing happens inline in the list or in the separate modal
+  editInline = false;
+  // validation / UI error when handling images
+  imageError: string | null = null;
 
   selected?: BubblePost;
+  selectedImageIndex = 0;
   newCommentText = '';
   // id of the post pending deletion (for inline confirm)
   pendingDeleteId: number | null = null;
@@ -74,6 +81,30 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     try { document.body.style.overflow = ''; } catch (_) {}
+  }
+
+  get selectedImages(): string[] {
+    if (!this.selected) return [];
+    if (Array.isArray(this.selected.imageUrls) && this.selected.imageUrls.length) return this.selected.imageUrls;
+    if (this.selected.imageUrl) return [this.selected.imageUrl];
+    return [];
+  }
+
+  showNextSelectedImage() {
+    const imgs = this.selectedImages;
+    if (!imgs.length) return;
+    this.selectedImageIndex = (this.selectedImageIndex + 1) % imgs.length;
+  }
+
+  showPrevSelectedImage() {
+    const imgs = this.selectedImages;
+    if (!imgs.length) return;
+    this.selectedImageIndex = (this.selectedImageIndex - 1 + imgs.length) % imgs.length;
+  }
+
+  selectedImageSrc(): string | undefined {
+    const imgs = this.selectedImages;
+    return imgs.length ? imgs[this.selectedImageIndex] : undefined;
   }
 
   addComment() {
@@ -146,38 +177,89 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
 
   onImageSelected(e: Event) {
     const inp = e.target as HTMLInputElement;
-    if (!inp.files || inp.files.length === 0) { this.newImageFile = null; this.newImagePreview = null; return; }
-    const f = inp.files[0];
-    this.newImageFile = f;
-    // Create an object URL first so the preview appears immediately
-    try {
-      if (this.imageObjectUrl) { try { URL.revokeObjectURL(this.imageObjectUrl); } catch {} }
-      this.imageObjectUrl = URL.createObjectURL(f);
-      this.newImagePreview = this.imageObjectUrl;
-    } catch (e) {
-      this.newImagePreview = null;
+    if (!inp.files || inp.files.length === 0) {
+      return; // no borrar las imágenes existentes si la selección está vacía
     }
 
-    // Then also read as data URL for broader compatibility/persistence
+    // prevent exceeding global max of 3 images (including existing previews)
+    const selectedFiles = Array.from(inp.files);
+    const existingCount = (this.newImagePreviews && this.newImagePreviews.length) || 0;
+    if (existingCount + selectedFiles.length > 3) {
+      this.imageError = 'El máximo es 3 imágenes';
+      return;
+    }
+
+    // cap at remaining slots and append to existing images
+    const files = selectedFiles.slice(0, Math.max(0, 3 - existingCount));
+    this.newImageFiles = [...(this.newImageFiles || []), ...files];
     this.imageLoading = true;
+
+    const readers: Promise<void>[] = files.map((file, relIdx) => {
+      const absIdx = existingCount + relIdx;
+      return new Promise<void>((resolve) => {
+        // push object URL immediately for feedback
+        try {
+          const obj = URL.createObjectURL(file);
+          this.newImagePreviews.push(obj);
+        } catch (_) {
+          this.newImagePreviews.push('');
+        }
+
+        const r = new FileReader();
+        r.onload = () => {
+          const data = r.result as string;
+          // replace at the correct absolute index with the persistent data URL
+          try { this.zone.run(() => { this.newImagePreviews[absIdx] = data || this.newImagePreviews[absIdx]; this.cdr.detectChanges(); resolve(); }); } catch (_) { resolve(); }
+        };
+        r.onerror = () => { resolve(); };
+        r.readAsDataURL(file);
+      });
+    });
+
+    Promise.all(readers).then(() => { this.zone.run(() => { this.imageLoading = false; this.cdr.detectChanges(); }); });
+  }
+
+  replaceFileClick(i: number) {
+    try { const el = document.getElementById('replace-file-' + i) as HTMLInputElement | null; if (el) el.click(); } catch (_) {}
+  }
+
+  replaceFileClickEdit(i: number) {
+    try { const el = document.getElementById('replace-file-edit-' + i) as HTMLInputElement | null; if (el) el.click(); } catch (_) {}
+  }
+
+  onReplaceImage(e: Event, index: number) {
+    const inp = e.target as HTMLInputElement;
+    if (!inp.files || inp.files.length === 0) return;
+    const f = inp.files[0];
+    this.newImageFiles[index] = f;
+    try {
+      const obj = URL.createObjectURL(f);
+      this.newImagePreviews[index] = obj;
+    } catch (_) {}
     const reader = new FileReader();
     reader.onload = () => {
-      try {
-        this.zone.run(() => {
-          // Replace object URL with data URL when ready
-          const data = reader.result as string;
-          this.newImagePreview = data || this.newImagePreview;
-          if (this.imageObjectUrl) { try { URL.revokeObjectURL(this.imageObjectUrl); } catch {} this.imageObjectUrl = null; }
-          this.imageLoading = false;
-          this.cdr.detectChanges();
-        });
-      } catch (err) {
-        this.zone.run(() => { this.newImagePreview = this.newImagePreview || null; this.imageLoading = false; this.cdr.detectChanges(); });
-      }
+      try { this.zone.run(() => { this.newImagePreviews[index] = (reader.result as string) || this.newImagePreviews[index]; this.cdr.detectChanges(); }); } catch (_) {}
     };
-    reader.onerror = () => { this.zone.run(() => { this.newImagePreview = this.newImagePreview || null; this.imageLoading = false; this.cdr.detectChanges(); }); };
+    reader.onerror = () => {};
     reader.readAsDataURL(f);
   }
+
+  deleteImage(index: number) {
+    if (index < 0 || index >= this.newImagePreviews.length) return;
+    this.newImagePreviews.splice(index, 1);
+    if (this.newImageFiles && this.newImageFiles.length > index) this.newImageFiles.splice(index, 1);
+    if (this.newImagePreviewIndex >= this.newImagePreviews.length) {
+      this.newImagePreviewIndex = Math.max(0, this.newImagePreviews.length - 1);
+    }
+    // clear any image-related error when user manually deletes
+    if (this.imageError) this.imageError = null;
+  }
+
+  selectNewImage(i: number) { if (i >= 0 && i < this.newImagePreviews.length) { this.newImagePreviewIndex = i; try { this.cdr.detectChanges(); } catch (_) {} } }
+
+  showNextNewImage() { if (!this.newImagePreviews || this.newImagePreviews.length <= 1) return; this.newImagePreviewIndex = (this.newImagePreviewIndex + 1) % this.newImagePreviews.length; }
+
+  showPrevNewImage() { if (!this.newImagePreviews || this.newImagePreviews.length <= 1) return; this.newImagePreviewIndex = (this.newImagePreviewIndex - 1 + this.newImagePreviews.length) % this.newImagePreviews.length; }
 
   // ---- Contenteditable helpers ----
   onPostInput(el: HTMLElement) {
@@ -256,7 +338,14 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
       const p = this.posts.find(x => x.id === this.editingId);
       if (!p) return;
       p.text = this.newText || '';
-      p.imageUrl = this.newImagePreview || undefined;
+      // compatibilidad: guardar array de urls si hay varias
+      if (this.newImagePreviews && this.newImagePreviews.length) {
+        p.imageUrls = this.newImagePreviews.slice(0, 3);
+        p.imageUrl = this.newImagePreviews[0] || undefined;
+      } else {
+        p.imageUrls = undefined;
+        p.imageUrl = undefined;
+      }
       this.editingId = null;
       this.clearForm();
       this.creating = false;
@@ -268,7 +357,8 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     const post: BubblePost = {
       id,
       user: { name: username, avatarUrl: avatar || undefined },
-      imageUrl: this.newImagePreview || undefined,
+      imageUrl: this.newImagePreviews.length ? this.newImagePreviews[0] : undefined,
+      imageUrls: this.newImagePreviews.length ? this.newImagePreviews.slice(0, 3) : undefined,
       text: this.newText || '',
       likes: 0,
       liked: false,
@@ -310,9 +400,13 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     if (!p) return;
     this.editingId = p.id;
     this.newText = p.text || '';
-    this.newImagePreview = p.imageUrl || null;
-    // Do not open the top create form; show inline editor instead
-    // set editor content after the inline editor is rendered
+    // restore previews from post imageUrls or single imageUrl
+    this.newImagePreviews = (p.imageUrls && p.imageUrls.slice()) || (p.imageUrl ? [p.imageUrl] : []);
+    this.newImagePreviewIndex = 0;
+    // Open the editor in the separate modal instead of inline
+    this.editInline = false;
+    this.creating = true;
+    // set editor content after the modal renders
     setTimeout(() => { try { this.setPostEditorContent(); if (this.postEditorRef?.nativeElement) this.postEditorRef.nativeElement.focus(); } catch (_) {} }, 50);
   }
 
@@ -325,9 +419,10 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
 
   private clearForm() {
     this.newText = '';
-    this.newImageFile = null;
+    this.newImageFiles = [];
     try { if (this.postEditorRef?.nativeElement) this.postEditorRef.nativeElement.innerHTML = ''; } catch (_) {}
     if (this.imageObjectUrl) { try { URL.revokeObjectURL(this.imageObjectUrl); } catch {} this.imageObjectUrl = null; }
-    this.newImagePreview = null;
+    this.newImagePreviews = [];
+    this.newImagePreviewIndex = 0;
   }
 }

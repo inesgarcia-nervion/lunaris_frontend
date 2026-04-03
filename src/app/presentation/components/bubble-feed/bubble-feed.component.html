@@ -9,7 +9,7 @@
       <ng-container *ngIf="editingId !== p.id">
         <app-bubble-post [post]="p" (like)="toggleLike($event)" (open)="openPost($event)" (edit)="startEdit($event)" [canDelete]="auth.isAdmin() || (auth.getCurrentUsername() === p.user.name)" (delete)="removeConfirmedPost($event)"></app-bubble-post>
       </ng-container>
-      <ng-container *ngIf="editingId === p.id">
+      <ng-container *ngIf="editingId === p.id && editInline">
         <div class="create-card edit-card">
           <div class="create-header">
             <img *ngIf="auth?.getLocalAvatar() else letterAvatarEdit" [src]="auth.getLocalAvatar()" class="avatar">
@@ -21,8 +21,28 @@
 
           <div class="create-body">
             <div class="image-col">
-              <div class="image-preview" *ngIf="newImagePreview"><img [src]="newImagePreview"></div>
-              <input type="file" accept="image/*" (change)="onImageSelected($event)">
+              <div class="image-preview" *ngIf="newImagePreviews.length">
+                <div class="preview-main">
+                  <button *ngIf="newImagePreviews.length > 1" class="img-nav left" (click)="$event.stopPropagation(); showPrevNewImage()">◀</button>
+                  <img [src]="newImagePreviews[newImagePreviewIndex]">
+                  <button class="main-delete" title="Eliminar imagen" (click)="$event.stopPropagation(); deleteImage(newImagePreviewIndex)">✕</button>
+                  <button *ngIf="newImagePreviews.length > 1" class="img-nav right" (click)="$event.stopPropagation(); showNextNewImage()">▶</button>
+                  <div *ngIf="newImagePreviews.length > 1" class="img-counter">{{ newImagePreviewIndex + 1 }} / {{ newImagePreviews.length }}</div>
+                </div>
+                <div class="preview-thumbs" *ngIf="newImagePreviews.length">
+                  <div class="thumb" *ngFor="let thumb of newImagePreviews; let i = index">
+                    <img [src]="thumb" [class.active]="i === newImagePreviewIndex" (click)="selectNewImage(i)" />
+                    <button class="thumb-delete" (click)="$event.stopPropagation(); deleteImage(i)">✕</button>
+                    <input id="replace-file-{{i}}" type="file" accept="image/*" (change)="onReplaceImage($event, i)" hidden>
+                    <button class="thumb-replace" (click)="$event.stopPropagation(); replaceFileClick(i)">Cambiar</button>
+                  </div>
+                </div>
+              </div>
+              <div class="img-controls">
+                <div class="img-limit">Máx 3 imágenes</div>
+                <input type="file" accept="image/*" multiple (change)="onImageSelected($event)">
+                <div class="img-error" *ngIf="imageError">{{ imageError }}</div>
+              </div>
             </div>
             <div class="text-col">
               <div #postEditor contenteditable="true" class="post-input editable" (input)="onPostInput(postEditor)" (keydown)="onPostKeydown($event, postEditor)"></div>
@@ -31,7 +51,7 @@
           </div>
 
           <div class="create-actions">
-            <button (click)="publish()" [disabled]="( !newText.trim() && !newImagePreview ) || imageLoading">Guardar</button>
+            <button (click)="publish()" [disabled]="( !newText.trim() && !newImagePreviews.length )">Guardar</button>
             <button class="cancel" (click)="cancelCreate()">Cancelar</button>
           </div>
         </div>
@@ -54,8 +74,28 @@
 
         <div class="create-body">
           <div class="image-col">
-            <div class="image-preview" *ngIf="newImagePreview"><img [src]="newImagePreview"></div>
-            <input type="file" accept="image/*" (change)="onImageSelected($event)">
+            <div class="image-preview" *ngIf="newImagePreviews.length">
+              <div class="preview-main">
+                <button *ngIf="newImagePreviews.length > 1" class="img-nav left" (click)="$event.stopPropagation(); showPrevNewImage()">◀</button>
+                <img [src]="newImagePreviews[newImagePreviewIndex]">
+                <button class="main-delete" title="Eliminar imagen" (click)="$event.stopPropagation(); deleteImage(newImagePreviewIndex)">✕</button>
+                <button *ngIf="newImagePreviews.length > 1" class="img-nav right" (click)="$event.stopPropagation(); showNextNewImage()">▶</button>
+                <div *ngIf="newImagePreviews.length > 1" class="img-counter">{{ newImagePreviewIndex + 1 }} / {{ newImagePreviews.length }}</div>
+              </div>
+              <div class="preview-thumbs" *ngIf="newImagePreviews.length">
+                <div class="thumb" *ngFor="let thumb of newImagePreviews; let i = index">
+                  <img [src]="thumb" [class.active]="i === newImagePreviewIndex" (click)="selectNewImage(i)" />
+                  <button class="thumb-delete" (click)="$event.stopPropagation(); deleteImage(i)">✕</button>
+                  <input id="replace-file-edit-{{i}}" type="file" accept="image/*" (change)="onReplaceImage($event, i)" hidden>
+                  <button class="thumb-replace" (click)="$event.stopPropagation(); replaceFileClickEdit(i)">Cambiar</button>
+                </div>
+              </div>
+            </div>
+            <div class="img-controls">
+              <div class="img-limit">Máx 3 imágenes</div>
+              <input type="file" accept="image/*" multiple (change)="onImageSelected($event)">
+              <div class="img-error" *ngIf="imageError">{{ imageError }}</div>
+            </div>
           </div>
           <div class="text-col">
             <div #postEditor contenteditable="true" class="post-input editable" (input)="onPostInput(postEditor)" (keydown)="onPostKeydown($event, postEditor)" aria-label="Escribe algo..."></div>
@@ -64,7 +104,7 @@
         </div>
 
         <div class="create-actions">
-          <button (click)="publish()" [disabled]="( !newText.trim() && !newImagePreview ) || imageLoading">Publicar</button>
+          <button (click)="publish()" [disabled]="( !newText.trim() && !newImagePreviews.length )">Publicar</button>
           <button class="cancel" (click)="cancelCreate()">Cancelar</button>
         </div>
       </div>
@@ -88,7 +128,12 @@
         </div>
 
         <div class="detail-body">
-          <div *ngIf="selected.imageUrl" class="detail-image"><img [src]="selected.imageUrl"></div>
+          <div *ngIf="(selected.imageUrls?.length || selected.imageUrl)" class="detail-image">
+            <button *ngIf="selectedImages.length > 1" class="img-nav left" (click)="showPrevSelectedImage()">◀</button>
+            <img [src]="selectedImageSrc()">
+            <button *ngIf="selectedImages.length > 1" class="img-nav right" (click)="showNextSelectedImage()">▶</button>
+            <div *ngIf="selectedImages.length > 1" class="img-counter">{{ selectedImageIndex + 1 }} / {{ selectedImages.length }}</div>
+          </div>
           <div class="detail-text">{{ selected.text }}</div>
         </div>
 
