@@ -5,12 +5,13 @@ import { NewsService, NewsItem } from '../../../domain/services/news.service';
 import { ConfirmService } from '../../shared/confirm.service';
 import { AuthService } from '../../../domain/services/auth.service';
 import { Router } from '@angular/router';
+import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
 
 @Component({
   selector: 'app-noticias',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: './noticias.component.html',
   styleUrls: ['./noticias.component.css']
 })
@@ -24,6 +25,11 @@ export class NoticiasComponent implements OnInit {
   // id of the news pending deletion (for inline confirm)
   pendingDeleteId: string | null = null;
 
+  // Pagination
+  pageSize = 5;
+  currentPage = 1;
+  pagedNews: NewsItem[] = [];
+
   @ViewChild('bodyEditor') bodyEditorRef?: ElementRef<HTMLElement>;
   @ViewChild('fileInput') fileInputRef?: ElementRef<HTMLInputElement>;
   showCreateModal = false;
@@ -34,7 +40,11 @@ export class NoticiasComponent implements OnInit {
 
   ngOnInit(): void {
     this.news = this.newsService.getAll();
-    this.newsService.news$.subscribe(n => this.news = n || []);
+    this.updatePagination();
+    this.newsService.news$.subscribe(n => {
+      this.news = n || [];
+      this.updatePagination();
+    });
     this.isAdmin = this.auth.isAdmin();
     this.auth.isAdmin$.subscribe(v => this.isAdmin = v);
   }
@@ -43,6 +53,18 @@ export class NoticiasComponent implements OnInit {
 
   openDetail(id: string) {
     this.router.navigate(['noticias', id]);
+  }
+
+  updatePagination(): void {
+    const totalPages = Math.max(1, Math.ceil(this.news.length / this.pageSize));
+    if (this.currentPage > totalPages) this.currentPage = totalPages;
+    const start = (this.currentPage - 1) * this.pageSize;
+    this.pagedNews = this.news.slice(start, start + this.pageSize);
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.updatePagination();
   }
 
 

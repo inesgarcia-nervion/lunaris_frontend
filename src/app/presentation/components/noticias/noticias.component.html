@@ -30,7 +30,7 @@
 
 
   <div class="news-list">
-    <div *ngFor="let n of news" class="news-card" (click)="openDetail(n.id)" role="button" tabindex="0">
+    <div *ngFor="let n of pagedNews" class="news-card" (click)="openDetail(n.id)" role="button" tabindex="0">
       <div class="news-meta">
         <h2>{{ n.title }}</h2>
         <span class="news-date">{{ n.date | date:"d 'de' MMMM 'de' y, HH:mm" }}</span>
@@ -52,4 +52,11 @@
       </div>
     </div>
   </div>
+
+  <app-pagination *ngIf="news.length > pageSize"
+    [totalItems]="news.length"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage"
+    (pageChange)="onPageChange($event)">
+  </app-pagination>
 </div>

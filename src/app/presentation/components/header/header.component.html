@@ -133,7 +133,6 @@
         <div class="book-info-simple">
           <h3 class="book-title-simple">{{ book.title }}</h3>
           <p *ngIf="book.authorNames?.length" class="book-author-simple">{{ book.authorNames[0] }}</p>
-          <p *ngIf="isSaga(book)" class="saga-badge">Saga</p>
         </div>
       </div>
     </div>

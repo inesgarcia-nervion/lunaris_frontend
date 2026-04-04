@@ -75,11 +75,61 @@
   transition: transform 140ms ease, box-shadow 140ms ease;
 }
 .more-btn:hover, .more-btn:focus{ transform: translateY(-4px); box-shadow: 0 8px 18px rgba(0,0,0,0.12); }
+
+/* Grid layout for paged reading sections: 4 columns × 3 rows */
+.books-paged-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 8px;
+}
+.books-paged-grid .mini-book {
+  display: flex;
+  justify-content: center;
+}
+.books-paged-grid .mini-book img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+.section-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-color);
+}
+.section-count {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.btn-go-list {
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 140ms;
+}
+.btn-go-list:hover { background: var(--bg-hover); }
+.section-empty {
+  color: var(--text-secondary);
+  font-size: 13px;
+  padding: 8px 0;
+}
+@media (max-width: 600px) {
+  .books-paged-grid { grid-template-columns: repeat(2, 1fr); }
+}
 .your-lists{ margin-top:18px }
 .lists-row{ display:flex; gap:12px; flex-wrap:wrap }
 .lists-grid-profile{
   display:grid;
-  grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap:18px;
 }
 .list-card-profile{

@@ -6,11 +6,12 @@ import { Location } from '@angular/common';
 import { BubblePostComponent, BubblePost } from '../bubble-post/bubble-post.component';
 import { ConfirmService } from '../../shared/confirm.service';
 import { AuthService } from '../../../domain/services/auth.service';
+import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
 @Component({
   selector: 'app-bubble-feed',
   standalone: true,
-  imports: [CommonModule, FormsModule, BubblePostComponent],
+  imports: [CommonModule, FormsModule, BubblePostComponent, PaginationComponent],
   templateUrl: './bubble-feed.component.html',
   styleUrls: ['./bubble-feed.component.css']
 })
@@ -38,6 +39,11 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
   // id of the post pending deletion (for inline confirm)
   pendingDeleteId: number | null = null;
 
+  // Pagination
+  pageSize = 5;
+  currentPage = 1;
+  pagedPosts: BubblePost[] = [];
+
   @ViewChild('postEditor') postEditorRef?: ElementRef<HTMLElement>;
   @ViewChild('commentEditor') commentEditorRef?: ElementRef<HTMLElement>;
 
@@ -59,6 +65,18 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
       if (p) this.selected = p;
       // Otherwise keep selected undefined; when posts are published locally they will appear in the list
     });
+  }
+
+  updatePagination(): void {
+    const totalPages = Math.max(1, Math.ceil(this.posts.length / this.pageSize));
+    if (this.currentPage > totalPages) this.currentPage = totalPages;
+    const start = (this.currentPage - 1) * this.pageSize;
+    this.pagedPosts = this.posts.slice(start, start + this.pageSize);
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.updatePagination();
   }
 
   toggleLike(postId: number) {
@@ -369,6 +387,7 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     this.posts.unshift(post);
     this.clearForm();
     this.creating = false;
+    this.currentPage = 1;
     this.savePosts();
   }
 
@@ -382,6 +401,7 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     } catch (e) {
       // ignore storage errors
     }
+    this.updatePagination();
   }
 
   private loadPosts() {
@@ -395,6 +415,7 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     } catch (e) {
       // ignore parse errors
     }
+    this.updatePagination();
   }
 
   startEdit(postId: number) {

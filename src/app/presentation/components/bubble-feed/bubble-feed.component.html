@@ -5,7 +5,7 @@
 
   <section class="posts">
     <div *ngIf="posts.length === 0" class="empty-state">Aún no hay publicaciones. Sé el primero en publicar.</div>
-    <div *ngFor="let p of posts">
+    <div *ngFor="let p of pagedPosts">
       <ng-container *ngIf="editingId !== p.id">
         <app-bubble-post [post]="p" (like)="toggleLike($event)" (open)="openPost($event)" (edit)="startEdit($event)" [canDelete]="auth.isAdmin() || (auth.getCurrentUsername() === p.user.name)" (delete)="removeConfirmedPost($event)"></app-bubble-post>
       </ng-container>
@@ -58,6 +58,13 @@
       </ng-container>
     </div>
   </section>
+
+  <app-pagination *ngIf="posts.length > pageSize"
+    [totalItems]="posts.length"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage"
+    (pageChange)="onPageChange($event)">
+  </app-pagination>
 
   <!-- Modal create overlay opened by floating button -->
   <div *ngIf="creating" class="create-modal-overlay">
