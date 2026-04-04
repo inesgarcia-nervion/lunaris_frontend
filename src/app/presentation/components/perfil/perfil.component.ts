@@ -27,8 +27,8 @@ export class PerfilComponent implements OnInit {
   leidoId: string | null = null;
   planParaLeerId: string | null = null;
 
-  // Pagination for reading sections (4 cols × 3 rows = 12 per page)
-  pageSize = 12;
+  // Pagination for reading sections in profile preview: show 4 items per section
+  pageSize = 4;
   leyendoPage = 1;
   leidoPage = 1;
   planParaLeerPage = 1;

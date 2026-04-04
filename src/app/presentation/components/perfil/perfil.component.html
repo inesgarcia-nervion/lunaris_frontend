@@ -16,16 +16,10 @@
           <img [src]="getCoverUrl(b)" [alt]="b.title" />
         </div>
       </div>
-      <app-pagination *ngIf="leyendo.length > pageSize"
-        [totalItems]="leyendo.length"
-        [pageSize]="pageSize"
-        [currentPage]="leyendoPage"
-        (pageChange)="onLeyendoPageChange($event)">
-      </app-pagination>
       <div *ngIf="leyendo.length === 0" class="section-empty">No hay libros en esta lista aún.</div>
       <div class="section-footer">
         <span class="section-count">{{ leyendo.length }} libro{{ leyendo.length !== 1 ? 's' : '' }}</span>
-        <button class="btn-go-list" (click)="navigateToList(leyendoId)">Ver lista →</button>
+        <button class="btn-go-list" (click)="navigateToList(leyendoId)" aria-label="Ver lista">→</button>
       </div>
     </div>
 
@@ -36,16 +30,10 @@
           <img [src]="getCoverUrl(b)" [alt]="b.title" />
         </div>
       </div>
-      <app-pagination *ngIf="leido.length > pageSize"
-        [totalItems]="leido.length"
-        [pageSize]="pageSize"
-        [currentPage]="leidoPage"
-        (pageChange)="onLeidoPageChange($event)">
-      </app-pagination>
       <div *ngIf="leido.length === 0" class="section-empty">No hay libros en esta lista aún.</div>
       <div class="section-footer">
         <span class="section-count">{{ leido.length }} libro{{ leido.length !== 1 ? 's' : '' }}</span>
-        <button class="btn-go-list" (click)="navigateToList(leidoId)">Ver lista →</button>
+        <button class="btn-go-list" (click)="navigateToList(leidoId)" aria-label="Ver lista">→</button>
       </div>
     </div>
 
@@ -56,16 +44,10 @@
           <img [src]="getCoverUrl(b)" [alt]="b.title" />
         </div>
       </div>
-      <app-pagination *ngIf="planParaLeer.length > pageSize"
-        [totalItems]="planParaLeer.length"
-        [pageSize]="pageSize"
-        [currentPage]="planParaLeerPage"
-        (pageChange)="onPlanParaLeerPageChange($event)">
-      </app-pagination>
       <div *ngIf="planParaLeer.length === 0" class="section-empty">No hay libros en esta lista aún.</div>
       <div class="section-footer">
         <span class="section-count">{{ planParaLeer.length }} libro{{ planParaLeer.length !== 1 ? 's' : '' }}</span>
-        <button class="btn-go-list" (click)="navigateToList(planParaLeerId)">Ver lista →</button>
+        <button class="btn-go-list" (click)="navigateToList(planParaLeerId)" aria-label="Ver lista">→</button>
       </div>
     </div>
   </div>
@@ -84,7 +66,7 @@
         </div>
         <h4 class="list-name">{{ l.nombre }}</h4>
         <div class="list-actions-row">
-          <button type="button" class="btn-discover" (click)="navigateToList(l.id); $event.stopPropagation()">Descúbrela</button>
+          <button type="button" class="btn-go-list" (click)="navigateToList(l.id); $event.stopPropagation()" aria-label="Ver lista">→</button>
         </div>
       </div>
     </div>
@@ -112,7 +94,7 @@
         <h4 class="list-name">{{ l.nombre }}</h4>
         <div class="list-owner">Por {{ l.owner }}</div>
         <div class="list-actions-row">
-          <button type="button" class="btn-discover" (click)="navigateToList(l.id); $event.stopPropagation()">Descúbrela</button>
+          <button type="button" class="btn-go-list" (click)="navigateToList(l.id); $event.stopPropagation()" aria-label="Ver lista">→</button>
         </div>
       </div>
     </div>

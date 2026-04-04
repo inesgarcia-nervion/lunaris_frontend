@@ -107,16 +107,20 @@
   color: var(--text-secondary);
 }
 .btn-go-list {
-  background: none;
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  padding: 4px 10px;
-  border-radius: 6px;
+  background: var(--text-primary);
+  color: var(--bg-card);
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  font-size: 13px;
-  transition: background 140ms;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
 }
-.btn-go-list:hover { background: var(--bg-hover); }
+.btn-go-list:hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(0,0,0,0.18); }
 .section-empty {
   color: var(--text-secondary);
   font-size: 13px;
