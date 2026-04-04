@@ -27,6 +27,8 @@ export class ListasUsuariosComponent implements OnInit {
   newListName: string = '';
   newListPrivate: boolean = false;
   currentUser: string | null = null;
+  createError: string = '';
+  private errorTimer: any = null;
 
   constructor(
     public bookSearchService: BookSearchService,
@@ -124,6 +126,18 @@ export class ListasUsuariosComponent implements OnInit {
     if (!name) {
       return;
     }
+    // Check for duplicate name for the current user
+    const duplicate = this.listasService.getAll().some(
+      l => l.owner === this.currentUser && (l.nombre || '').toLowerCase() === name.toLowerCase()
+    );
+    if (duplicate) {
+      this.createError = 'Ya tienes una lista con ese nombre';
+      if (this.errorTimer) clearTimeout(this.errorTimer);
+      this.errorTimer = setTimeout(() => { this.createError = ''; this.cdr.markForCheck(); }, 3000);
+      this.cdr.markForCheck();
+      return;
+    }
+    this.createError = '';
     // create list with current user as owner (ListasService handles owner assignment)
     const nueva = this.listasService.addList(name, !!this.newListPrivate);
     // filteredListas se actualizará por suscripción

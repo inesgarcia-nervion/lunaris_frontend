@@ -8,7 +8,7 @@
     <input
       type="text"
       [(ngModel)]="newListName"
-      (keyup.enter)="confirmCreate()"
+      (keyup.enter)="(newListName || '').trim() && confirmCreate()"
       (keyup.esc)="cancelCreate()"
       placeholder="Nombre de la nueva lista"
       class="input-crear-lista"
@@ -17,9 +17,10 @@
     <label class="create-list-privada">
       <input type="checkbox" [(ngModel)]="newListPrivate" /> Privada
     </label>
-    <button class="btn-confirm" (click)="confirmCreate()">Crear</button>
+    <button class="btn-confirm" (click)="confirmCreate()" [disabled]="!newListName.trim()">Crear</button>
     <button class="btn-cancel" (click)="cancelCreate()">Cancelar</button>
   </div>
+  <div class="message error" *ngIf="createError">{{ createError }}</div>
 
   <div class="listas-actions">
     <input
