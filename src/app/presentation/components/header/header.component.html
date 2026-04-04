@@ -98,6 +98,12 @@
   </div>
 
 
+  <!-- Loading inicial de búsqueda -->
+  <div *ngIf="loading && searchResults.length === 0 && !selectedBook" class="detail-loading-container">
+    <div class="detail-loading-spinner"></div>
+    <p class="detail-loading-text">Buscando libros...</p>
+  </div>
+
   <!-- VISTA DE BÚSQUEDA SIMPLIFICADA -->
   <div *ngIf="searchResults.length > 0 && !selectedBook && !sagaLoading" class="results-section">
     <!-- Skeletons while loading -->
