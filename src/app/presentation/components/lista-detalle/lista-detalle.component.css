@@ -7,6 +7,15 @@
   box-shadow: 0 2px 12px var(--shadow-sm);
   color: var(--text-primary);
 }
+/* Aumenta el tamaño de letra base para accesibilidad */
+:host {
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+@media (max-width: 480px) {
+  :host { font-size: 16px; }
+}
 .lista-title {
   font-size: 2.2rem;
   margin: 0 0 8px 0;

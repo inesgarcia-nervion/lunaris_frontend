@@ -11,7 +11,7 @@ import { ContenteditableDirective } from '../../shared/contenteditable.directive
   standalone: true,
   imports: [CommonModule, FormsModule, ContenteditableDirective],
   templateUrl: './admin-create-book.component.html',
-  styleUrl: './admin-create-book.component.css'
+    styleUrls: ['./admin-create-book.component.css']
 })
 export class AdminCreateBookComponent implements OnInit {
   title: string = '';

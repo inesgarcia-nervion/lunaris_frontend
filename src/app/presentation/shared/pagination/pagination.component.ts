@@ -28,23 +28,25 @@ import { CommonModule } from '@angular/common';
     `
     :host { display:block; width:100%; }
     /* Neutral styles so the component inherits app theme; override with parent CSS when needed */
-    .pagination-wrapper { padding:8px 6px; display:flex; gap:12px; align-items:center; justify-content:center; width:100%; }
-    .pagination { display:flex; gap:8px; align-items:center; justify-content:center; }
+    .pagination-wrapper { padding:10px 8px; display:flex; gap:14px; align-items:center; justify-content:center; width:100%; }
+    .pagination { display:flex; gap:12px; align-items:center; justify-content:center; }
 
-    .arrow { background:transparent; border:1px solid var(--border-color, rgba(0,0,0,0.15)); width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:4px; color:inherit; cursor:pointer; }
-    .arrow[disabled] { opacity:0.4; cursor:not-allowed; }
-    .arrow-inner { font-size:18px; line-height:1; }
+    .arrow { background:transparent; border:1px solid var(--border-color, rgba(0,0,0,0.15)); width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:6px; color:inherit; cursor:pointer; }
+    .arrow[disabled] { opacity:0.45; cursor:not-allowed; }
+    .arrow-inner { font-size:22px; line-height:1; }
 
-    .page-num { background:transparent; border:none; color:inherit; padding:6px 8px; font-weight:600; cursor:pointer; }
+    .page-num { background:transparent; border:none; color:inherit; padding:8px 10px; font-weight:700; cursor:pointer; font-size:16px; }
     .page-num:hover { text-decoration:underline; }
-    .page-num[aria-current="page"], .page-num.active { background:var(--pagination-active-bg, #ffd54f); color:var(--pagination-active-fg, #222); border-radius:4px; padding:6px 10px; }
+    .page-num[aria-current="page"], .page-num.active { background:var(--pagination-active-bg, #ffd54f); color:var(--pagination-active-fg, #222); border-radius:6px; padding:8px 12px; }
 
-    .small-counter { color:var(--text-secondary, rgba(0,0,0,0.6)); font-size:12px; }
+    .small-counter { color:var(--text-secondary, rgba(0,0,0,0.6)); font-size:15px; font-weight:600; }
 
     @media (max-width:480px) {
-      .pagination-wrapper { gap:6px; padding:6px; }
-      .page-num { padding:4px 6px; }
-      .arrow { width:30px; height:30px; }
+      .pagination-wrapper { gap:8px; padding:8px; }
+      .page-num { padding:6px 8px; font-size:14px; }
+      .arrow { width:38px; height:38px; }
+      .arrow-inner { font-size:18px; }
+      .small-counter { font-size:13px; }
     }
     `
   ]

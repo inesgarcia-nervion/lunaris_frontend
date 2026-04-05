@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [CommonModule, PaginationComponent],
   templateUrl: './menu.component.html',
-  styleUrl: './menu.component.css'
+  styleUrls: ['./menu.component.css']
 })
 export class MenuComponent implements OnInit, OnDestroy {
   searchResults: OpenLibraryBook[] = [];

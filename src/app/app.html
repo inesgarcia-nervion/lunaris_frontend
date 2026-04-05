@@ -7,7 +7,7 @@
       <div class="footer-item footer-copyright">©2025 Lunaris</div>
       <div class="footer-separator">•</div>
       <div class="footer-item footer-help">
-        <span class="help-text">¿Necesitas ayuda?</span>
+        <span class="help-text">¿No encuentras lo que buscas?</span>
         <button *ngIf="!auth.isAdmin()" (click)="navigateToPeticiones()" class="footer-link">Accede a nuestras peticiones</button>
       </div>
       <div class="footer-separator">•</div>
@@ -30,7 +30,7 @@
     padding: 1.5rem 2rem;
     background: var(--bg-page);
     color: var(--text-muted);
-    font-size: 0.85rem;
+    font-size: 1rem;
     border-top: 1px solid var(--border-color);
     display: flex;
     align-items: center;
@@ -44,14 +44,15 @@
   .footer-content.horizontal { flex-direction:row; flex-wrap:wrap }
   .footer-item { display:flex; align-items:center; gap:8px }
   .footer-separator { color:var(--border-color) }
-  .help-text { color:var(--text-secondary); font-weight:500 }
+  .help-text { color:var(--text-secondary); font-weight:600; font-size:1rem; }
   .footer-link {
     background: linear-gradient(90deg, #5b6ef6, #8a5df5);
     color: white;
     border: none;
-    padding: 0.45rem 0.85rem;
+    padding: 0.6rem 1rem;
     border-radius: 999px;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 1rem;
     box-shadow: 0 8px 20px rgba(91,110,246,0.12);
     cursor: pointer;
     transition: transform 0.12s ease, box-shadow 0.12s ease;
@@ -59,9 +60,11 @@
   .footer-link:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(91,110,246,0.18); }
 
   @media (max-width: 600px) {
-    .app-footer { padding: 1rem 1rem; }
+    .app-footer { padding: 1rem 1rem; font-size: 0.98rem; }
     .footer-content.horizontal { flex-direction: column; gap: 8px; }
     .footer-separator { display: none; }
     .footer-item.footer-help { flex-direction: column; gap: 6px; }
+    .help-text { font-size: 0.98rem; }
+    .footer-link { padding: 0.55rem 0.9rem; font-size: 0.96rem; }
   }
 </style>

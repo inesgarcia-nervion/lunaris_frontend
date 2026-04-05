@@ -8,7 +8,7 @@ import { PeticionesService } from '../../../domain/services/peticiones.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './peticiones.component.html',
-  styleUrl: './peticiones.component.css'
+    styleUrls: ['./peticiones.component.css']
 })
 export class PeticionesComponent {
   title = '';

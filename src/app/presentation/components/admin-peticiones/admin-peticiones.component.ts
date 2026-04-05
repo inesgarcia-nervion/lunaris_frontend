@@ -9,7 +9,7 @@ import { PaginationComponent } from '../../shared/pagination/pagination.componen
   standalone: true,
   imports: [CommonModule, PaginationComponent],
   templateUrl: './admin-peticiones.component.html',
-  styleUrl: './admin-peticiones.component.css'
+    styleUrls: ['./admin-peticiones.component.css']
 })
 export class AdminPeticionesComponent implements OnInit {
   requests: BookRequestDto[] = [];

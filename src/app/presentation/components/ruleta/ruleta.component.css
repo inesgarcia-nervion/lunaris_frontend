@@ -1,4 +1,14 @@
 
+./* Aumenta el tamaño de letra base para accesibilidad */
+.ruleta-container {
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+@media (max-width: 480px) {
+  .ruleta-container { font-size: 16px; }
+}
+
 .ruleta-container {
   max-width: 900px;
   margin: 50px auto;

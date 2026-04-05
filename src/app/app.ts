@@ -11,7 +11,7 @@ import { AuthService } from './domain/services/auth.service';
   selector: 'app-root',
   imports: [CommonModule, RouterOutlet, HeaderComponent, ConfirmDialogComponent],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+    styleUrls: ['./app.css']
 })
 export class App implements OnInit, OnDestroy {
   protected readonly title = signal('lunaris_frontend');

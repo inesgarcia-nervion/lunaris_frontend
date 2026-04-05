@@ -1,4 +1,17 @@
 .bubble-post {
+  /* Aumenta el tamaño de letra base para accesibilidad */
+}
+/* apply host rule to whole component */
+:host {
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+@media (max-width: 480px) {
+  :host { font-size: 16px; }
+}
+
+.bubble-post {
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 16px;

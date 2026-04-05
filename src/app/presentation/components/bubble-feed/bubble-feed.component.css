@@ -1,3 +1,13 @@
+/* Aumenta el tamaño de letra base para accesibilidad */
+:host {
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+@media (max-width: 480px) {
+  :host { font-size: 16px; }
+}
+
 /* Raise the background closer to the header and lower the title inside the container */
 .bubble-container {
   max-width: 920px;

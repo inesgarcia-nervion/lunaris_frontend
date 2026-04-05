@@ -1,4 +1,13 @@
 /* ===== NAVBAR ===== */
+/* Aumenta el tamaño de letra base para accesibilidad */
+:host {
+  font-size: 20px;
+  line-height: 1.45;
+}
+
+@media (max-width: 480px) {
+  :host { font-size: 18px; }
+}
 .navbar {
   background: var(--navbar-bg);
   padding: 0.6rem 2rem;
@@ -261,7 +270,7 @@
 }
 
 .hero-title {
-  font-size: 2.5rem;
+  font-size: 2.6rem;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.3;
@@ -269,7 +278,7 @@
 }
 
 .hero-description {
-  font-size: 1rem;
+  font-size: 1.15rem;
   color: var(--text-secondary);
   line-height: 1.6;
   margin: 0;
@@ -296,15 +305,22 @@
 }
 
 .stat-number {
-  font-size: 1.8rem;
+  font-size: 2.2rem;
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 0.5rem;
 }
 
 .stat-label {
-  font-size: 0.9rem;
+  font-size: 1.05rem;
   color: var(--text-secondary);
+}
+
+@media (max-width: 720px) {
+  .hero-title { font-size: 2.1rem; }
+  .hero-description { font-size: 1rem; }
+  .stat-number { font-size: 1.8rem; }
+  .stat-label { font-size: 0.95rem; }
 }
 
 .hero-right {
@@ -400,7 +416,7 @@
 
 .results-info p {
   margin: 5px 0;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 /* Alertas */
@@ -491,7 +507,7 @@
 }
 
 .book-title {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 10px;
@@ -503,7 +519,7 @@
 .book-editions,
 .book-rating,
 .book-description {
-  font-size: 13px;
+  font-size: 15px;
   color: var(--text-secondary);
   margin: 4px 0;
   line-height: 1.4;
@@ -525,7 +541,7 @@
   padding: 8px 12px;
   border: none;
   border-radius: 5px;
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 600;
@@ -619,7 +635,7 @@
 
 .section-deco {
   color: #bbb;
-  font-size: 0.95rem;
+  font-size: 1rem;
   letter-spacing: 0.4rem;
   margin-bottom: 1rem;
 }
@@ -632,7 +648,7 @@
 }
 
 .section-desc {
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   color: var(--text-secondary);
   max-width: 660px;
   line-height: 1.6;
@@ -696,7 +712,7 @@
 }
 
 .list-card-title {
-  font-size: 1.05rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
@@ -704,7 +720,7 @@
 }
 
 .list-card-desc {
-  font-size: 0.88rem;
+  font-size: 1rem;
   color: var(--text-secondary);
   margin: 0;
   line-height: 1.5;
@@ -717,7 +733,7 @@
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s ease;
@@ -895,7 +911,7 @@
 }
 
 .review-username {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -932,7 +948,7 @@
 }
 
 .news-preview-title {
-  font-size: 1.05rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.4;
@@ -940,7 +956,7 @@
 }
 
 .news-preview-desc {
-  font-size: 0.9rem;
+  font-size: 1.05rem;
   color: var(--text-secondary);
   line-height: 1.6;
   flex: 1;
@@ -985,14 +1001,14 @@
 }
 
 .ruleta-section-subtitle {
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   color: var(--text-muted);
   font-style: italic;
   margin: 0;
 }
 
 .ruleta-section-desc {
-  font-size: 0.93rem;
+  font-size: 1.1rem;
   color: var(--text-secondary);
   line-height: 1.7;
   max-width: 620px;
