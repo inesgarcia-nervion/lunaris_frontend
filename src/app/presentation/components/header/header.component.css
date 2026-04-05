@@ -77,12 +77,17 @@
 }
 .search-input {
   flex: 1;
+  min-width: 0;
+  width: 100%;
   border: none;
   outline: none;
   color: var(--text-primary);
   background: transparent;
   font-size: 0.95rem;
   padding: 0.4rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .search-input::placeholder {
   color: var(--text-secondary);
@@ -170,6 +175,25 @@
 @media (max-width: 480px) {
   .user-name { font-size: 0.9rem; max-width: 120px; }
   .role-badge { font-size: 0.75rem; }
+}
+
+/* Responsive adjustments for the search placeholder and input */
+@media (max-width: 768px) {
+  .search-input {
+    font-size: 0.85rem;
+  }
+  .search-input::placeholder {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-input {
+    font-size: 0.78rem;
+  }
+  .search-input::placeholder {
+    font-size: 0.78rem;
+  }
 }
 
 .role-admin {
