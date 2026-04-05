@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit, OnDestroy, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -11,7 +11,7 @@ import { AuthService } from '../../../domain/services/auth.service';
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent implements OnInit, OnDestroy {
   username = '';
   email = '';
   password = '';
@@ -20,14 +20,19 @@ export class RegisterComponent implements OnInit {
   loading = false;
   showPassword: boolean = false;
 
-  constructor(private auth: AuthService, public router: Router, private cdr: ChangeDetectorRef) {}
+  constructor(private auth: AuthService, public router: Router, private cdr: ChangeDetectorRef, private renderer: Renderer2) {}
 
   ngOnInit(): void {
+    this.renderer.setStyle(document.body, 'overflow', 'hidden');
     this.clearForm();
     // Limpiar de nuevo después de un pequeño delay para evitar que el gestor de contraseñas autocomplete
     setTimeout(() => {
       this.clearForm();
     }, 200);
+  }
+
+  ngOnDestroy(): void {
+    this.renderer.removeStyle(document.body, 'overflow');
   }
 
   clearForm(): void {

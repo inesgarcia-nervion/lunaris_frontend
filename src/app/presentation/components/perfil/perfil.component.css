@@ -128,6 +128,12 @@
 }
 @media (max-width: 600px) {
   .books-paged-grid { grid-template-columns: repeat(2, 1fr); }
+  .perfil-container { padding: 4px; }
+  .perfil-header { flex-direction: column; align-items: center; text-align: center; gap: 12px; }
+  .username { font-size: 22px; }
+  .avatar { font-size: 48px; width: 72px; height: 72px; }
+  .lists-grid-profile { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .list-card-profile { min-height: 140px; padding: 10px; }
 }
 .your-lists{ margin-top:18px }
 .lists-row{ display:flex; gap:12px; flex-wrap:wrap }
@@ -186,3 +192,15 @@
   transform: translateY(-1px);
 }
 .btn-delete-like-news:active { transform: translateY(0); }
+
+/* Additional responsive breakpoints */
+@media (max-width: 768px) {
+  .lists-grid-profile { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .books-paged-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 400px) {
+  .lists-grid-profile { grid-template-columns: 1fr; }
+  .books-paged-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .section-card { padding: 8px; }
+}

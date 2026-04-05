@@ -16,6 +16,7 @@ import { AuthService } from './domain/services/auth.service';
 export class App implements OnInit, OnDestroy {
   protected readonly title = signal('lunaris_frontend');
   showHeader = false;
+  showFooter = false;
   private subs: Subscription[] = [];
   private publicFirstSegments = new Set(['', 'login', 'register', 'recuperar-contrasena', 'reset-password']);
 
@@ -44,10 +45,12 @@ export class App implements OnInit, OnDestroy {
       console.error('Error assigning ownership on app init', e);
     }
     this.showHeader = this.computeShowHeader(this.router.url);
+    this.showFooter = this.showHeader;
     this.applyThemeForRoute(this.router.url);
     this.subs.push(this.router.events.subscribe(e => {
       if (e instanceof NavigationEnd) {
         this.showHeader = this.computeShowHeader(e.urlAfterRedirects);
+        this.showFooter = this.showHeader;
         this.applyThemeForRoute(e.urlAfterRedirects);
       }
     }));

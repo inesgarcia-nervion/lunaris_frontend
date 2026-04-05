@@ -1,18 +1,19 @@
 
 .ruleta-container {
   max-width: 900px;
-  margin: 40px auto;
+  margin: 50px auto;
   padding: 32px 24px;
   background: var(--bg-card);
   border-radius: 16px;
   box-shadow: 0 2px 12px var(--shadow-sm);
+  overflow-x: clip;
 }
 .card { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
-.big-box { min-height: 560px; display:flex; align-items:center; justify-content:center; background: transparent; color:var(--text-color, #000); position:relative; margin-bottom: 8px; }
+.big-box { min-height: 400px; display:flex; align-items:center; justify-content:center; background: transparent; color:var(--text-color, #000); position:relative; margin-bottom: 8px; }
 .placeholder { font-size: 24px; opacity:0.9; }
 
 /* Wheel specific styles */
-.wheel-wrap { position: relative; display:flex; align-items:center; justify-content:center; }
+.wheel-wrap { position: relative; display:flex; align-items:center; justify-content:center; width: 100%; }
 .wheel { border-radius: 50%; background: #fff; box-shadow: 0 18px 40px rgba(0,0,0,0.18), inset 0 8px 20px rgba(0,0,0,0.06); position: relative; display:block; overflow: visible; border: 10px solid #000; }
 .wheel.spinning { will-change: transform; }
 .wheel-item { position: absolute; left: 50%; top: 50%; transform-origin: 0 0; }
@@ -42,7 +43,7 @@
 .wheel::after { content: ''; position: absolute; inset: 6px; border-radius: 50%; box-shadow: inset 0 0 0 2px rgba(0,0,0,0.06); pointer-events: none; }
 /* Ensure wheel scales nicely on smaller screens */
 @media (max-width: 720px) {
-	.wheel { width: 320px !important; height: 320px !important; border-width:8px; border-color: #000; }
+	.wheel { border-width:8px; border-color: #000; }
 }
 
 .result-title { font-size: 28px; font-weight:700; text-align:center; margin-bottom:8px; }
@@ -107,6 +108,16 @@ button { padding:8px 12px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 @media (max-width: 720px) {
-	.big-box { height: 420px; }
 	.result-cover { max-height: 220px; max-width:220px; }
+}
+
+@media (max-width: 480px) {
+	.ruleta-container { margin: 16px auto; padding: 20px 12px; }
+	.controls { flex-direction: column; align-items: stretch; }
+	.buttons { margin-left: 0; justify-content: center; }
+	.big-box { min-height: 380px; }
+	.result-card { padding: 12px; }
+	.cover-wrap { width: 140px; height: 210px; }
+	.result-cover { width: 120px; height: 180px; }
+	.result-title { font-size: 16px; }
 }

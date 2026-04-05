@@ -81,12 +81,39 @@ body * {
 .config-container,
 .peticiones-container,
 .perfil-container,
+.bubble-container,
 .app-container {
   margin-top: 120px;
 }
 
 .admin-create-book-container {
   margin-top: 50px;
+}
+
+/* ===== GLOBAL RESPONSIVE ADJUSTMENTS ===== */
+@media (max-width: 768px) {
+  .book-search-container,
+  .config-container,
+  .peticiones-container,
+  .perfil-container,
+  .bubble-container,
+  .app-container {
+    margin-top: 80px;
+  }
+  .admin-create-book-container {
+    margin-top: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .book-search-container,
+  .config-container,
+  .peticiones-container,
+  .perfil-container,
+  .bubble-container,
+  .app-container {
+    margin-top: 60px;
+  }
 }
 
 /* All page-level containers inherit the active theme background */

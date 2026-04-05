@@ -1,12 +1,6 @@
 :host {
   display: block;
   height: 100vh;
-  overflow: hidden;
-}
-
-html, body {
-  overflow: hidden !important;
-  height: 100%;
 }
 
 .page-wrap {
@@ -22,6 +16,11 @@ html, body {
   position: fixed;
   top: 0;
   left: 0;
+  box-sizing: border-box;
+}
+
+@media (max-height: 700px) {
+  .page-wrap { overflow-y: auto; }
 }
 
 .back-arrow {
@@ -52,21 +51,6 @@ html, body {
 .title { margin: 6px 0 0; font-size: 44px; color: #caa6ff; text-shadow: 0 6px 10px rgba(154,124,255,0.35); font-family: "Poppins", sans-serif;}
 .subtitle { margin: 6px 0 20px; color: #9e88b8; font-weight: 600; font-family: "Poppins", sans-serif; font-size: 18px;}
 
-.page-wrap {
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 32px 16px 64px;
-  background: var(--bg-page);
-  color: var(--text-primary);
-  overflow: hidden;
-  position: fixed;
-  top: 0;
-  left: 0;
-}
-
 .card {
   width: 520px;
   max-width: calc(100% - 40px);
@@ -74,8 +58,6 @@ html, body {
   border-radius: 8px;
   padding: 28px 36px;
   box-shadow: 0 8px 20px var(--shadow-md);
-  max-height: 80vh;
-  overflow-y: auto;
 }
 
 .login-form { display: flex; flex-direction: column; }
@@ -103,11 +85,6 @@ html, body {
 .password-row .eye:hover { background: rgba(0,0,0,0.03); }
 .password-row .eye svg { display:block; }
 
-.forgot { display:inline-block; margin-top:8px; float:right; color:#474BCA; text-decoration:none; font-size:15px; font-family: "Inter", sans-serif; }
-
-.remember-row { margin: 8px 0 18px; }
-.remember { display:flex; align-items:center; gap:10px; font-weight:600; color:#2f1b1b; font-family: "Poppins", sans-serif; font-size:16px; }
-.remember input { width:18px; height:18px; }
 
 .submit {
   margin-top: 8px;
@@ -139,4 +116,16 @@ html, body {
 .submit:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .page-wrap { padding: 20px 10px 40px; }
+  .card { padding: 20px 18px; }
+  .title { font-size: 32px; }
+  .subtitle { font-size: 15px; }
+  .brand-icon { width: 80px; height: auto; }
+  .input { font-size: 16px; padding: 14px 8px; }
+  .submit { font-size: 16px; padding: 12px 16px; }
+  .back-arrow { font-size: 36px; width: 40px; height: 40px; line-height: 40px; }
 }

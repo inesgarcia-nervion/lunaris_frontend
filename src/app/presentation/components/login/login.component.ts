@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit, OnDestroy, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -12,7 +12,7 @@ import { ListasService } from '../../../domain/services/listas.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   username = '';
   password = '';
   rememberMe = false;
@@ -21,9 +21,10 @@ export class LoginComponent implements OnInit {
   showPassword: boolean = false;
 
 
-  constructor(private auth: AuthService, public router: Router, private cdr: ChangeDetectorRef, private listasService: ListasService) {}
+  constructor(private auth: AuthService, public router: Router, private cdr: ChangeDetectorRef, private listasService: ListasService, private renderer: Renderer2) {}
 
   ngOnInit(): void {
+    this.renderer.setStyle(document.body, 'overflow', 'hidden');
     try {
       // If the user previously chose "remember me" we stored a flag and the username
       const remembered = localStorage.getItem('lunaris_remember');
@@ -41,6 +42,10 @@ export class LoginComponent implements OnInit {
     } catch (e) {
       // ignore storage errors
     }
+  }
+
+  ngOnDestroy(): void {
+    this.renderer.removeStyle(document.body, 'overflow');
   }
 
   submit() {

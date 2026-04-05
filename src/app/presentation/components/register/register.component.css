@@ -1,12 +1,6 @@
 :host {
   display: block;
   height: 100vh;
-  overflow: hidden;
-}
-
-html, body {
-  overflow: hidden !important;
-  height: 100%;
 }
 
 .page-wrap {
@@ -22,6 +16,11 @@ html, body {
   position: fixed;
   top: 0;
   left: 0;
+  box-sizing: border-box;
+}
+
+@media (max-height: 700px) {
+  .page-wrap { overflow-y: auto; }
 }
 
 .back-arrow {
@@ -127,4 +126,16 @@ html, body {
 .submit:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .page-wrap { padding: 20px 10px 40px; }
+  .card { padding: 20px 18px; max-height: 85vh; overflow-y: auto; }
+  .title { font-size: 32px; }
+  .subtitle { font-size: 15px; }
+  .brand-icon { width: 80px; height: auto; }
+  .input { font-size: 16px; padding: 14px 8px; }
+  .submit { font-size: 16px; padding: 12px 16px; }
+  .back-arrow { font-size: 36px; width: 40px; height: 40px; line-height: 40px; }
 }

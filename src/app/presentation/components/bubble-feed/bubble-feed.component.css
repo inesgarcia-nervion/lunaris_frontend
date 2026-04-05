@@ -1,7 +1,7 @@
 /* Raise the background closer to the header and lower the title inside the container */
 .bubble-container {
   max-width: 920px;
-  margin: 40px auto 28px;
+  margin: 50px auto 28px;
   padding: 32px 24px;
   background: var(--bg-card);
   border-radius: 16px;
@@ -13,8 +13,18 @@
 .bubble-container > h2 { margin-top: 0; margin-bottom: 12px; font-size: 1.75rem; letter-spacing: -0.02em }
 .app-bg { background: linear-gradient(180deg,#f7f9fc 0%, #ffffff 100%); padding-bottom:40px }
 .mock-create { padding:14px; border:1px dashed var(--border-color); border-radius:10px; margin-bottom:16px; background:var(--bg-secondary) }
-.detail-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:flex-start; justify-content:center; padding-top:160px; box-sizing:border-box }
+.detail-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:flex-start; justify-content:center; padding-top:160px; box-sizing:border-box; z-index:1300; overflow-y:auto }
 .detail-card { width:90%; max-width:760px; background:var(--bg-card); padding:20px; border-radius:12px; position:relative; max-height:80vh; overflow:auto }
+
+@media (max-width: 768px) {
+  .detail-overlay { padding-top: 100px; }
+  .detail-card { width: 94%; max-height: calc(100vh - 120px); }
+}
+
+@media (max-width: 480px) {
+  .detail-overlay { padding-top: 70px; }
+  .detail-card { width: 96%; max-height: calc(100vh - 90px); padding: 14px; }
+}
 .detail-card .close { position:absolute; right:12px; top:12px; border:none; background:transparent; font-size:18px; cursor:pointer; color: var(--text-primary); }
 .comments { margin-top:18px }
 
@@ -182,7 +192,7 @@
 .accent { color: #5b6ef6 }
 
 @media (max-width: 700px) {
-	.create-body { flex-direction:column }
+	.create-body { flex-direction:column; align-items:stretch }
 	.image-col { width:100%; }
 	.image-preview { height:160px }
 	.image-preview img { width:100%; height:100% }
@@ -262,3 +272,28 @@
 .detail-image .img-nav.left { left:8px }
 .detail-image .img-nav.right { right:8px }
 .detail-image .img-counter { position:absolute; right:8px; bottom:8px; background:rgba(0,0,0,0.5); color:white; padding:4px 8px; border-radius:12px; font-size:12px }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .bubble-container {
+    padding: 20px 16px;
+  }
+  .create-modal { max-width: 95%; padding: 14px; }
+  .detail-card { width: 95%; padding: 16px; }
+  .floating-create { right: 20px; bottom: 40px; width: 60px; height: 60px; font-size: 28px; }
+}
+
+@media (max-width: 480px) {
+  .bubble-container {
+    padding: 16px 10px;
+  }
+  .bubble-container > h2 { font-size: 1.4rem; }
+  .create-body { flex-direction: column; align-items: stretch; }
+  .image-col { width: 100%; flex: 0 0 auto; }
+  .image-preview { height: 140px; }
+  .detail-image { width: 100%; flex: 0 0 auto; }
+  .detail-image img { width: 100%; height: auto; }
+  .detail-overlay { padding-top: 80px; }
+  .floating-create { right: 16px; bottom: 30px; width: 56px; height: 56px; font-size: 24px; }
+  .create-modal .create-card .image-preview { width: 100%; flex: 0 0 auto; }
+}

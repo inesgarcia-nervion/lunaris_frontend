@@ -105,3 +105,25 @@
   line-height: 1.4;
   max-width: 100%;
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .noticias-container {
+    margin: 50px auto;
+    padding: 20px 16px;
+  }
+  .create-modal { max-width: 95%; padding: 14px; }
+  .floating-create { right: 20px; bottom: 40px; width: 60px; height: 60px; font-size: 28px; }
+  .news-card { max-width: 100%; }
+  .admin-news-form { max-width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .noticias-container {
+    margin: 10px auto;
+    padding: 16px 10px;
+  }
+  .floating-create { right: 16px; bottom: 30px; width: 56px; height: 56px; font-size: 24px; }
+  .news-image { max-width: 100%; }
+  .news-image img { width: 100%; height: auto; }
+}

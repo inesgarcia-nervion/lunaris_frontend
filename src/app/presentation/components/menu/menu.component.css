@@ -1183,83 +1183,34 @@
   .user-lists-section {
     padding: 2rem;
   }
+
+  .reviews-section,
+  .news-preview-section,
+  .ruleta-preview-section {
+    padding: 2rem 1rem;
+  }
+
+  .ruleta-preview-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .ruleta-section-desc {
+    max-width: 100%;
+  }
+
+  .list-covers {
+    height: 180px;
+  }
+
+  .review-cover-wrap {
+    height: 180px;
+  }
 }
 
 @media (max-width: 480px) {
-  .navbar {
-    padding: 0.75rem 1rem;
-  }
-
-  .navbar-container {
-    gap: 0.5rem;
-  }
-
-  .brand-icon {
-    height: 40px;
-  }
-
-  .navbar-logo {
-    flex: 1;
-    order: 1;
-  }
-
-  .navbar-right {
-    order: 2;
-  }
-
-  .navbar-center {
-    order: 3;
-    width: 100%;
-  }
-
-  .navbar-menu {
-    width: 100%;
-    gap: 0.3rem;
-  }
-
-  .nav-item {
-    padding: 0.5rem 0.8rem;
-    font-size: 0.85rem;
-  }
-
-  .search-bar {
-    min-width: 0;
-  }
-
-  .search-input {
-    font-size: 0.8rem;
-  }
-
-  .search-icon {
-    font-size: 1rem;
-  }
-
-  .user-btn {
-    width: 40px;
-    height: 40px;
-    font-size: 1.1rem;
-  }
-
   .book-search-container {
     padding: 10px;
-  }
-
-  .books-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .book-actions {
-    flex-direction: column;
-  }
-
-  .btn-import,
-  .btn-external {
-    width: 100%;
-    min-width: auto;
-  }
-
-  .pagination {
-    flex-direction: column;
   }
 
   .hero-section {
@@ -1329,6 +1280,20 @@
 
   .section-title {
     font-size: 1.5rem;
+  }
+
+  .reviews-section,
+  .news-preview-section,
+  .ruleta-preview-section {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .list-covers {
+    height: 160px;
+  }
+
+  .review-cover-wrap {
+    height: 160px;
   }
 }
 

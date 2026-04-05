@@ -186,3 +186,36 @@
 
 /* Responsive tweak: ensure button width doesn't overflow card on tiny screens */
 .libro-card-box .btn-delete { max-width: 100%; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .lista-detalle-container {
+    margin: 20px auto;
+    padding: 24px 16px;
+  }
+  .lista-title { font-size: 1.8rem; }
+  .libros-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 20px;
+    padding: 8px;
+  }
+  .libro-card-box { min-height: 280px; padding: 10px; }
+  .libro-cover { height: 180px; }
+  .lista-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
+
+@media (max-width: 480px) {
+  .lista-detalle-container {
+    margin: 10px auto;
+    padding: 16px 8px;
+  }
+  .lista-title { font-size: 1.4rem; }
+  .libros-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 4px;
+  }
+  .libro-card-box { min-height: 240px; padding: 8px; }
+  .libro-cover { height: 160px; }
+  .lista-actions { flex-wrap: wrap; }
+}

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ListasService, ListaItem } from '../../../domain/services/listas.service';
@@ -25,6 +25,7 @@ export class RuletaComponent implements OnInit {
   rotationDeg: number = 0;
   spinDurationMs: number = 3800;
   wheelSize: number = 520;
+  private readonly maxWheelSize: number = 520;
   initialWheelSize: number = this.wheelSize;
   wheelBackground: string = '';
   additionalColors: string[] = [
@@ -92,7 +93,23 @@ export class RuletaComponent implements OnInit {
     private ngZone: NgZone
   ) {}
 
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.recalcWheelSize();
+  }
+
+  private recalcWheelSize(): void {
+    const vw = window.innerWidth;
+    // Leave generous padding so labels extending outside the circle never get clipped
+    const available = vw - 160;
+    this.wheelSize = Math.max(200, Math.min(this.maxWheelSize, available));
+    this.initialWheelSize = this.wheelSize;
+    this.radius = Math.floor(this.wheelSize / 2) - 40;
+    this.computeLabelOffset();
+  }
+
   ngOnInit(): void {
+    this.recalcWheelSize();
     this.currentUser = this.listasService.getCurrentUser();
     this.listasService.ensureProfileSections(this.currentUser);
     this.updateAvailableLists(this.listasService.getAll() || []);

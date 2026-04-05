@@ -2,7 +2,7 @@
   <app-header *ngIf="showHeader"></app-header>
   <router-outlet></router-outlet>
   <app-confirm-dialog></app-confirm-dialog>
-  <footer class="app-footer">
+  <footer class="app-footer" *ngIf="showFooter">
     <div class="footer-content horizontal">
       <div class="footer-item footer-copyright">©2025 Lunaris</div>
       <div class="footer-separator">•</div>
@@ -57,4 +57,11 @@
     transition: transform 0.12s ease, box-shadow 0.12s ease;
   }
   .footer-link:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(91,110,246,0.18); }
+
+  @media (max-width: 600px) {
+    .app-footer { padding: 1rem 1rem; }
+    .footer-content.horizontal { flex-direction: column; gap: 8px; }
+    .footer-separator { display: none; }
+    .footer-item.footer-help { flex-direction: column; gap: 6px; }
+  }
 </style>

@@ -5,3 +5,11 @@
 .card-body .author { color:#555 }
 .card-actions button { background:#ff6b6b; color:white; border:none; padding:6px 10px; border-radius:4px }
 .error { color:#a12a2a }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .admin-peticiones { padding: 12px 8px; }
+  .card { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .card-actions { width: 100%; }
+  .card-actions button { width: 100%; }
+}

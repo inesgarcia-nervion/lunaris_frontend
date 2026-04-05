@@ -124,3 +124,13 @@ html, body {
   margin: 8px 0;
   text-align: center;
 }
+
+/* Responsive */
+@media (max-width: 480px) {
+  .page-wrap { padding: 20px 10px 40px; }
+  .card { padding: 20px 18px; }
+  .title { font-size: 28px; }
+  .input { font-size: 16px; }
+  .submit { font-size: 15px; padding: 10px 16px; }
+  .back-arrow { font-size: 36px; width: 40px; height: 40px; line-height: 40px; }
+}

@@ -27,3 +27,18 @@ label{color:var(--text-secondary)}
 .theme-label{font-size:1rem;font-weight:600;color:var(--text-primary)}
 .btn-theme{padding:8px 18px;border-radius:8px;border:1px solid #5b6ef6;background:#5b6ef6;color:#fff;cursor:pointer;font-size:0.95rem;font-weight:600;transition:background 0.2s ease}
 .btn-theme:hover:not([disabled]){background:#4a5de0;border-color:#4a5de0}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .config-container { margin: 16px auto; padding: 16px; }
+  .config-container h1 { font-size: 22px; }
+  .input-group { flex-direction: column; }
+  .row { flex-direction: column; gap: 8px; }
+  .theme-row { flex-direction: column; gap: 10px; }
+  .preview img { max-width: 120px; width: 120px; height: 120px; }
+}
+
+@media (max-width: 480px) {
+  .config-container { padding: 12px 8px; }
+  .avatar-actions { flex-direction: column; }
+}
