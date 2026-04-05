@@ -298,6 +298,17 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     this.newCommentText = text;
   }
 
+  /**
+   * Returns true when the current comment text contains any visible characters.
+   * This strips regular whitespace and common invisible characters (NBSP, zero-width)
+   * because contenteditable placeholders or pasted content can include them.
+   */
+  canSendComment(): boolean {
+    if (!this.newCommentText) return false;
+    const stripped = this.newCommentText.replace(/[\s\u00A0\u200B\u200C\u200D\uFEFF]/g, '');
+    return stripped.length > 0;
+  }
+
   onPostKeydown(event: KeyboardEvent, el: HTMLElement) {
     // Prevent exceeding max length when typing
     const text = this.extractTextFromEditable(el);

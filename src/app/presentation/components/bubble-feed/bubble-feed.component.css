@@ -122,6 +122,12 @@
   transition: background 0.15s ease;
 }
 .comment-actions button:hover { background: #4a5de0; }
+/* Disabled state for comment send button */
+.comment-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #5b6ef6;
+}
 .char-counter { margin-top:6px; font-size:12px; color:var(--text-muted); text-align:right }
 
 .create-controls { margin-bottom:12px }
