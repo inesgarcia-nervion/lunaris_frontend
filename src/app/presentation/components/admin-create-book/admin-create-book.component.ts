@@ -6,6 +6,13 @@ import { BookSearchService } from '../../../domain/services/book-search.service'
 import { AuthService } from '../../../domain/services/auth.service';
 import { ContenteditableDirective } from '../../shared/contenteditable.directive';
 
+/**
+ * Componente para que los administradores puedan crear nuevos libros manualmente.
+ * 
+ * Permite ingresar título, autor, descripción, imagen de portada (URL o archivo), 
+ * año de lanzamiento, puntuación y géneros.
+ * Solo accesible para usuarios con rol de admin.
+ */
 @Component({
   selector: 'app-admin-create-book',
   standalone: true,
@@ -33,16 +40,21 @@ export class AdminCreateBookComponent implements OnInit {
   isAdmin: boolean = false;
   currentUserId: number | null = null;
 
+  /**
+   * Constructor del componente.
+   * @param bookService Servicio para manejar operaciones relacionadas con libros (crear, obtener géneros, etc).
+   * @param auth Servicio de autenticación para verificar permisos y obtener información del usuario actual.
+   * @param router Servicio de enrutamiento para redirigir a otras páginas si el usuario no es admin o después de crear un libro.
+   * @param cdr ChangeDetectorRef para forzar la detección de cambios después de cargar la imagen o actualizar el estado.
+   */
   constructor(
     private bookService: BookSearchService,
     private auth: AuthService,
     public router: Router,
     private cdr: ChangeDetectorRef
   ) {
-    // Verificar que es admin
     this.isAdmin = this.auth.isAdmin();
     
-    // Obtener el ID del usuario actual (necesario para registrar quién crea el libro)
     try {
       const userData = localStorage.getItem('lunaris_user');
       if (userData) {
@@ -59,6 +71,11 @@ export class AdminCreateBookComponent implements OnInit {
     }
   }
 
+  /**
+   * Inicializa el componente cargando la lista de géneros disponibles.
+   * 
+   * Si el usuario no es admin, se muestra un mensaje de error y se redirige al menú principal.
+   */
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'instant' });
     this.bookService.getGenres().subscribe({
@@ -67,14 +84,29 @@ export class AdminCreateBookComponent implements OnInit {
     });
   }
 
+  /**
+   * Alterna la visibilidad del dropdown de selección de géneros.
+   * 
+   * El dropdown muestra la lista de géneros disponibles y permite seleccionar múltiples géneros para el libro.
+   */
   toggleGenreDropdown(): void {
     this.genreDropdownOpen = !this.genreDropdownOpen;
   }
 
+  /**
+   * Verifica si un género con el ID dado está seleccionado.
+   * @param id ID del género a verificar
+   * @returns true si el género está seleccionado, false en caso contrario
+   */
   isGenreSelected(id: number): boolean {
     return this.selectedGenreIds.includes(id);
   }
 
+  /**
+   * Alterna la selección de un género dado su ID.
+   * Si el género ya está seleccionado, se deselecciona; si no, se selecciona.
+   * @param id ID del género a alternar
+   */
   toggleGenre(id: number): void {
     const idx = this.selectedGenreIds.indexOf(id);
     if (idx >= 0) {
@@ -84,14 +116,31 @@ export class AdminCreateBookComponent implements OnInit {
     }
   }
 
+  /**
+   * Elimina un género de la lista de géneros seleccionados dado su ID.
+   * Si el género no está seleccionado, no hace nada.
+   * @param id ID del género a eliminar de la selección
+   */
   removeGenre(id: number): void {
     this.selectedGenreIds = this.selectedGenreIds.filter(g => g !== id);
   }
 
+  /**
+   * Obtiene el nombre de un género dado su ID.
+   * Si el género no se encuentra en la lista de todos los géneros, devuelve una cadena vacía.
+   * @param id ID del género del cual obtener el nombre
+   * @returns El nombre del género o una cadena vacía si no se encuentra el género
+   */
   getGenreName(id: number): string {
     return this.allGenres.find(g => g.id === id)?.name || '';
   }
 
+  /**
+   * Genera la etiqueta que se muestra en el dropdown de géneros basado en los géneros seleccionados.
+   * Si no hay géneros seleccionados, muestra "Selecciona géneros...".
+   * Si hay géneros seleccionados, muestra una lista separada por comas de los nombres de los géneros seleccionados.
+   * @returns La etiqueta a mostrar en el dropdown de géneros
+   */
   getDropdownLabel(): string {
     if (this.selectedGenreIds.length === 0) return 'Selecciona géneros...';
     return this.allGenres
@@ -100,6 +149,13 @@ export class AdminCreateBookComponent implements OnInit {
       .join(', ');
   }
 
+  /**
+   * Maneja el cambio de archivo en el input de imagen de portada.
+   * Lee el archivo seleccionado y genera una vista previa de la imagen.
+   * Si se selecciona un archivo, se carga como Data URL y se asigna a coverImage para su posterior envío.
+   * @param event Evento de cambio del input de archivo que contiene el archivo seleccionado por el usuario
+   * @returns void
+   */
   onFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
@@ -116,11 +172,19 @@ export class AdminCreateBookComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
+  /**
+   * Establece la imagen de portada a partir de la URL ingresada en el campo correspondiente.
+   * @returns void
+   */
   setImageFromUrl(): void {
     if (!this.coverImage.trim()) return;
     this.filePreview = this.coverImage;
   }
 
+  /**
+   * Limpia el formulario restableciendo todos los campos a sus valores iniciales.
+   * @returns void
+   */
   clearForm(): void {
     this.title = '';
     this.author = '';
@@ -135,11 +199,17 @@ export class AdminCreateBookComponent implements OnInit {
     this.genreDropdownOpen = false;
   }
 
+  /**
+   * Envía el formulario para crear un nuevo libro con los datos ingresados.
+   * Realiza validaciones básicas antes de enviar la solicitud al servicio.
+   * Si la creación es exitosa, muestra un mensaje de éxito y redirige al menú principal después de unos segundos.
+   * Si ocurre un error, muestra un mensaje de error adecuado según el tipo de error.
+   * @returns void
+   */
   submit(): void {
     this.error = null;
     this.success = null;
 
-    // Validaciones
     if (!this.title.trim()) {
       this.error = 'El título es obligatorio';
       return;

@@ -1,4 +1,7 @@
+<!-- Componente: perfil -->
+<!-- Contenedor de perfil: avatar, secciones de listas y favoritas -->
 <div class="perfil-container">
+    <!-- Cabecera de perfil: avatar y nombre -->
     <div class="perfil-header">
     <div class="avatar-wrapper">
       <span *ngIf="isAdmin" class="small-crown">👑</span>
@@ -8,6 +11,7 @@
     <h1 class="username">{{ username || 'Usuario' }}</h1>
   </div>
 
+  <!-- Secciones principales: Leyendo, Leído, Plan para leer -->
   <div class="sections">
     <div class="section-card">
       <h3>Leyendo</h3>
@@ -52,6 +56,7 @@
     </div>
   </div>
 
+  <!-- Tus listas: grid de listas del usuario -->
   <div class="your-lists">
     <h3>Tus listas</h3>
     <div class="lists-grid-profile">

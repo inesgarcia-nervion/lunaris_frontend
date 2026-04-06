@@ -1,3 +1,5 @@
+<!-- Componente: noticias-detail -->
+<!-- Contenedor detalle noticia: muestra título, fecha, imagen y cuerpo -->
 <div class="noticia-detail" *ngIf="noticia">
   <button class="back" (click)="back()">← Volver</button>
   <h1>{{ noticia.title }}</h1>
@@ -8,4 +10,5 @@
     <p *ngIf="!noticia.body">{{ noticia.text }}</p>
   </div>
 </div>
+<!-- Mensaje cuando no existe la noticia -->
 <div *ngIf="!noticia" class="not-found">Noticia no encontrada.</div>

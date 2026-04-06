@@ -1,9 +1,11 @@
+<!-- Componente: listas-usuarios -->
 <div class="listas-usuarios-container">
   <div class="listas-header">
     <h1 class="listas-title">Listas de usuarios</h1>
     <button class="btn-add-circle" (click)="crearLista()" aria-label="Crear nueva lista">+</button>
   </div>
   <!-- Input inline para crear nueva lista -->
+  <!-- Fila de creación: input, checkbox privada y botones -->
   <div *ngIf="showCreateInput" class="create-list-row">
     <input
       type="text"
@@ -37,6 +39,7 @@
   </div>
 
   <!-- Mostrar la lista más reciente en grande arriba, el resto en la rejilla -->
+  <!-- Lista destacada y grid de listas -->
   <div *ngIf="filteredListas.length > 0" class="lista-featured">
     <div class="lista-header">
       <div class="list-author">
@@ -62,6 +65,7 @@
     </button>
   </div>
 
+  <!-- Grid de listas de usuarios -->
   <div *ngIf="filteredListas.length > 1" class="listas-grid">
     <div *ngFor="let lista of pagedListas" class="lista-card">
       <div class="lista-header">
@@ -83,11 +87,9 @@
         <div *ngIf="lista.libros.length > 5" class="more-badge">+{{ lista.libros.length - 5 }}</div>
       </div>
       <button class="btn-go-list" (click)="openListFromListas(lista.id)" aria-label="Ver lista">→</button>
-      <!-- Favorite button placed inside the card (top-right) -->
       <button *ngIf="lista.owner && lista.owner !== currentUser" class="btn-favorite" (click)="$event.stopPropagation(); toggleFavorite(lista.id, $event)" [class.favorited]="isFavorited(lista.id)" aria-label="Favorito" title="{{ isFavorited(lista.id) ? 'Quitar de favoritos' : 'Añadir a favoritos' }}">
         <span class="star">{{ isFavorited(lista.id) ? '★' : '☆' }}</span>
       </button>
-      <!-- Aquí puedes mostrar más info de la lista -->
     </div>
   </div>
   <app-pagination *ngIf="filteredListas.length > 1"

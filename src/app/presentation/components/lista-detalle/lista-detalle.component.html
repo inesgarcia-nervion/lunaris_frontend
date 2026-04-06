@@ -1,8 +1,10 @@
+<!-- Componente: lista-detalle -->
+<!-- Contenedor de detalle de lista: cabecera, grid de libros y acciones -->
 <div class="lista-detalle-container">
   <button class="btn-back" (click)="back()">{{ backButtonLabel }}</button>
 
   <div *ngIf="lista; else notFound" class="lista-content">
-    <!-- Header: title + owner actions -->
+    <!-- Cabecera de la lista: título, propietario y acciones -->
     <div class="lista-header">
       <div style="display:flex; align-items:center; gap:12px;">
         <h1 class="lista-title">{{ lista.nombre }}</h1>
@@ -13,10 +15,11 @@
         <button class="btn-edit-list" (click)="editListName()">Editar</button>
         <button class="btn-delete" (click)="confirmAndDeleteList()">Eliminar lista</button>
       </div>
-        <!-- Show 'Eliminar favorito' for lists the current user has favorited (owned by others) -->
         <button *ngIf="lista.owner && lista.owner !== currentUser && isFavorited()" class="btn-delete-like-news" (click)="$event.stopPropagation(); confirmAndRemoveFavorite()">Eliminar favorito</button>
       </div>
     </div>
+
+    <!-- Mensaje si la lista está vacía -->
     <div *ngIf="(lista.libros || []).length === 0" class="lista-empty">
       <p>Esta lista está vacía. Añade libros desde la búsqueda.</p>
     </div>
@@ -30,6 +33,8 @@
         </div>
       </div>
     </div>
+
+    <!-- Paginación para la lista de libros -->
     <app-pagination *ngIf="(lista.libros || []).length > pageSize"
       [totalItems]="(lista.libros || []).length"
       [pageSize]="pageSize"
@@ -38,6 +43,7 @@
     </app-pagination>
   </div>
 
+  <!-- Template alternativo si no se encuentra la lista -->
   <ng-template #notFound>
     <p>Lista no encontrada.</p>
   </ng-template>

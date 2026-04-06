@@ -1,11 +1,15 @@
+<!-- Contenedor admin-peticiones: lista de peticiones y acciones -->
 <div class="admin-peticiones">
   <h2>Peticiones de libros</h2>
 
+  <!-- Mensajes de estado -->
   <div *ngIf="loading">Cargando...</div>
   <div *ngIf="error" class="error">{{error}}</div>
 
+  <!-- Mensaje si no hay peticiones -->
   <div *ngIf="!loading && requests.length === 0">No hay peticiones actualmente.</div>
 
+  <!-- Lista de peticiones -->
   <div class="cards">
     <div class="card" *ngFor="let r of pagedRequests">
       <div class="card-body">
@@ -18,6 +22,7 @@
     </div>
   </div>
 
+  <!-- Paginación -->
   <app-pagination *ngIf="requests.length > pageSize"
     [totalItems]="requests.length"
     [pageSize]="pageSize"

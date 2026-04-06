@@ -1,8 +1,8 @@
+<!-- Componente: bubble-feed -->
 <div class="bubble-container">
   <h2>Bubble</h2>
 
-  <!-- Top create removed; creation now via floating button -->
-
+  <!-- Sección: posts (lista de publicaciones) -->
   <section class="posts">
     <div *ngIf="posts.length === 0" class="empty-state">Aún no hay publicaciones. Sé el primero en publicar.</div>
     <div *ngFor="let p of pagedPosts">
@@ -10,7 +10,9 @@
         <app-bubble-post [post]="p" (like)="toggleLike($event)" (open)="openPost($event)" (edit)="startEdit($event)" [canDelete]="auth.isAdmin() || (auth.getCurrentUsername() === p.user.name)" (delete)="removeConfirmedPost($event)"></app-bubble-post>
       </ng-container>
       <ng-container *ngIf="editingId === p.id && editInline">
+        <!-- Tarjeta de edición: campos para editar una publicación -->
         <div class="create-card edit-card">
+          <!-- Cabecera de la tarjeta: avatar y nombre de usuario -->
           <div class="create-header">
             <img *ngIf="auth?.getLocalAvatar() else letterAvatarEdit" [src]="auth.getLocalAvatar()" class="avatar">
             <ng-template #letterAvatarEdit>
@@ -19,6 +21,8 @@
             <div class="user-name">{{ auth.getCurrentUsername() || 'Tú' }}</div>
           </div>
 
+          <!-- Editar post -->
+          <!-- Cuerpo de la tarjeta: imagenes y texto del post -->
           <div class="create-body">
             <div class="image-col">
               <div class="image-preview" *ngIf="newImagePreviews.length">
@@ -50,6 +54,7 @@
             </div>
           </div>
 
+          <!-- Acciones: botones Guardar/Cancelar para edición -->
           <div class="create-actions">
             <button (click)="publish()" [disabled]="( !newText.trim() && !newImagePreviews.length )">Guardar</button>
             <button class="cancel" (click)="cancelCreate()">Cancelar</button>
@@ -59,6 +64,7 @@
     </div>
   </section>
 
+  <!-- Paginación para la lista de publicaciones -->
   <app-pagination *ngIf="posts.length > pageSize"
     [totalItems]="posts.length"
     [pageSize]="pageSize"
@@ -66,7 +72,7 @@
     (pageChange)="onPageChange($event)">
   </app-pagination>
 
-  <!-- Modal create overlay opened by floating button -->
+  <!-- Modal de detalle de publicación -->
   <div *ngIf="creating" class="create-modal-overlay">
     <div class="create-modal">
       <button class="close-modal" (click)="cancelCreate()">✕</button>
@@ -79,6 +85,7 @@
           <div class="user-name">{{ auth.getCurrentUsername() || 'Tú' }}</div>
         </div>
 
+        <!-- Crear nuevo post -->
         <div class="create-body">
           <div class="image-col">
             <div class="image-preview" *ngIf="newImagePreviews.length">
@@ -110,6 +117,7 @@
           </div>
         </div>
 
+        <!-- Acciones: botones Publicar/Cancelar para creación -->
         <div class="create-actions">
           <button (click)="publish()" [disabled]="( !newText.trim() && !newImagePreviews.length )">Publicar</button>
           <button class="cancel" (click)="cancelCreate()">Cancelar</button>
@@ -118,13 +126,14 @@
     </div>
   </div>
 
-  <!-- Floating create button (fixed) -->
   <button *ngIf="!creating" class="floating-create" (click)="openCreate()" aria-label="Crear publicación">+</button>
 
+  <!-- Modal de detalle de publicación -->
   <div class="detail-overlay" *ngIf="selected">
     <div class="detail-card">
       <button class="close" (click)="closeDetail()">✕</button>
 
+      <!-- Detalle del post: imagenes, texto, acciones -->
       <div class="detail-post">
         <div class="post-header">
           <img *ngIf="selected.user.avatarUrl; else letterAvatarDetail" [src]="selected.user.avatarUrl" class="avatar">
@@ -134,6 +143,7 @@
           <div class="user-name">{{ selected.user.name }}</div>
         </div>
 
+        <!-- Cuerpo del detalle: imagenes y texto -->
         <div class="detail-body">
           <div *ngIf="(selected.imageUrls?.length || selected.imageUrl)" class="detail-image">
             <button *ngIf="selectedImages.length > 1" class="img-nav left" (click)="showPrevSelectedImage()">◀</button>
@@ -144,11 +154,13 @@
           <div class="detail-text">{{ selected.text }}</div>
         </div>
 
+        <!-- Acciones del detalle: like, comentar -->
         <div class="detail-actions">
           <button (click)="toggleLike(selected.id)">❤️ {{ selected.likes }}</button>
         </div>
       </div>
 
+      <!-- Sección de comentarios: lista de comentarios y formulario para agregar nuevo comentario -->
       <div class="comments">
         <h3>Comentarios</h3>
         <div *ngIf="!(selected.comments && selected.comments.length)">Sé el primero en comentar.</div>
@@ -162,6 +174,7 @@
           </div>
         </div>
 
+        <!-- Formulario para agregar nuevo comentario -->
         <div class="add-comment">
           <div #commentEditor contenteditable="true" class="comment-input editable" data-placeholder="Escribe tu comentario aquí..." (input)="onCommentInput(commentEditor)" (keydown)="onCommentKeydown($event, commentEditor)" aria-label="Escribe un comentario..."></div>
           <div class="comment-actions"><button (click)="addComment()" [disabled]="!canSendComment()">Enviar</button></div>

@@ -1,3 +1,5 @@
+<!-- Componente: register -->
+<!-- Contenedor de la página de registro -->
 <div class="page-wrap">
   <a class="back-arrow" title="Volver" (click)="router.navigate(['/']); $event.preventDefault()">←</a>
 
@@ -6,8 +8,10 @@
     <h2 class="title">Registro</h2>
   </header>
 
+  <!-- Tarjeta principal: formulario de registro -->
   <main class="card">
     <form (ngSubmit)="submit()" class="login-form">
+      <!-- Campo usuario -->
       <div class="field">
         <label class="label">Usuario</label>
         <input class="input" [(ngModel)]="username" name="registro-username" placeholder="Inserce el usuario" autocomplete="off" required />

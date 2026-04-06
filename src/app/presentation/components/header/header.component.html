@@ -1,4 +1,7 @@
+<!-- Componente: header -->
+<!-- Barra de navegación principal -->
 <nav class="navbar">
+  <!-- Contenedor de la barra: logo, centro y usuario -->
   <div class="navbar-container">
     <!-- Logo izquierda -->
       <div class="navbar-logo">
@@ -9,6 +12,7 @@
 
 
     <!-- Centro: Menú + Búsqueda -->
+    <!-- Centro de la barra: menú y búsqueda -->
     <div class="navbar-center">
       <!-- Menú de navegación -->
       <div class="navbar-menu" [class.active]="isMenuOpen">
@@ -40,6 +44,7 @@
 
 
     <!-- Usuario derecha -->
+    <!-- Sección derecha: usuario y menú móvil -->
     <div class="navbar-right">
       <!-- Menú de usuario -->
       <div class="user-menu">
@@ -64,7 +69,6 @@
           <a (click)="navigateAndClose('/configuracion')" class="dropdown-item">Configuración</a>
           <a *ngIf="isAdmin" (click)="navigateAndClose('/noticias')" class="dropdown-item">Gestionar noticias</a>
           <a *ngIf="isAdmin" (click)="navigateAndClose('/admin/peticiones')" class="dropdown-item">Peticiones de libros</a>
-          <!-- 'Pedir un libro' moved to footer for users -->
           <hr />
           <button (click)="logout()" class="dropdown-item logout-btn">
             Cerrar sesión
@@ -85,6 +89,7 @@
 
 
 <!-- Contenido principal -->
+<!-- Contenedor de búsqueda y resultados mostrado en rutas de menú -->
 <div *ngIf="isMenuRoute" class="book-search-container">
   <!-- Alertas en la parte superior -->
   <div *ngIf="error" class="alert alert-error alert-top">{{ error }}</div>
@@ -108,7 +113,6 @@
 
   <!-- VISTA DE BÚSQUEDA SIMPLIFICADA -->
   <div *ngIf="searchResults.length > 0 && !selectedBook && !sagaLoading" class="results-section">
-    <!-- Skeletons while loading -->
     <div *ngIf="loading" class="books-grid-simple skeleton-grid">
       <div *ngFor="let _ of skeletonArray" class="book-card-simple skeleton-card">
         <div class="book-cover-simple skeleton-cover"></div>
@@ -235,7 +239,7 @@
           </div>
         </div>
 
-
+        <!-- Selector de estado para añadir a 'Leído', 'Plan para leer' o 'Leyendo' -->
         <div class="form-group-inline">
           <label class="selector-label">Estado</label>
           <div class="form-select-row">
@@ -310,6 +314,8 @@
               </button>
             </div>
           </div>
+
+          <!-- Editor de review: contenteditable con placeholder -->
           <div
             #reviewEditor
             class="review-textinput content-editable"
@@ -337,6 +343,8 @@
               Eliminar
             </button>
           </div>
+
+          <!-- Mostrar rating con estrellas -->
           <div class="review-rating-example">
             <ng-container *ngFor="let s of generateRatingArray(r.rating)">
               <span class="star-example" [ngClass]="{ 'filled': s === 'full', 'half': s === 'half' }">★</span>

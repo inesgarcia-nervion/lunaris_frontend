@@ -1,4 +1,7 @@
+<!-- Componente: bubble-post -->
+<!-- Contenedor post: envuelve header, cuerpo y acciones del post -->
 <div class="bubble-post" (click)="onMaybeOpen($event)">
+  <!-- Cabecera del post: avatar y nombre del usuario -->
   <div class="post-header">
     <img *ngIf="post.user.avatarUrl; else avatarLetter" [src]="post.user.avatarUrl" class="avatar">
     <ng-template #avatarLetter>
@@ -7,6 +10,7 @@
     <div class="user-name">{{ post.user.name }}</div>
   </div>
 
+  <!-- Cuerpo del post: imagenes y texto -->
   <div class="post-body">
     <div *ngIf="images.length" class="post-image">
       <img [src]="firstImageSrc()" alt="post image">
@@ -14,6 +18,7 @@
     <div class="post-text" [class.full]="!images.length">{{ post.text }}</div>
   </div>
 
+  <!-- Acciones del post: like, comentar, editar, eliminar -->
   <div class="post-actions">
     <button class="like" (click)="$event.stopPropagation(); onToggleLike()">❤️ {{ post.likes }}</button>
     <button class="comment" (click)="$event.stopPropagation()">💬 {{ post.comments?.length || 0 }}</button>

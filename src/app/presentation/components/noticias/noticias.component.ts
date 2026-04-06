@@ -7,7 +7,10 @@ import { AuthService } from '../../../domain/services/auth.service';
 import { Router } from '@angular/router';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
-
+/**
+   * Componente para listar, crear y eliminar noticias (solo administradores).
+   * Incluye paginación, subida de imagen y edición de contenido vía contenteditable.
+   */
 @Component({
   selector: 'app-noticias',
   standalone: true,
@@ -16,16 +19,15 @@ import { PaginationComponent } from '../../shared/pagination/pagination.componen
   styleUrls: ['./noticias.component.css']
 })
 export class NoticiasComponent implements OnInit {
+  
   news: NewsItem[] = [];
   title = '';
   text = '';
   body = '';
   imageData: string | null = null;
   isAdmin = false;
-  // id of the news pending deletion (for inline confirm)
   pendingDeleteId: string | null = null;
 
-  // Pagination
   pageSize = 5;
   currentPage = 1;
   pagedNews: NewsItem[] = [];

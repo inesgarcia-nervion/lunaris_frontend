@@ -1,6 +1,10 @@
+<!-- Componente: confirm-dialog -->
+<!-- Overlay de confirmación: cuadro modal con mensaje y acciones -->
 <div class="confirm-overlay" [class.show]="show" role="dialog" aria-modal="true">
+  <!-- Caja de confirmación: mensaje y botones -->
   <div class="confirm-box">
     <div class="confirm-message">{{ message }}</div>
+    <!-- Acciones: No / Sí -->
     <div class="confirm-actions">
       <button class="confirm-no" (click)="confirmNo()">No</button>
       <button class="confirm-yes" (click)="confirmYes()">Sí</button>

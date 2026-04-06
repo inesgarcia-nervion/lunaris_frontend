@@ -1,3 +1,5 @@
+<!-- Componente: recuperar-contrasena -->
+<!-- Contenedor de la página de recuperación de contraseña -->
 <div class="page-wrap">
   <a class="back-arrow" title="Volver" (click)="router.navigate(['/']); $event.preventDefault()">←</a>
 
@@ -6,6 +8,7 @@
     <h2 class="title">Recuperar contraseña</h2>
   </header>
 
+  <!-- Tarjeta principal: formulario para solicitar enlace -->
   <main class="card">
     <form (ngSubmit)="submit()" class="login-form" autocomplete="off">
       <div class="field">
@@ -16,11 +19,13 @@
       <p *ngIf="message" class="success">{{ message }}</p>
       <p *ngIf="error" class="error">{{ error }}</p>
 
+      <!-- Botón de envío con estado de carga -->
       <button class="submit" type="submit" [disabled]="loading">
         <span *ngIf="!loading">Cambiar contraseña a través de email</span>
         <span *ngIf="loading">Enviando...</span>
       </button>
 
+      <!-- Enlaces para iniciar sesión o registrarse -->
       <div class="links">
         <a href="javascript:void(0)" (click)="router.navigate(['/login'])">Inicia sesión</a>
         <a href="javascript:void(0)" (click)="router.navigate(['/register'])">Crear cuenta</a>
