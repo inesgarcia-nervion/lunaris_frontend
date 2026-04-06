@@ -92,7 +92,7 @@
       </select>
 
       <div class="buttons">
-        <button (click)="comenzarRuleta()" [disabled]="spinning || revealing || !selectedListId">Comenzar</button>
+        <button (click)="comenzarRuleta()" [disabled]="!canStart">Comenzar</button>
       </div>
     </div>
   </div>

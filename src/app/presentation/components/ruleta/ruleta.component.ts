@@ -199,6 +199,18 @@ export class RuletaComponent implements OnInit {
     return Math.max(14, Math.min(24, base));
   }
 
+  /** Whether the start button should be enabled */
+  get canStart(): boolean {
+    if (this.spinning || this.revealing) return false;
+    if (!this.selectedListId) return false;
+    try {
+      const lista = this.listasService.getById(this.selectedListId);
+      return !!lista && !!lista.libros && lista.libros.length > 0;
+    } catch {
+      return false;
+    }
+  }
+
   private buildWheelBackground(titles: string[]): string {
     // Force a uniform purple background for the wheel regardless of list contents.
     const purple = '#7e57c2';
