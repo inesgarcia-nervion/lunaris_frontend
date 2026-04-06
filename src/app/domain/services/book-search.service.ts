@@ -4,7 +4,11 @@ import { Observable, BehaviorSubject, forkJoin, of } from 'rxjs';
 import { map, catchError as rxCatchError } from 'rxjs/operators';
 
 /**
- * Interfaz para los libros de Open Library
+ * Interfaz para un libro obtenido de Open Library, adaptada al formato que usamos en la app
+ * 
+ * Incluye campos comunes de Open Library y también mapea algunos campos alternativos que 
+ * podrían venir del backend o de la base de datos local, para facilitar el consumo en los 
+ * componentes sin tener que lidiar con múltiples formatos. 
  */
 export interface OpenLibraryBook {
   key: string;
@@ -32,7 +36,10 @@ export interface OpenLibraryBook {
 }
 
 /**
- * Interfaz para la respuesta de búsqueda
+ * Interfaz para la respuesta de búsqueda de Open Library, adaptada al formato que usamos en la app
+ * 
+ * Contiene el número total de resultados encontrados, el índice de inicio (offset) y un array de libros.
+ * El array de libros ya está mapeado al formato de OpenLibraryBook para facilitar su consumo en los componentes.
  */
 export interface OpenLibrarySearchResponse {
   numFound: number;
@@ -41,7 +48,10 @@ export interface OpenLibrarySearchResponse {
 }
 
 /**
- * Interfaz para un libro de una saga scrapeada
+ * Interfaz para un libro dentro de una saga scrapeada, con los campos relevantes para mostrar en la UI
+ * 
+ * Incluye el título, autor, número de orden dentro de la saga (si se pudo inferir), número de páginas, 
+ * año de publicación y URL a StoryGraph.
  */
 export interface SagaBookEntry {
   title: string;
@@ -53,7 +63,13 @@ export interface SagaBookEntry {
 }
 
 /**
- * Interfaz para la saga scrapeada
+ * Interfaz para la información de una saga scrapeada, que incluye el nombre de la saga y un array 
+ * de libros pertenecientes a esa saga.
+ * 
+ * El nombre de la saga se infiere a partir de patrones comunes en los títulos, series o subjects 
+ * de Open Library, o directamente desde Goodreads si se scrapea desde allí.
+ * El array de libros contiene objetos con la información relevante para mostrar en la UI, como 
+ * título, autor, orden dentro de la saga, número de páginas, año y URL a StoryGraph.
  */
 export interface SagaScraped {
   sagaName: string;
@@ -61,23 +77,22 @@ export interface SagaScraped {
 }
 
 /**
- * Servicio para interactuar con la API de Open Library integrada en el backend
+ * Servicio para manejar la búsqueda de libros, tanto en Open Library como en la base de datos local.
+ * 
+ * Este servicio centraliza toda la lógica relacionada con la búsqueda de libros: 
  */
 @Injectable({
   providedIn: 'root'
 })
 export class BookSearchService {
-  private apiUrl = 'http://localhost:8080'; // Cambiar según tu configuración
-  // simple in-memory cache for query+limit+offset -> response
+  private apiUrl = 'http://localhost:8080'; 
   private pageCache = new Map<string, OpenLibrarySearchResponse>();
 
-  // Estado compartido para que Header publique resultados y Menu los consuma
   private responseSubject = new BehaviorSubject<OpenLibrarySearchResponse | null>(null);
   response$ = this.responseSubject.asObservable();
 
   private selectedBookSubject = new BehaviorSubject<OpenLibraryBook | null>(null);
   selectedBook$ = this.selectedBookSubject.asObservable();
-  // navigation origin: tells where the detail was opened from (search or list)
   private originSubject = new BehaviorSubject<{ type: 'search' | 'list' | 'other' | 'profile' | 'menu' | 'listas'; listId?: string } | null>(null);
   origin$ = this.originSubject.asObservable();
 
@@ -100,6 +115,16 @@ export class BookSearchService {
     this.loadGenreCache();
   }
 
+  /**
+   * Carga los nombres de los géneros desde la base de datos al iniciar el servicio 
+   * y los almacena en un Set para validación rápida.
+   * 
+   * Esto se hace para poder filtrar los subjects de Open Library y mapearlos a los 
+   * géneros existentes en la base de datos, evitando mostrar categorías que no 
+   * tenemos definidas o que no son relevantes.
+   * Si la carga falla, se inicializa con un Set vacío para evitar errores posteriores, 
+   * aunque esto significa que no se podrán mapear géneros desde los subjects.
+   */
   private loadGenreCache(): void {
     this.getGenres().pipe(
       rxCatchError(() => of([] as { id: number; name: string }[]))
@@ -110,6 +135,9 @@ export class BookSearchService {
 
   /**
    * Mapea la respuesta del backend al formato esperado
+   * 
+   * Dado que el backend puede devolver campos con nombres diferentes o estructuras ligeramente distintas,
+   * esta función se encarga de normalizar la respuesta para que los componentes puedan consumirla de forma consistente.
    */
   private mapBooks(response: any): OpenLibrarySearchResponse {
     console.log('Response recibida:', response);
@@ -157,7 +185,6 @@ export class BookSearchService {
         rxCatchError(() => of({ numFound: 0, start: 0, docs: [] } as OpenLibrarySearchResponse))
       );
 
-    // Local books are only fetched on page 1 (offset === 0) to avoid duplicates on subsequent pages
     const localSearch$ = offset === 0
       ? this.http
           .get<any[]>(`${this.apiUrl}/books/search`, { params: new HttpParams().set('q', query) })
@@ -181,7 +208,6 @@ export class BookSearchService {
         const localKeys = new Set(localBooks.map(b => b.key));
         const filteredOl = olResponse.docs.filter(b => !localKeys.has(b.key));
         const merged = [...localBooks, ...filteredOl];
-        // Use OpenLibrary's real total so all pages are reachable via pagination
         const total = (olResponse.numFound || 0) + (offset === 0 ? localBooks.length : 0);
         return { numFound: total || merged.length, start: offset, docs: merged };
       })
@@ -190,6 +216,7 @@ export class BookSearchService {
 
   /**
    * Recupera todos los resultados (OpenLibrary + locales) sin paginar.
+   * 
    * WARNING: solicita un límite alto a OpenLibrary para traer suficientes resultados
    * y permitir paginación client-side. Ajustar `maxResults` según sea necesario.
    */
@@ -233,6 +260,11 @@ export class BookSearchService {
 
   /**
    * Publica los resultados en el observable compartido
+   * 
+   * Esta función se llama después de obtener los resultados de búsqueda para 
+   * actualizar el estado compartido que los componentes pueden suscribirse 
+   * para mostrar los resultados. También se encarga de limpiar el estado de 
+   * error y loading.
    */
   publishResults(response: OpenLibrarySearchResponse | null): void {
     this.responseSubject.next(response);
@@ -273,6 +305,10 @@ export class BookSearchService {
 
   /**
    * Devuelve la query de búsqueda actual
+   * 
+   * Esta función es útil para componentes que necesitan acceder a la query actual 
+   * sin suscribirse a un observable, como por ejemplo para mostrarla en un campo 
+   * de búsqueda o para realizar acciones basadas en la query actual.
    */
   getSearchQuery(): string {
     return this.currentQuery;
@@ -280,6 +316,13 @@ export class BookSearchService {
 
   /**
    * Ejecuta la búsqueda usando la query y la página actuales y publica los resultados
+   * 
+   * Esta función se llama típicamente cuando el usuario navega a una nueva página de 
+   * resultados o cuando se actualiza la query.
+   * Se encarga de manejar el estado de loading, error y success, así como de cachear 
+   * los resultados por página para mejorar la experiencia de usuario.
+   * También implementa una estrategia de prefetching para cargar la siguiente página en 
+   * segundo plano y hacer la navegación más fluida.
    */
   searchCurrent(limit: number = 12): void {
     if (!this.currentQuery || !this.currentQuery.trim()) {
@@ -290,13 +333,11 @@ export class BookSearchService {
     const offset = (page - 1) * limit;
     const cacheKey = `${this.currentQuery}::${limit}::${offset}`;
 
-    // If we have a cached page, publish immediately and return (but still prefetch next)
     const cached = this.pageCache.get(cacheKey);
     if (cached) {
       this.setLoading(false);
       this.setError(null);
       this.publishResults(cached);
-      // prefetch next page in background
       this.prefetchPage(this.currentQuery, limit, offset + limit);
       return;
     }
@@ -305,17 +346,14 @@ export class BookSearchService {
     this.setError(null);
     this.setSuccess(null);
 
-    // Paginación server-side: cada página pide sólo `limit` libros a OpenLibrary con el offset correcto
     this.searchBooks(this.currentQuery, limit, offset).subscribe({
       next: (response) => {
-        // cache response
-        try { this.pageCache.set(cacheKey, response); } catch (e) { /* ignore cache set errors */ }
+        try { this.pageCache.set(cacheKey, response); } catch (e) { /* */ }
         this.publishResults(response);
         this.setLoading(false);
         if (!response.docs || response.docs.length === 0) {
           this.setError('No se encontraron libros. Intenta con otra búsqueda.');
         }
-        // prefetch next page in background
         this.prefetchPage(this.currentQuery, limit, offset + limit);
       },
       error: (err) => {
@@ -332,6 +370,13 @@ export class BookSearchService {
     });
   }
 
+  /**
+   * Prefetch de la siguiente página de resultados para mejorar la experiencia de usuario
+   * @param query Término de búsqueda
+   * @param limit Número de resultados por página
+   * @param offset Desplazamiento para la paginación
+   * @returns void
+   */
   private prefetchPage(query: string, limit: number, offset: number): void {
     if (!query || offset < 0) return;
     const cacheKey = `${query}::${limit}::${offset}`;
@@ -341,10 +386,15 @@ export class BookSearchService {
       next: (response) => {
         try { this.pageCache.set(cacheKey, response); } catch (e) { /* ignore */ }
       },
-      error: () => { /* ignore prefetch errors */ }
+      error: () => { /*  */ }
     });
   }
 
+  /**
+   * Búsqueda por autor usando la query actual
+   * @param limit Número de resultados a mostrar (default: 10)
+   * @returns void
+   */
   searchByAuthorCurrent(limit: number = 10): void {
     if (!this.currentQuery || !this.currentQuery.trim()) {
       this.setError('Por favor ingresa un autor');
@@ -428,6 +478,7 @@ export class BookSearchService {
 
   /**
    * Obtiene todos los géneros disponibles
+   * @return Observable con un array de objetos que contienen el id y nombre de cada género
    */
   getGenres(): Observable<{ id: number; name: string }[]> {
     return this.http.get<{ id: number; name: string }[]>(`${this.apiUrl}/genres`);
@@ -451,24 +502,32 @@ export class BookSearchService {
     if (coverId) {
       return `https://covers.openlibrary.org/b/id/${coverId}-M.jpg`;
     }
-    return 'assets/default-book-cover.svg'; // Imagen por defecto
+    return 'assets/default-book-cover.svg';
   }
 
+  /**
+   * Obtiene el nombre del primer autor de un libro, o "Autor desconocido" si no hay autores disponibles
+   * @param book El libro del cual obtener el nombre del autor
+   * @returns El nombre del primer autor o "Autor desconocido" si no hay autores disponibles
+   */
   getFirstAuthor(book: OpenLibraryBook): string {
     return book.authorNames && book.authorNames.length > 0 ? book.authorNames[0] : 'Autor desconocido';
   }
 
+  /**
+   * Intenta inferir el nombre de la saga a la que pertenece un libro a partir de su título, series o subjects.
+   * @param book El libro del cual intentar inferir el nombre de la saga
+   * @returns El nombre de la saga si se pudo inferir, o null si no se pudo determinar un nombre de saga válido
+   */
   getSagaName(book: any): string | null {
     const title = (book.title || '').toLowerCase();
     if (book.series && Array.isArray(book.series) && book.series.length > 0) {
-      // Try entries with "series:Name" prefix — strip the prefix
       for (const s of book.series) {
         if (typeof s === 'string' && !s.includes('=') && /^series:/i.test(s)) {
           const name = s.substring(s.indexOf(':') + 1).trim();
           if (name.length > 0 && name.length < 100) return name;
         }
       }
-      // Fall back to plain names with no internal identifier pattern
       const validSeries = book.series.filter((s: string) =>
         typeof s === 'string' && !s.includes('=') && !/^[A-Za-z_]+:/.test(s)
       );
@@ -480,7 +539,6 @@ export class BookSearchService {
         const subjectLower = subject.toLowerCase();
         if (subjectLower.includes('saga') || subjectLower.includes('series') || subjectLower.includes('trilogy') || subjectLower.includes('cycle')) {
           let sagaName = subject.split('--')[0].trim();
-          // Strip any "word:" prefix (e.g. "series:", "serie:")
           const prefixMatch = sagaName.match(/^[A-Za-z_]+:(.+)/);
           if (prefixMatch) sagaName = prefixMatch[1].trim();
           if (sagaName.length > 0 && sagaName.length < 100) return sagaName;
@@ -505,17 +563,38 @@ export class BookSearchService {
     return null;
   }
 
+  /**
+   * Determina si un libro pertenece a una saga intentando inferir el nombre 
+   * de la saga a partir de su título, series o subjects.
+   * @param book El libro del cual intentar inferir si pertenece a una saga
+   * @returns true si se pudo inferir un nombre de saga válido, o false si no 
+   * se pudo determinar un nombre de saga o si el libro no parece pertenecer 
+   * a una saga
+   */
   isSaga(book: OpenLibraryBook): boolean {
     return this.getSagaName(book) !== null;
   }
 
+  /**
+   * Obtiene el número de ediciones de un libro, intentando mapear tanto el campo 
+   * `editionCount` como `edition_count` para mayor compatibilidad con diferentes 
+   * formatos de respuesta.
+   * Si no se encuentra ninguno de los campos, devuelve '0' por defecto.
+   * @param book El libro del cual obtener el número de ediciones
+   * @returns El número de ediciones como cadena, o '0' si no se encuentra la información de ediciones
+   */
   getEditionCount(book: OpenLibraryBook): string {
     return book.editionCount?.toString() || book.edition_count?.toString() || '0';
   }
 
+  /**
+   * Obtiene las categorías de un libro a partir de sus géneros o subjects, filtrando y mapeando
+   * solo aquellos que coincidan con los géneros existentes en la base de datos.
+   * @param book El libro del cual obtener las categorías
+   * @returns Un arreglo de categorías como cadenas, o un arreglo vacío si no se encuentran categorías válidas
+   */
   getCategories(book: any): string[] {
     const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-    // Primero usar los géneros guardados en la BD (objetos con id y name)
     if (Array.isArray(book.genres) && book.genres.length > 0) {
       const seen = new Set<string>();
       const result: string[] = [];
@@ -532,14 +611,12 @@ export class BookSearchService {
       }
       if (result.length > 0) return result;
     }
-    // Fallback: subjects de OpenLibrary filtrados contra los géneros existentes en BD
     const raw: any[] = book.subject || book.subjects || book.categories || [];
     if (Array.isArray(raw)) {
       const seen = new Set<string>();
       const result: string[] = [];
       for (const s of raw) {
         if (typeof s !== 'string' || s.includes('=') || /^[A-Za-z_]+:/.test(s)) continue;
-        // Split on commas to separate compound values like "Fiction, fantasy, general"
         const parts = s.split(',').map((p: string) => p.trim()).filter(Boolean);
         for (const part of parts) {
           const key = part.toLowerCase();
@@ -554,6 +631,17 @@ export class BookSearchService {
     return [];
   }
 
+  /**
+   * Intenta inferir categorías de un libro a partir de palabras clave en su título o descripción,
+   * utilizando un conjunto de palabras clave predefinidas para cada categoría común.
+   * Esta función se utiliza como último recurso cuando no se pueden obtener categorías 
+   * válidas a partir de los géneros o subjects, para al menos asignar una categoría 
+   * general basada en el contenido del libro.
+   * @param book El libro del cual intentar inferir las categorías
+   * @returns Un arreglo de categorías inferidas como cadenas, o un arreglo con 'Ficción' si no 
+   * se pudieron inferir categorías específicas, o un arreglo vacío si no se pudo determinar 
+   * ninguna categoría relevante
+   */
   private inferCategories(book: any): string[] {
     const categories: string[] = [];
     const titleAndDesc = ((book.title || '') + (book.description || '')).toLowerCase();
@@ -575,6 +663,17 @@ export class BookSearchService {
     return categories.length > 0 ? categories : ['Ficción'];
   }
 
+  /**
+   * Genera un arreglo de strings que representan el estado de cada estrella (full, half, empty)
+   * a partir de un rating numérico, para facilitar la visualización de estrellas en la UI.
+   * El rating se redondea hacia abajo para determinar el número de estrellas completas, y si 
+   * hay una fracción decimal se agrega una estrella media. El resto se completa con estrellas 
+   * vacías hasta un total de 5.
+   * @param rating El rating numérico del libro, que puede ser un número decimal o entero, o 
+   * undefined si no hay rating disponible
+   * @returns Un arreglo de strings que representan el estado de cada estrella (full, half, empty), 
+   * o un arreglo con 5 'empty' si no hay rating disponible
+   */
   generateRatingArray(rating: number | undefined): string[] {
     const stars: string[] = [];
     const ratingValue = rating || 0;
@@ -592,6 +691,10 @@ export class BookSearchService {
 
   /**
    * Scrapea la información de la saga de un libro desde Goodreads
+   * 
+   * Dado un título y opcionalmente un autor, esta función hace una petición al 
+   * backend para obtener la información de la saga a la que pertenece el libro, 
+   * incluyendo el nombre de la saga y los libros que forman parte de ella.
    */
   scrapeSaga(title: string, author?: string): Observable<SagaScraped | null> {
     let params = new HttpParams().set('title', title);

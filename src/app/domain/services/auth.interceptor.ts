@@ -3,6 +3,12 @@ import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/c
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 
+/**
+ * Interceptor de autenticación.
+ * 
+ * Este interceptor se encarga de agregar el token de autenticación a las solicitudes HTTP salientes.
+ * Si el usuario está autenticado, se agrega un encabezado Authorization con el token.
+ */
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   constructor(private auth: AuthService) {}
