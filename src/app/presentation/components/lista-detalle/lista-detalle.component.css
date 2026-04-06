@@ -1,3 +1,10 @@
+/*
+  Archivo: lista-detalle.component.css
+  Descripción: Estilos para la vista de detalle de listas de libros.
+  Incluye grid de libros, tarjetas, acciones (editar/eliminar) y
+  ajustes responsivos para dispositivos pequeños.
+*/
+
 .lista-detalle-container {
   max-width: 1000px;
   margin: 40px auto;
@@ -7,6 +14,7 @@
   box-shadow: 0 2px 12px var(--shadow-sm);
   color: var(--text-primary);
 }
+
 /* Aumenta el tamaño de letra base para accesibilidad */
 :host {
   font-size: 18px;
@@ -14,7 +22,9 @@
 }
 
 @media (max-width: 480px) {
-  :host { font-size: 16px; }
+  :host {
+    font-size: 16px;
+  }
 }
 .lista-title {
   font-size: 2.2rem;
@@ -39,10 +49,22 @@
   border: 1px solid transparent;
   cursor: pointer;
 }
-.btn-edit-list { background:var(--bg-card); color:var(--text-primary); border-color:var(--border-color) }
-.btn-edit-list:hover { background:var(--bg-hover) }
-.btn-delete-list { background:#ffeded; color:#b71c1c; border-color:#f3c6c6 }
-.btn-delete-list:hover { background:#ffdede }
+.btn-edit-list {
+  background:var(--bg-card);
+  color:var(--text-primary);
+  border-color:var(--border-color);
+}
+.btn-edit-list:hover {
+  background: var(--bg-hover);
+}
+.btn-delete-list {
+  background:#ffeded;
+  color:#b71c1c;
+  border-color:#f3c6c6;
+}
+.btn-delete-list:hover {
+  background: #ffdede;
+}
 .lista-empty {
   color: var(--text-secondary);
   padding: 24px;
@@ -52,13 +74,13 @@
 .libros-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 45px; /* increased spacing between cards */
+  gap: 45px;
   margin-top: 12px;
   align-items: stretch;
-  grid-auto-rows: 1fr; /* make rows equal height so cards match */
-  padding: 12px; /* inner padding so items don't sit flush to container edges */}
+  grid-auto-rows: 1fr;
+  padding: 12px;
+}
 
-/* spacing for pagination below the grid */
 .lista-detalle-container app-pagination {
   margin-top: 40px;
 }
@@ -74,7 +96,9 @@
   cursor: pointer;
   transition: transform 0.12s ease;
 }
-.libro-cover:hover { /* no movement on image hover; the whole card moves instead */ }
+.libro-cover:hover {
+  /* no movement on image hover; the whole card moves instead */
+}
 .btn-back {
   display: inline-block;
   background: none;
@@ -121,33 +145,47 @@
   box-shadow: 0 4px 10px rgba(211,47,47,0.08);
   transform: translateY(-1px);
 }
-.btn-delete-like-news:active { transform: translateY(0); }
+.btn-delete-like-news:active {
+  transform: translateY(0);
+}
 
-.libro-title { 
-  font-size: 1rem; 
-  margin: 8px 0 4px; 
-  cursor: pointer; 
-  display: -webkit-box; 
-  -webkit-line-clamp: 2; /* limit to 2 lines */
-  -webkit-box-orient: vertical; 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  line-height: 1.2em; 
-  max-height: 2.4em; 
+.libro-title {
+  font-size: 1rem;
+  margin: 8px 0 4px;
+  cursor: pointer;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  /* limit to 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2em;
+  max-height: 2.4em;
 }
-.libro-author { 
-  font-size: 0.9rem; 
-  color: var(--text-secondary); 
-  margin-bottom: 8px; 
-  display: -webkit-box; 
-  -webkit-line-clamp: 1; /* single line for author */
-  -webkit-box-orient: vertical; 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  white-space: normal; 
+.libro-author {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  /* single line for author */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
 }
-.btn-delete-list { background:#e53935; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; display:inline-block; }
-.btn-delete-list:hover { opacity:0.95 }
+.btn-delete-list {
+  background:#e53935;
+  color:white;
+  border:none;
+  padding:8px 12px;
+  border-radius:6px;
+  cursor:pointer;
+  display:inline-block;
+}
+.btn-delete-list:hover {
+  opacity: 0.95;
+}
 
 .libro-card-box {
   background: var(--bg-secondary);
@@ -161,11 +199,17 @@
   gap: 10px;
   cursor: pointer;
   width: 100%;
-  height: 100%; /* fill grid cell so cards match height */
-  min-height: 320px; /* visual consistency */
+  height: 100%;
+  /* fill grid cell so cards match height */
+  min-height: 320px;
+  /* visual consistency */
   overflow: hidden;
 }
-.libro-card-box:hover { transform: translateY(-4px); transition: transform 0.12s ease; box-shadow: 0 10px 28px rgba(22,31,84,0.06); }
+.libro-card-box:hover {
+  transform: translateY(-4px);
+  transition: transform 0.12s ease;
+  box-shadow: 0 10px 28px rgba(22,31,84,0.06);
+}
 
 /* .delete-box removed: delete button displays inline without extra container */
 
@@ -194,7 +238,9 @@
 }
 
 /* Responsive tweak: ensure button width doesn't overflow card on tiny screens */
-.libro-card-box .btn-delete { max-width: 100%; }
+.libro-card-box .btn-delete {
+  max-width: 100%;
+}
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -202,15 +248,26 @@
     margin: 20px auto;
     padding: 24px 16px;
   }
-  .lista-title { font-size: 1.8rem; }
+  .lista-title {
+    font-size: 1.8rem;
+  }
   .libros-grid {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 20px;
     padding: 8px;
   }
-  .libro-card-box { min-height: 280px; padding: 10px; }
-  .libro-cover { height: 180px; }
-  .lista-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .libro-card-box {
+    min-height: 280px;
+    padding: 10px;
+  }
+  .libro-cover {
+    height: 180px;
+  }
+  .lista-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -218,13 +275,22 @@
     margin: 10px auto;
     padding: 16px 8px;
   }
-  .lista-title { font-size: 1.4rem; }
+  .lista-title {
+    font-size: 1.4rem;
+  }
   .libros-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
     padding: 4px;
   }
-  .libro-card-box { min-height: 240px; padding: 8px; }
-  .libro-cover { height: 160px; }
-  .lista-actions { flex-wrap: wrap; }
+  .libro-card-box {
+    min-height: 240px;
+    padding: 8px;
+  }
+  .libro-cover {
+    height: 160px;
+  }
+  .lista-actions {
+    flex-wrap: wrap;
+  }
 }

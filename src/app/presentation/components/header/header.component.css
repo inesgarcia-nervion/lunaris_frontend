@@ -1,4 +1,9 @@
-/* ===== NAVBAR HEADER ONLY ===== */
+/*
+  Archivo: src/app/presentation/components/header/header.component.css
+  Descripción: Estilos del header/navigation bar y secciones hero, cards
+  y respuestas a diferentes tamaños de pantalla. Contiene animaciones,
+  dropdowns, y estilos de elementos interactivos (botones, búsqueda).
+*/
 .navbar {
   background: var(--navbar-bg);
   padding: 0.6rem 2rem;
@@ -32,7 +37,7 @@
   transition: transform 0.18s ease, filter 0.18s ease;
 }
 
-/* Logo button */
+/* Botón del logo */
 .logo-btn {
   background: none;
   border: none;
@@ -194,11 +199,16 @@
 }
 
 @media (max-width: 480px) {
-  .user-name { font-size: 0.9rem; max-width: 120px; }
-  .role-badge { font-size: 0.75rem; }
+  .user-name {
+    font-size: 0.9rem;
+    max-width: 120px;
+  }
+  .role-badge {
+    font-size: 0.75rem;
+  }
 }
 
-/* Responsive adjustments for the search placeholder and input */
+/* Ajustes responsivos para el placeholder y el input de búsqueda */
 @media (max-width: 768px) {
   .search-input {
     font-size: 0.85rem;
@@ -246,7 +256,6 @@
   background: var(--bg-hover);
 }
 
-/* Avatar image inside the user button: ensure it fits the circular button */
 .user-avatar {
   width: 100%;
   height: 100%;
@@ -267,8 +276,14 @@
   overflow: hidden;
 }
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .dropdown-item {
   display: block;
@@ -315,14 +330,12 @@
   transition: all 0.3s ease;
 }
 
-/* ===== CONTENIDO PRINCIPAL ===== */
 .book-search-container {
   padding: 20px;
-  max-width: 1400px; /* permitir usar más ancho de pantalla */
+  max-width: 1400px;
   margin: 0 auto;
 }
 
-/* Hero Section */
 .hero-section {
   background: var(--bg-card);
   border-radius: 8px;
@@ -520,7 +533,6 @@
   border-left: 5px solid #2e7d32;
 }
 
-/* Inline review alerts (near the review form) */
 .review-alert {
   padding: 10px 14px;
   margin: 0 0 12px 0;
@@ -564,14 +576,54 @@
   margin-bottom: 30px;
 }
 
-/* Skeleton styles for loading state */
-.skeleton-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
-.skeleton-card { background: var(--bg-card); border-radius: 8px; padding: 12px; box-shadow: 0 2px 8px var(--shadow-sm); display:flex; flex-direction:column; gap:12px; }
-.skeleton-cover { height:200px; background: linear-gradient(90deg,#f0f0f0,#e8e8e8,#f0f0f0); background-size:200% 100%; animation: shimmer 1.2s linear infinite; border-radius:6px; }
-.skeleton-line { height:14px; background: linear-gradient(90deg,#f0f0f0,#e8e8e8,#f0f0f0); background-size:200% 100%; animation: shimmer 1.2s linear infinite; border-radius:4px; }
-.skeleton-line.title { width:70%; height:18px; margin-top:6px; }
-.skeleton-line.author { width:40%; height:14px; margin-top:6px; }
-@keyframes shimmer { 0% { background-position:200% 0 } 100% { background-position:-200% 0 } }
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+.skeleton-card {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 8px var(--shadow-sm);
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.skeleton-cover {
+  height:200px;
+  background: linear-gradient(90deg,#f0f0f0,#e8e8e8,#f0f0f0);
+  background-size:200% 100%;
+  animation: shimmer 1.2s linear infinite;
+  border-radius:6px;
+}
+.skeleton-line {
+  height:14px;
+  background: linear-gradient(90deg,#f0f0f0,#e8e8e8,#f0f0f0);
+  background-size:200% 100%;
+  animation: shimmer 1.2s linear infinite;
+  border-radius:4px;
+}
+.skeleton-line.title {
+  width:70%;
+  height:18px;
+  margin-top:6px;
+}
+.skeleton-line.author {
+  width:40%;
+  height:14px;
+  margin-top:6px;
+}
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
 
 .book-card {
   background: var(--bg-card);
@@ -726,7 +778,6 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
-  /* --- Navbar: just shrink, never collapse --- */
   .navbar {
     padding: 0.4rem 1rem;
   }
@@ -768,7 +819,6 @@
     padding: 1px 6px;
   }
 
-  /* --- Page content --- */
   .books-grid {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
@@ -787,7 +837,6 @@
 }
 
 @media (max-width: 768px) {
-  /* --- Navbar: shrink more --- */
   .navbar {
     padding: 0.3rem 0.5rem;
   }
@@ -838,7 +887,6 @@
     gap: 0;
   }
 
-  /* --- Page content --- */
   .books-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 15px;
@@ -896,7 +944,6 @@
     font-size: 1rem;
   }
 
-  /* Book detail responsive */
   .detail-container {
     grid-template-columns: 1fr;
     gap: 20px;
@@ -935,7 +982,6 @@
     height: 260px;
   }
 
-  /* User lists grid */
   .user-lists-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -958,7 +1004,6 @@
 }
 
 @media (max-width: 480px) {
-  /* --- Navbar: smallest --- */
   .navbar {
     padding: 0.25rem 0.4rem;
   }
@@ -1000,7 +1045,6 @@
     font-size: 0.8rem;
   }
 
-  /* --- Page content --- */
   .book-search-container {
     padding: 10px;
   }
@@ -1093,7 +1137,6 @@
     font-size: 0.95rem;
   }
 
-  /* User lists and reviews single column */
   .user-lists-grid {
     grid-template-columns: 1fr;
   }
@@ -1512,7 +1555,8 @@
 
 .book-cover-simple {
   width: 100%;
-  height: 340px; /* portada más alta para mejor ajuste vertical */
+  height: 340px;
+  /* portada más alta para mejor ajuste vertical */
   overflow: hidden;
   background: transparent;
   border-top-left-radius: 8px;
@@ -1527,7 +1571,8 @@
 }
 
 .book-info-simple {
-  padding: 10px; /* padding solo en la info */
+  padding: 10px;
+  /* padding solo en la info */;
 }
 
 .book-author-simple {
@@ -1915,7 +1960,9 @@
   animation: detail-spin 0.8s linear infinite;
 }
 @keyframes detail-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 .detail-loading-text {
   font-size: 20px;
@@ -2024,7 +2071,8 @@
 }
 
 .btn-delete {
-  background: #e53935; /* red */
+  background: #e53935;
+  /* red */
   color: #fff;
   border: 1px solid #d32f2f;
 }
@@ -2044,19 +2092,25 @@
   color: var(--text-primary);
   font-family: Arial, sans-serif;
   font-size: 13px;
-  resize: none; /* disable manual resize */
+  resize: none;
+  /* disable manual resize */
   outline: none;
-  white-space: pre-wrap !important; /* allow wrapping */
+  white-space: pre-wrap !important;
+  /* allow wrapping */
   word-break: break-word;
   overflow-wrap: anywhere;
   /* Aggressive break for long unbroken strings (e.g. AAAAA...) */
   word-break: break-all;
   box-sizing: border-box;
   max-width: 100%;
-  overflow-x: hidden; /* prevent horizontal scroll */
-  max-height: 300px; /* limit visual height */
-  overflow-y: auto; /* allow vertical scroll when content exceeds max-height */
-  min-width: 0; /* allow flex/grid parents to shrink the element */
+  overflow-x: hidden;
+  /* prevent horizontal scroll */
+  max-height: 300px;
+  /* limit visual height */
+  overflow-y: auto;
+  /* allow vertical scroll when content exceeds max-height */
+  min-width: 0;
+  /* allow flex/grid parents to shrink the element */
   hyphens: auto;
 }
 
@@ -2165,7 +2219,8 @@
   margin: 0;
   font-size: 16px;
   color: var(--text-primary);
-  text-align: left; /* alinear con el título */
+  text-align: left;
+  /* alinear con el título */
   box-sizing: border-box;
   /* Mostrar comentario completo: permitir saltos de línea y ajuste */
   white-space: pre-wrap;

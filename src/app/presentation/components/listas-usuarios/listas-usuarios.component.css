@@ -5,7 +5,9 @@
 }
 
 @media (max-width: 480px) {
-  .listas-usuarios-container { font-size: 18px; }
+  .listas-usuarios-container {
+    font-size: 18px;
+  }
 }
 
 .listas-usuarios-container {
@@ -17,7 +19,10 @@
   box-shadow: 0 2px 12px var(--shadow-sm);
   color: var(--text-primary);
 }
-.listas-usuarios-container::before { content: ""; display: none; }
+.listas-usuarios-container::before {
+  content: "";
+  display: none;
+}
 .listas-title {
   font-size: 2.5rem;
   margin: 0;
@@ -37,8 +42,17 @@
   align-items: center;
 }
 
-.message { margin-top: 10px; padding: 8px 12px; border-radius: 6px; font-size: 14px; }
-.message.error { background: rgba(161,42,42,0.15); color: #e07070; border: 1px solid rgba(161,42,42,0.3); }
+.message {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+.message.error {
+  background: rgba(161,42,42,0.15);
+  color: #e07070;
+  border: 1px solid rgba(161,42,42,0.3);
+}
 
 .create-list-row {
   display: flex;
@@ -120,7 +134,8 @@
 }
 .listas-grid {
   display: grid;
-  grid-template-columns: 1fr; /* single column so each lista-card sits alone */
+  grid-template-columns: 1fr;
+  /* single column so each lista-card sits alone */
   gap: 16px;
 }
 .lista-card {
@@ -136,7 +151,10 @@
   overflow: hidden;
   transition: transform .14s ease, box-shadow .14s ease;
 }
-.lista-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(20,16,35,0.06); }
+.lista-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(20,16,35,0.06);
+}
 .lista-nombre {
   font-size: 1.25rem;
   margin: 8px 0 6px;
@@ -147,7 +165,8 @@
 .lista-header {
   width: 100%;
   display: flex;
-  flex-direction: column; /* stack author above name */
+  flex-direction: column;
+  /* stack author above name */
   align-items: flex-start;
   justify-content: flex-start;
   gap: 6px;
@@ -162,12 +181,14 @@
 .lista-actions-card {
   display: flex;
   gap: 8px;
-  margin-left: 12px; /* small gap from the author */
+  margin-left: 12px;
+  /* small gap from the author */;
 }
 
 .lista-actions-featured {
   position: absolute;
-  right: 72px; /* leave space for the circular go button */
+  right: 72px;
+  /* leave space for the circular go button */
   top: 18px;
   display: flex;
   gap: 8px;
@@ -186,13 +207,17 @@
   color: var(--text-primary);
   border-color: var(--border-color);
 }
-.btn-edit-list:hover { background:var(--bg-hover) }
+.btn-edit-list:hover {
+  background: var(--bg-hover);
+}
 .btn-delete-list {
   background: #ffebe9;
   color: #c62828;
   border-color: #f5c6c6;
 }
-.btn-delete-list:hover { background:#ffdede }
+.btn-delete-list:hover {
+  background: #ffdede;
+}
 
 /* restore original alignment and remove large cover style */
 
@@ -251,14 +276,32 @@
   z-index: 20;
   border: 1px solid var(--border-light);
 }
-.btn-favorite .star { pointer-events: none; font-size: 1.1rem; line-height:1 }
-.btn-favorite:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,16,35,0.10); background: var(--bg-hover); color: var(--text-secondary); }
-.btn-favorite:focus { outline: 2px solid rgba(108,99,255,0.18); outline-offset: 2px }
-.btn-favorite.favorited { color: #ffffff; background: linear-gradient(180deg,#ffcf5a,#ffb400); box-shadow: 0 8px 28px rgba(255,180,0,0.18); border-color: rgba(255,180,0,0.14) }
+.btn-favorite .star {
+  pointer-events: none;
+  font-size: 1.1rem;
+  line-height:1;
+}
+.btn-favorite:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(20,16,35,0.10);
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+.btn-favorite:focus {
+  outline: 2px solid rgba(108,99,255,0.18);
+  outline-offset: 2px;
+}
+.btn-favorite.favorited {
+  color: #ffffff;
+  background: linear-gradient(180deg,#ffcf5a,#ffb400);
+  box-shadow: 0 8px 28px rgba(255,180,0,0.18);
+  border-color: rgba(255,180,0,0.14);
+}
 
 /* Slight variant for featured card — same position, no override needed */
 
-.btn-unfavorite { /* fallback for perfil view button */
+.btn-unfavorite {
+  /* fallback for perfil view button */
   background: #fff;
   border: 1px solid #e0e0e0;
   padding: 6px 10px;
@@ -272,7 +315,8 @@
   align-items: center;
   margin-top: 12px;
   overflow: hidden;
-  justify-content: flex-start; /* align previews to the left */
+  justify-content: flex-start;
+  /* align previews to the left */;
 }
 .preview-img {
   width: 56px;
@@ -283,7 +327,9 @@
   margin-left: -12px;
   border: 1px solid rgba(0,0,0,0.04);
 }
-.preview-img:first-child { margin-left: 0 }
+.preview-img:first-child {
+  margin-left: 0;
+}
 
 /* small previews not used in original layout */
 
@@ -302,8 +348,10 @@
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  margin-top: 0; /* avoid vertical offset that made it look centered */
-  margin-left: 0; /* reset horizontal positioning so it sits above the title */
+  margin-top: 0;
+  /* avoid vertical offset that made it look centered */
+  margin-left: 0;
+  /* reset horizontal positioning so it sits above the title */
   margin-right: 0;
   margin-bottom: 4px;
 }
@@ -367,13 +415,31 @@
     padding: 20px 16px;
     border-radius: 12px;
   }
-  .listas-title { font-size: 2rem; }
-  .listas-header { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .listas-actions { flex-direction: column; width: 100%; }
-  .input-buscar-lista { width: 100%; }
-  .create-list-row { flex-direction: column; }
-  .input-crear-lista { width: 100%; }
-  .preview-img { width: 48px; height: 72px; }
+  .listas-title {
+    font-size: 2rem;
+  }
+  .listas-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .listas-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .input-buscar-lista {
+    width: 100%;
+  }
+  .create-list-row {
+    flex-direction: column;
+  }
+  .input-crear-lista {
+    width: 100%;
+  }
+  .preview-img {
+    width: 48px;
+    height: 72px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -381,8 +447,19 @@
     margin: 12px auto;
     padding: 16px 10px;
   }
-  .listas-title { font-size: 1.6rem; }
-  .lista-featured { padding: 10px; }
-  .btn-go-list { width: 40px; height: 40px; right: 10px; }
-  .preview-img { width: 40px; height: 60px; }
+  .listas-title {
+    font-size: 1.6rem;
+  }
+  .lista-featured {
+    padding: 10px;
+  }
+  .btn-go-list {
+    width: 40px;
+    height: 40px;
+    right: 10px;
+  }
+  .preview-img {
+    width: 40px;
+    height: 60px;
+  }
 }

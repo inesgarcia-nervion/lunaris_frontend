@@ -1,21 +1,27 @@
+/*
+  Archivo: admin-peticiones.component.css
+  Descripción: Estilos de la vista administrativa de peticiones. Contiene
+  diseño de tarjetas, acciones y estilos responsivos.
+*/
+
 .admin-peticiones {
-  max-width:900px; 
-  margin:20px auto; 
-  padding:16px; 
+  max-width:900px;
+  margin:20px auto;
+  padding:16px;
 }
 
-.cards { 
-  display:flex; 
-  flex-direction:column; 
+.cards {
+  display:flex;
+  flex-direction:column;
   gap:10px;
 }
 
-.card { 
-  display:flex; 
-  justify-content:space-between; 
-  align-items:center; 
-  padding:10px; 
-  border:1px solid #ddd; 
+.card {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px;
+  border:1px solid #ddd;
   border-radius:6px;
 }
 
@@ -23,25 +29,34 @@
   font-weight:700; 
 }
 
-.card-body .author { 
-  color:#555; 
+.card-body .title {
+  font-weight: 700;
+}
+.card-body .author {
+  color: #555;
+}
+.card-actions button {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
 }
 
-.card-actions button { 
-  background:#ff6b6b; 
-  color:white; 
-  border:none; 
-  padding:6px 10px; 
-  border-radius:4px; 
+.error {
+  color: #a12a2a;
 }
-
-.error { 
-  color:#a12a2a; 
-}
-
-@media (max-width: 600px) {
-  .admin-peticiones { padding: 12px 8px; }
-  .card { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .card-actions { width: 100%; }
-  .card-actions button { width: 100%; }
-}
+  .admin-peticiones {
+    padding: 12px 8px;
+  }
+  .card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .card-actions {
+    width: 100%;
+  }
+  .card-actions button {
+    width: 100%;
+  }

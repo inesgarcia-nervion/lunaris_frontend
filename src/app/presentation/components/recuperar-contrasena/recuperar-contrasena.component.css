@@ -45,10 +45,30 @@ html, body {
   background: rgba(0, 0, 0, 0.05);
 }
 
-.brand { text-align: center; margin: 18px 0 30px; }
-.brand-icon { display: block; margin: 0 auto 6px; }
-.brand-name { margin: 0; font-size: 18px; letter-spacing: 2px; color: #4e2a6a; font-weight: 700; font-family: "Poppins", sans-serif; }
-.title { margin: 6px 0 0; font-size: 36px; color: #caa6ff; text-shadow: 0 6px 10px rgba(154,124,255,0.35); font-family: "Poppins", sans-serif; font-style: italic; }
+.brand {
+  text-align: center;
+  margin: 18px 0 30px;
+}
+.brand-icon {
+  display: block;
+  margin: 0 auto 6px;
+}
+.brand-name {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 2px;
+  color: #4e2a6a;
+  font-weight: 700;
+  font-family: "Poppins", sans-serif;
+}
+.title {
+  margin: 6px 0 0;
+  font-size: 36px;
+  color: #caa6ff;
+  text-shadow: 0 6px 10px rgba(154,124,255,0.35);
+  font-family: "Poppins", sans-serif;
+  font-style: italic;
+}
 
 .card {
   width: 520px;
@@ -60,9 +80,20 @@ html, body {
   margin-top: 20px;
 }
 
-.login-form { display: flex; flex-direction: column; }
-.field { margin-bottom: 18px; }
-.label { display: block; font-weight: 700; margin-bottom: 10px; color: #373026; font-family: "Poppins", sans-serif; }
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+.field {
+  margin-bottom: 18px;
+}
+.label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #373026;
+  font-family: "Poppins", sans-serif;
+}
 .input {
   width: 100%;
   padding: 14px 5px;
@@ -73,7 +104,9 @@ html, body {
   font-size: 14px;
   outline: none;
 }
-.input::placeholder { color: #adaaaa; }
+.input::placeholder {
+  color: #adaaaa;
+}
 
 .submit {
   margin-top: 6px;
@@ -127,10 +160,26 @@ html, body {
 
 /* Responsive */
 @media (max-width: 480px) {
-  .page-wrap { padding: 20px 10px 40px; }
-  .card { padding: 20px 18px; }
-  .title { font-size: 28px; }
-  .input { font-size: 16px; }
-  .submit { font-size: 15px; padding: 10px 16px; }
-  .back-arrow { font-size: 36px; width: 40px; height: 40px; line-height: 40px; }
+  .page-wrap {
+    padding: 20px 10px 40px;
+  }
+  .card {
+    padding: 20px 18px;
+  }
+  .title {
+    font-size: 28px;
+  }
+  .input {
+    font-size: 16px;
+  }
+  .submit {
+    font-size: 15px;
+    padding: 10px 16px;
+  }
+  .back-arrow {
+    font-size: 36px;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+  }
 }
