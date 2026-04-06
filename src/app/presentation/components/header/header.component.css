@@ -29,7 +29,28 @@
 .brand-icon {
   height: 100px;
   width: auto;
+  transition: transform 0.18s ease, filter 0.18s ease;
 }
+
+/* Logo button */
+.logo-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.logo-btn:hover .brand-icon,
+.logo-btn:focus .brand-icon {
+  transform: translateY(-4px) scale(1.03);
+  filter: brightness(1.04);
+}
+
 .navbar-center {
   display: flex;
   align-items: center;

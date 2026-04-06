@@ -1,8 +1,10 @@
 <nav class="navbar">
   <div class="navbar-container">
     <!-- Logo izquierda -->
-    <div class="navbar-logo">
-      <img [src]="isDarkTheme ? '/assets/LunarisLogo.png' : '/assets/IconoAplicacion.jpg'" class="brand-icon" alt="Lunaris" />
+      <div class="navbar-logo">
+      <button class="logo-btn" (click)="navigate('/menu'); $any($event.currentTarget).blur()">
+        <img [src]="isDarkTheme ? '/assets/LunarisLogoModoOscuro.png' : '/assets/IconoAplicacion.jpg'" class="brand-icon" alt="Lunaris" />
+      </button>
     </div>
 
 

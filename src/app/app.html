@@ -7,7 +7,7 @@
       <div class="footer-item footer-copyright">©2025 Lunaris</div>
       <div class="footer-separator">•</div>
       <div class="footer-item footer-help">
-        <span class="help-text">¿No encuentras lo que buscas?</span>
+        <span *ngIf="!auth.isAdmin()" class="help-text">¿No encuentras lo que buscas?</span>
         <button *ngIf="!auth.isAdmin()" (click)="navigateToPeticiones()" class="footer-link">Accede a nuestras peticiones</button>
       </div>
       <div class="footer-separator">•</div>
