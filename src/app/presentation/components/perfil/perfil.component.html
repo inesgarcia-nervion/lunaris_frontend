@@ -27,6 +27,7 @@
       </div>
     </div>
 
+    <!-- Sección Leído: similar a Leyendo pero con su propia paginación y datos -->
     <div class="section-card">
       <h3>Leído</h3>
       <div class="books-paged-grid">
@@ -41,6 +42,7 @@
       </div>
     </div>
 
+    <!-- Sección Plan para leer: similar a las anteriores pero con su propia paginación y datos -->
     <div class="section-card">
       <h3>Plan para leer</h3>
       <div class="books-paged-grid">
@@ -84,6 +86,7 @@
     <div *ngIf="userLists.length === 0" class="empty-lists">Aún no tienes listas creadas.</div>
   </div>
   
+  <!-- Listas en favoritos: grid de listas que el usuario ha marcado como favoritas -->
   <div class="favorite-lists" *ngIf="favoriteLists && favoriteLists.length > 0">
     <h3>Listas en favoritos</h3>
     <div class="lists-grid-profile">

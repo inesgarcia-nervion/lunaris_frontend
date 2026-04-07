@@ -1,6 +1,13 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+/**
+ * Componente de paginación utilizado para mostrar controles de navegación entre 
+ * páginas de contenido, como listas o tablas. 
+ * 
+ * Permite al usuario seleccionar una página específica, avanzar o retroceder
+ * entre páginas, y muestra un resumen del número total de páginas y la página actual.
+ */
 @Component({
   selector: 'app-pagination',
   standalone: true,
@@ -27,7 +34,6 @@ import { CommonModule } from '@angular/common';
   styles: [
     `
     :host { display:block; width:100%; }
-    /* Neutral styles so the component inherits app theme; override with parent CSS when needed */
     .pagination-wrapper { padding:10px 8px; display:flex; gap:14px; align-items:center; justify-content:center; width:100%; }
     .pagination { display:flex; gap:12px; align-items:center; justify-content:center; }
 
@@ -55,14 +61,23 @@ export class PaginationComponent {
   @Input() totalItems = 0;
   @Input() pageSize = 10;
   @Input() currentPage = 1;
-  @Input() maxPages = 7; // maximum numbered buttons to show including first/last
-  @Input() leadingPages = 3; // window size: number of consecutive pages to show
+  @Input() maxPages = 7;
+  @Input() leadingPages = 3; 
   @Output() pageChange = new EventEmitter<number>();
 
+  /**
+   * Calcula el número total de páginas basado en el total de elementos y el tamaño de página.
+   * @returns El número total de páginas.
+   */
   get totalPages(): number {
     return Math.max(1, Math.ceil(this.totalItems / this.pageSize));
   }
 
+  /**
+   * Calcula las páginas que se mostrarán en la paginación, incluyendo los números de página
+   * y los indicadores de elipsis para saltos.
+   * @returns Un arreglo de números de página y valores especiales para elipsis.
+   */
   get pagesToShow(): number[] {
     const total = this.totalPages;
     const windowSize = Math.max(1, Math.floor(this.leadingPages));
@@ -72,49 +87,52 @@ export class PaginationComponent {
 
     const { start, end } = this.getWindowRange();
 
-    // If window doesn't start at 1, show first page and left ellipsis when needed
     if (start > 1) {
       pages.push(1);
       if (start > 2) {
-        pages.push(-1); // left ellipsis (clickable -> jump backwards)
+        pages.push(-1);
       }
     }
 
-    // Add window pages (consecutive)
     for (let i = start; i <= end; i++) pages.push(i);
 
-    // If there are more pages after the window, show right ellipsis and last page
     if (end < total) {
-      if (end < total - 1) pages.push(-2); // right ellipsis (clickable -> jump forwards)
+      if (end < total - 1) pages.push(-2); 
       pages.push(total);
     }
 
     return pages;
   }
 
+  /**
+   * Calcula el rango de páginas que se mostrarán en la ventana de paginación, centrado alrededor de la página actual.
+   * Asegura que el rango no exceda el número total de páginas y que se mantenga dentro de los límites.
+   * @returns Un objeto con las propiedades `start` y `end` que indican el rango de páginas a mostrar.
+   */
   private getWindowRange(): { start: number; end: number } {
     const total = this.totalPages;
     const windowSize = Math.max(1, Math.floor(this.leadingPages));
 
-    // Start tries to follow currentPage, but keep window inside bounds
     const maxStart = Math.max(1, total - windowSize + 1);
     const start = Math.min(Math.max(1, this.currentPage), maxStart);
     const end = Math.min(total, start + windowSize - 1);
     return { start, end };
   }
 
+  /**
+   * Maneja el evento de clic en un número de página o en los indicadores de elipsis.
+   * @param p El número de página seleccionado o un valor especial para elipsis (-1 para retroceder, -2 para avanzar).
+   * @returns No retorna nada, pero emite un evento de cambio de página si se selecciona una página válida.
+   */
   onClick(p: number) {
     if (p === -2) {
-      // right ellipsis: jump to the page after the current window
       const { end } = this.getWindowRange();
       this.selectPage(Math.min(this.totalPages, end + 1));
       return;
     }
 
     if (p === -1) {
-      // left ellipsis: jump backwards by one window (or to 1)
       const { start } = this.getWindowRange();
-      // jump to the page immediately before the current window
       this.selectPage(Math.max(1, start - 1));
       return;
     }
@@ -122,6 +140,12 @@ export class PaginationComponent {
     this.selectPage(p);
   }
 
+  /**
+   * Selecciona una página específica, asegurándose de que el número de página esté dentro de los límites válidos.
+   * @param p El número de página a seleccionar.
+   * @returns No retorna nada, pero actualiza la página actual y emite un evento de cambio de página si se 
+   * selecciona una página diferente a la actual.
+   */
   selectPage(p: number) {
     const page = Math.min(this.totalPages, Math.max(1, p));
     if (page === this.currentPage) return;

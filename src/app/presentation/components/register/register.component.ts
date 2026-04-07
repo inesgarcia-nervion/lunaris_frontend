@@ -4,6 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../domain/services/auth.service';
 
+/**
+ * Componente para el registro de nuevos usuarios.
+ * 
+ * Permite a los usuarios crear una cuenta ingresando un nombre de usuario, 
+ * correo electrónico y contraseña.
+ * Valida que todos los campos estén completos y que la contraseña tenga al
+ * menos 6 caracteres antes de enviar la solicitud.
+ * Muestra mensajes de éxito o error según corresponda.
+ */
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -22,19 +31,36 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   constructor(private auth: AuthService, public router: Router, private cdr: ChangeDetectorRef, private renderer: Renderer2) {}
 
+  /**
+   * Al iniciar el componente, se deshabilita el scroll del body para evitar 
+   * que el fondo se desplace en pantallas pequeñas.
+   * También se limpia el formulario para asegurarse de que no haya datos 
+   * residuales. Al destruir el componente, se vuelve a habilitar el scroll 
+   * del body.
+   * @returns void
+   */
   ngOnInit(): void {
     this.renderer.setStyle(document.body, 'overflow', 'hidden');
     this.clearForm();
-    // Limpiar de nuevo después de un pequeño delay para evitar que el gestor de contraseñas autocomplete
     setTimeout(() => {
       this.clearForm();
     }, 200);
   }
 
+  /**
+   * Al destruir el componente, se vuelve a habilitar el scroll del body para
+   * permitir que el usuario navegue normalmente por el sitio.
+   * @returns void
+   */
   ngOnDestroy(): void {
     this.renderer.removeStyle(document.body, 'overflow');
   }
 
+  /**
+   * Limpia el formulario de registro, restableciendo los campos de nombre de 
+   * usuario, correo electrónico y contraseña a valores vacíos. También borra
+   * cualquier mensaje de error o éxito que pueda estar presente. 
+   */
   clearForm(): void {
     this.username = '';
     this.email = '';
@@ -43,6 +69,13 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.success = null;
   }
 
+  /**
+   * Envía la solicitud de registro al backend a través del servicio de autenticación.
+   * Valida que todos los campos estén completos y que la contraseña tenga al
+   * menos 6 caracteres antes de enviar la solicitud. Muestra un mensaje de éxito
+   * si la cuenta se crea correctamente o un mensaje de error si falla.
+   * @returns void
+   */
   submit() {
     this.error = null;
     this.success = null;
@@ -81,6 +114,12 @@ export class RegisterComponent implements OnInit, OnDestroy {
     });
   }
   
+  /**
+   * Alterna la visibilidad de la contraseña en el formulario de registro.
+   * Cambia el valor de showPassword entre true y false, lo que a su vez 
+   * cambia el tipo del input de contraseña entre 'password' y 'text' en la plantilla.
+   * @returns void
+   */
   togglePassword(): void {
     this.showPassword = !this.showPassword;
   }

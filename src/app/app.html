@@ -3,6 +3,7 @@
   <router-outlet></router-outlet>
   <app-confirm-dialog></app-confirm-dialog>
   <footer class="app-footer" *ngIf="showFooter">
+    <!-- Contenido del pie de página con diseño horizontal y adaptativo -->
     <div class="footer-content horizontal">
       <div class="footer-item footer-copyright">©2025 Lunaris</div>
       <div class="footer-separator">•</div>
@@ -16,6 +17,8 @@
   </footer>
 </div>
 
+<!-- Estilos específicos para el diseño del contenedor principal y el pie de página, 
+ con enfoque en la adaptabilidad y la experiencia de usuario -->
 <style>
   .app-container {
     width: 100%;
@@ -40,11 +43,35 @@
     text-align: center;
   }
 
-  .footer-content { display:flex; align-items:center; justify-content:center; gap:18px; width:100%; max-width:980px }
-  .footer-content.horizontal { flex-direction:row; flex-wrap:wrap }
-  .footer-item { display:flex; align-items:center; gap:8px }
-  .footer-separator { color:var(--border-color) }
-  .help-text { color:var(--text-secondary); font-weight:600; font-size:1rem; }
+  .footer-content { 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    gap:18px; 
+    width:100%; 
+    max-width:980px;
+  }
+  .footer-content.horizontal { 
+    flex-direction:row; 
+    flex-wrap:wrap;
+  }
+
+  .footer-item { 
+    display:flex; 
+    align-items:center; 
+    gap:8px;
+  }
+
+  .footer-separator { 
+    color:var(--border-color);
+  }
+
+  .help-text { 
+    color:var(--text-secondary); 
+    font-weight:600; 
+    font-size:1rem; 
+  }
+
   .footer-link {
     background: linear-gradient(90deg, #5b6ef6, #8a5df5);
     color: white;
@@ -57,14 +84,33 @@
     cursor: pointer;
     transition: transform 0.12s ease, box-shadow 0.12s ease;
   }
-  .footer-link:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(91,110,246,0.18); }
+  .footer-link:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 12px 28px rgba(91,110,246,0.18); 
+  }
 
   @media (max-width: 600px) {
-    .app-footer { padding: 1rem 1rem; font-size: 0.98rem; }
-    .footer-content.horizontal { flex-direction: column; gap: 8px; }
-    .footer-separator { display: none; }
-    .footer-item.footer-help { flex-direction: column; gap: 6px; }
-    .help-text { font-size: 0.98rem; }
-    .footer-link { padding: 0.55rem 0.9rem; font-size: 0.96rem; }
+    .app-footer { 
+      padding: 1rem 1rem; 
+      font-size: 0.98rem; 
+    }
+    .footer-content.horizontal { 
+      flex-direction: column; 
+      gap: 8px; 
+    }
+    .footer-separator {
+      display: none; 
+    }
+    .footer-item.footer-help { 
+      flex-direction: column; 
+      gap: 6px; 
+    }
+    .help-text { 
+      font-size: 0.98rem; 
+    }
+    .footer-link { 
+      padding: 0.55rem 0.9rem; 
+      font-size: 0.96rem; 
+    }
   }
 </style>

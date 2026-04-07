@@ -796,7 +796,7 @@
   cursor: not-allowed;
 }
 
-/* ===== Reviews section ===== */
+/* Sección de reseñas */
 .reviews-section {
   padding: 3rem;
   background: var(--bg-card);
@@ -870,12 +870,9 @@
   width: 100%;
   text-align: left;
   margin: 0;
-  /* alinear con el título dentro de review-card-body */
   padding: 0;
-  /* usar el padding del contenedor (.review-card-body) */
   line-height: 1.25em;
   max-height: calc(1.25em * 2);
-  /* límite visual a 2 líneas */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -883,11 +880,9 @@
   text-overflow: ellipsis;
   word-break: break-word;
   hyphens: auto;
-  /* Preservar saltos de línea tal como se escribió la reseña, pero mantener el truncado a 2 líneas */
   white-space: pre-wrap;
 }
 
-/* Fallback para navegadores que no soportan -webkit-line-clamp */
 .review-comment::after {
   content: '';
   display: block;
@@ -928,7 +923,7 @@
   color: var(--text-primary);
 }
 
-/* ===== News preview section ===== */
+/* Sección de vista previa de noticias */
 .news-preview-section {
   padding: 3rem;
   background: var(--bg-card);
@@ -979,7 +974,7 @@
   overflow: hidden;
 }
 
-/* ===== Ruleta preview section ===== */
+/* Sección de vista previa de la ruleta */
 .ruleta-preview-section {
   padding: 3rem;
   background: var(--bg-card);

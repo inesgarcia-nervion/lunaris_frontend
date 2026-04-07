@@ -1,6 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
 
+/**
+ * Pruebas unitarias para el componente raíz `App` de la aplicación Angular. 
+ * 
+ * Estas pruebas verifican que el componente se crea correctamente y que el 
+ * título se renderiza como se espera. 
+ */
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({

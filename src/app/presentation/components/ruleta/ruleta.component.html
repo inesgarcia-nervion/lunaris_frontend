@@ -2,6 +2,7 @@
 <div class="ruleta-container">
   <h1>Ruleta aleatoria</h1>
 
+  <!-- Contenedor principal de la ruleta y resultado -->
   <div class="card">
     <div class="big-box">
       <ng-container *ngIf="spinning || !resultBook">
@@ -51,19 +52,19 @@
                    title="{{ t }}">{{ truncateTitle(t) }}</div>
               </div>
             </ng-container>
-
           </div>
-
           <div class="pointer" aria-hidden="true">▼</div>
         </div>
       </ng-container>
 
+      <!-- Resultado mostrado después de girar -->
       <ng-container *ngIf="!spinning && resultBook">
         <div class="result-card">
           <div class="cover-wrap">
             <img class="result-cover" [src]="getCover(resultBook)" alt="Portada" />
           </div>
 
+          <!-- Información del libro seleccionado -->
           <div class="result-info">
             <div class="title-row">
               <div class="accent-bar" aria-hidden="true"></div>
@@ -73,10 +74,12 @@
               </div>
             </div>
 
+            <!-- Año de publicación, si está disponible -->
             <div class="result-meta-row">
               <span class="chip" *ngIf="resultBook.firstPublishYear">{{ resultBook.firstPublishYear }}</span>
             </div>
 
+            <!-- Botón para añadir el libro a la lista de lectura y quitarlo de la lista original -->
             <div class="result-actions">
               <button (click)="quitarLibro()" [disabled]="!resultBook || spinning">Añadir a Leyendo y quitar de la lista</button>
             </div>
@@ -85,6 +88,7 @@
       </ng-container>
     </div>
 
+    <!-- Controles para seleccionar la lista y comenzar la ruleta -->
     <div class="controls">
       <label>Elegir lista:</label>
       <select [(ngModel)]="selectedListId" (change)="onSelectList()">
@@ -92,6 +96,7 @@
         <option *ngFor="let l of listas" [ngValue]="l.id">{{ l.nombre }} ({{ l.libros?.length || 0 }})</option>
       </select>
 
+      <!-- Botón para comenzar la ruleta, deshabilitado si no se ha seleccionado una lista o si la ruleta está girando -->
       <div class="buttons">
         <button (click)="comenzarRuleta()" [disabled]="!canStart">Comenzar</button>
       </div>

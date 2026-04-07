@@ -1,12 +1,3 @@
-./*
-  Archivo: src/app/presentation/components/ruleta/ruleta.component.css
-  Descripción: Estilos del componente Ruleta (layout, rueda, controles,
-  tarjetas de resultado y estados responsivos).
-  Comentarios: Las secciones siguientes organizan estilos generales,
-  estilos específicos de la rueda, tarjetas de resultado y media queries
-  para dispositivos pequeños.
-*/
-
 /* Aumenta el tamaño de letra base para accesibilidad */
 .ruleta-container {
   font-size: 18px;
@@ -50,7 +41,7 @@
   opacity:0.9;
 }
 
-/* Wheel specific styles */
+/* Estilos de la rueda */
 .wheel-wrap {
   position: relative;
   display:flex;
@@ -92,7 +83,8 @@
 .wheel-item-label {
   display: block;
 }
-/* clamp to three lines so long titles don't overflow their sector */
+
+/* Limita a tres líneas para que los títulos largos no se desborden de su sector */
 .wheel-item-label {
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -100,7 +92,6 @@
   line-clamp: 3;
 }
 .wheel-item-label.selected {
-  /* Keep selected label subtle: only a slight scale and color change. */
   background: transparent;
   box-shadow: none;
   transform: scale(1.03);
@@ -144,7 +135,7 @@
   box-shadow: 0 8px 24px rgba(0,0,0,0.4);
 }
 
-/* Large centered label when wheel has a single slice */
+/* Estilo de la etiqueta centrada cuando la rueda tiene un solo sector */
 .wheel-center-label {
   position: absolute;
   left: 50%;
@@ -161,7 +152,7 @@
 }
 
 
-/* Add a visible outer ring to separate wheel from background */
+/* Añade un anillo exterior visible para separar la rueda del fondo */
 .wheel {
   box-shadow: 0 12px 30px rgba(0,0,0,0.16), inset 0 8px 20px rgba(0,0,0,0.06);
 }
@@ -173,7 +164,8 @@
   box-shadow: inset 0 0 0 2px rgba(0,0,0,0.06);
   pointer-events: none;
 }
-/* Ensure wheel scales nicely on smaller screens */
+
+/* Asegura que la rueda se escale correctamente en pantallas más pequeñas */
 @media (max-width: 720px) {
 	.wheel {
 	  border-width:8px;
@@ -253,7 +245,7 @@ button {
   text-align: center;
 }
 
-/* Result card styling */
+/* Estilo de la tarjeta de resultado */
 .result-card {
   display:flex;
   align-items:center;
@@ -355,7 +347,7 @@ button {
   box-shadow: 0 6px 16px rgba(75,134,255,0.12);
 }
 
-/* subtle hover / entry */
+/* Efecto al pasar el cursor / entrada */
 .result-card:hover .result-cover {
   transform: translateY(-6px) scale(1.01);
 }
@@ -393,6 +385,7 @@ button {
   }
 }
 
+/* Ajustes para pantallas pequeñas */
 @media (max-width: 720px) {
 	.result-cover {
 	  max-height: 220px;
@@ -400,6 +393,7 @@ button {
 	}
 }
 
+/* Ajustes para pantallas muy pequeñas */
 @media (max-width: 480px) {
 	.ruleta-container {
 	  margin: 16px auto;

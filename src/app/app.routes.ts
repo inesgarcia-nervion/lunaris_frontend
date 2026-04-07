@@ -19,6 +19,9 @@ import { PeticionesComponent } from './presentation/components/peticiones/petici
 import { AdminPeticionesComponent } from './presentation/components/admin-peticiones/admin-peticiones.component';
 import { BubbleFeedComponent } from './presentation/components/bubble-feed/bubble-feed.component';
 
+/**
+ * Definición de las rutas de la aplicación Angular, que mapea las URL a los componentes correspondientes.
+ */
 export const routes: Routes = [
 	{ path: '', component: InicioComponent },
 	{ path: 'login', component: LoginComponent },

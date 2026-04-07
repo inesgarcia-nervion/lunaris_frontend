@@ -10,6 +10,10 @@ registerLocaleData(localeEs);
 import { routes } from './app.routes';
 import { AuthInterceptor } from './domain/services/auth.interceptor';
 
+/**
+ * Configuración global de la aplicación Angular, que incluye la provisión de servicios y 
+ * configuraciones necesarias para el funcionamiento de la aplicación.
+ */
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),

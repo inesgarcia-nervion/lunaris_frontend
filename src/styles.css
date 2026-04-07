@@ -1,12 +1,11 @@
-/* You can add global styles to this file, and also import other style files */
-
+/* * Archivo de estilos globales para la aplicación Angular, que define las variables CSS para temas claros y oscuros,
+ * así como estilos base para el cuerpo, contenedores de página, tarjetas, botones de acción y otros elementos comunes.
+ */
 @import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;600;700;800&display=swap');
 
-/* Global font settings: use a single font across the whole app */
 :root {
   --app-font: "Urbanist", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-  /* ===== THEME VARIABLES (light mode defaults) ===== */
   --bg-page:        #f7f9fc;
   --bg-card:        #ffffff;
   --bg-input:       #ffffff;
@@ -28,7 +27,7 @@
   --dropdown-hover: #f5f5f5;
 }
 
-/* ===== DARK MODE VARIABLE OVERRIDES ===== */
+/* Modo oscuro */
 body.theme-dark,
 html.theme-dark {
   --bg-page:        #12121e;
@@ -60,23 +59,21 @@ html, body {
   color: var(--text-primary);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
-/* Force the application font for all elements (overrides component-local fonts) */
+
+/* Asegura que todos los elementos hereden la fuente definida en :root, y aplica suavizado de fuentes para mejorar la legibilidad. */
 body * {
   font-family: var(--app-font) !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Prevent page scrolling when `no-scroll` class is applied to body */
+/* Previene el desplazamiento de la página cuando se aplica la clase `no-scroll` al cuerpo */
 .no-scroll {
 	overflow: hidden !important;
 	height: 100%;
 }
 
-/* Increase top spacing for main content containers so they are not too close to the header.
-   Exclude `.lista-detalle-container` which is already adjusted separately.
-   Note: .ruleta-container, .noticias-container and .bubble-container manage their
-   own margin in their component CSS to match the white-card layout used by listas. */
+/* Aumenta el espacio superior para los contenedores de contenido principal para que no estén demasiado cerca del encabezado. */
 .book-search-container,
 .config-container,
 .peticiones-container,
@@ -90,7 +87,7 @@ body * {
   margin-top: 50px;
 }
 
-/* ===== GLOBAL RESPONSIVE ADJUSTMENTS ===== */
+/* Ajustes responsivos globales */
 @media (max-width: 768px) {
   .book-search-container,
   .config-container,
@@ -116,7 +113,7 @@ body * {
   }
 }
 
-/* All page-level containers inherit the active theme background */
+/* Todos los contenedores a nivel de página heredan el fondo del tema activo */
 .book-search-container,
 .config-container,
 .peticiones-container,
@@ -130,15 +127,15 @@ body * {
   color: var(--text-primary);
 }
 
-/* Card-style containers use the card background */
+/* Los contenedores de estilo tarjeta utilizan el fondo de la tarjeta */
 .ruleta-container {
   background-color: var(--bg-card);
   color: var(--text-primary);
 }
-/* Inline confirmation layout helper */
+/* Ayudante de diseño de confirmación en línea */
 .inline-confirm { display:inline-flex; gap:8px; align-items:center; }
 
-/* Button variants for delete actions */
+/* Variantes de botones para acciones de eliminación */
 .btn-delete {
   background: transparent;
   color: #d32f2f;
@@ -151,14 +148,14 @@ body * {
 }
 .btn-delete--small { padding:6px 8px; border-radius:6px; font-size:0.95rem }
 
-/* Muted / grey variant for less-destructive actions */
+/* Variante atenuada / gris para acciones menos destructivas */
 .btn-delete--muted {
   background: transparent;
   color: var(--text-secondary);
   border: 1px solid var(--border-color);
 }
 
-/* Hover: darker tone of the base color */
+/* Hover: tono más oscuro del color base */
 .btn-delete:hover,
 .btn-delete:focus {
   background: rgba(211,47,47,0.08);
@@ -172,10 +169,10 @@ body * {
   color: var(--text-primary);
 }
 
-/* Make disabled state subtle */
+/* Estado deshabilitado  */
 .btn-delete[disabled], .btn-delete--muted[disabled] { opacity:.6; cursor:not-allowed }
 
-/* Reusable action group used by news, posts, lists and any delete flows */
+/* Grupo de acciones reutilizable utilizado por noticias, publicaciones, listas y cualquier flujo de eliminación */
 .news-actions {
   margin-top: 8px;
   display: flex;
@@ -198,9 +195,11 @@ body * {
   box-shadow: 0 4px 10px rgba(211,47,47,0.08);
   transform: translateY(-1px);
 }
-.news-actions > button:not(.confirm-yes):not(.confirm-no):active { transform: translateY(0); }
+.news-actions > button:not(.confirm-yes):not(.confirm-no):active { 
+  transform: translateY(0); 
+}
 
-/* Confirm dialog overlay */
+/* Overlay del cuadro de confirmación */
 .confirm-overlay {
   position: fixed;
   inset: 0;
@@ -220,12 +219,34 @@ body * {
   box-shadow: 0 12px 40px rgba(0,0,0,0.18);
   color: var(--text-primary);
 }
-.confirm-message { margin-bottom: 12px; font-weight:600 }
-.confirm-actions { display:flex; gap:10px; justify-content:flex-end; align-items:center }
-.confirm-yes {
-  background: #d32f2f; color: white; border: none; padding: 8px 12px; border-radius:8px; cursor:pointer; font-weight:700
+.confirm-message { 
+  margin-bottom: 12px; 
+  font-weight:600;
 }
+.confirm-actions { 
+  display:flex; 
+  gap:10px; 
+  justify-content:flex-end;
+  align-items:center;
+}
+
+.confirm-yes {
+  background: #d32f2f; 
+  color: white; 
+  border: none; 
+  padding: 8px 12px; 
+  border-radius:8px; 
+  cursor:pointer; 
+  font-weight:700;
+}
+
 .confirm-no {
-  background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 12px; border-radius:8px; cursor:pointer; font-weight:600
+  background: transparent;
+  color: var(--text-secondary); 
+  border: 1px solid var(--border-color); 
+  padding: 8px 12px; 
+  border-radius:8px; 
+  cursor:pointer; 
+  font-weight:600;
 }
 

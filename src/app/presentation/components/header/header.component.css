@@ -1556,7 +1556,6 @@
 .book-cover-simple {
   width: 100%;
   height: 340px;
-  /* portada más alta para mejor ajuste vertical */
   overflow: hidden;
   background: transparent;
   border-top-left-radius: 8px;
@@ -1667,10 +1666,6 @@
   gap: 15px;
   align-self: start;
 }
-
-/* Separador - NO UTILIZADO (contenido ahora es flujo continuo) */
-
-/* Sección inferior - NO UTILIZADO (contenido ahora está en detail-info-right) */
 
 .detail-title {
   font-size: 36px;
@@ -1795,8 +1790,6 @@
   background-size: 20px;
 }
 
-/* Separador duplicado - eliminar */
-/* .detail-separator ya está definido arriba */
 
 /* Categorías */
 .categories-section {
@@ -1861,7 +1854,7 @@
   white-space: pre-wrap;
 }
 
-/* Saga books section */
+/* Saga sección */
 .saga-books-section {
   margin: 0;
   padding-top: 20px;
@@ -1942,7 +1935,7 @@
   margin-left: 6px;
 }
 
-/* Detail loading state */
+/* Cargando detalle */
 .detail-loading-container {
   display: flex;
   flex-direction: column;
@@ -1978,7 +1971,7 @@
   margin: 0;
 }
 
-/* Review section */
+/* Sección de reseñas */
 .review-section {
   margin: 0;
   padding: 20px 0;
@@ -2072,7 +2065,6 @@
 
 .btn-delete {
   background: #e53935;
-  /* red */
   color: #fff;
   border: 1px solid #d32f2f;
 }
@@ -2093,24 +2085,17 @@
   font-family: Arial, sans-serif;
   font-size: 13px;
   resize: none;
-  /* disable manual resize */
   outline: none;
   white-space: pre-wrap !important;
-  /* allow wrapping */
   word-break: break-word;
   overflow-wrap: anywhere;
-  /* Aggressive break for long unbroken strings (e.g. AAAAA...) */
   word-break: break-all;
   box-sizing: border-box;
   max-width: 100%;
   overflow-x: hidden;
-  /* prevent horizontal scroll */
   max-height: 300px;
-  /* limit visual height */
   overflow-y: auto;
-  /* allow vertical scroll when content exceeds max-height */
   min-width: 0;
-  /* allow flex/grid parents to shrink the element */
   hyphens: auto;
 }
 
@@ -2118,14 +2103,13 @@
   display: block;
 }
 
-/* Placeholder for contenteditable */
 .review-textinput.content-editable:empty:before {
   content: attr(data-placeholder);
   color: var(--text-secondary);
   pointer-events: none;
 }
 
-/* User reviews section */
+/* Sección de reseñas de usuarios */
 .user-reviews-section {
   margin: 0;
   padding: 20px 0;
@@ -2148,7 +2132,7 @@
   margin-bottom: 15px;
 }
 
-/* Caja para cada comentario (template usa .user-review-item) */
+/* Caja para cada comentario */
 .user-review-item {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -2220,9 +2204,7 @@
   font-size: 16px;
   color: var(--text-primary);
   text-align: left;
-  /* alinear con el título */
   box-sizing: border-box;
-  /* Mostrar comentario completo: permitir saltos de línea y ajuste */
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: anywhere;
@@ -2231,7 +2213,7 @@
   display: block;
 }
 
-/* List and state section */
+/* Sección de lista y estado */
 .list-state-section {
   display: none;
 }

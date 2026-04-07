@@ -5,6 +5,12 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../domain/services/auth.service';
 import { ConfirmService } from '../../shared/confirm.service';
 
+/**
+ * Componente para configurar el perfil del usuario
+ * 
+ * Permite subir un avatar desde un archivo o usar una URL, con vista 
+ * previa antes de aplicar.
+ */
 @Component({
   selector: 'app-configuracion',
   standalone: true,
@@ -17,10 +23,8 @@ export class ConfiguracionComponent implements OnInit {
   newUsername: string = '';
   avatarUrl: string = '';
   avatarPreview: string | null = null;
-  // preview data url for an uploaded file (not applied until user clicks)
   filePreviewDataUrl: string | null = null;
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
-  // snapshots of initial state to detect real changes
   private initialUsername: string = '';
   private initialAvatar: string | null = null;
   useFile: File | null = null;
@@ -31,18 +35,18 @@ export class ConfiguracionComponent implements OnInit {
 
   constructor(private auth: AuthService, private router: Router, private cdr: ChangeDetectorRef, private confirm: ConfirmService) {}
 
+  /**
+   * Inicializa el componente cargando el nombre de usuario actual, avatar y 
+   * tema desde el servicio de autenticación.
+   */
   ngOnInit(): void {
     const stored = this.auth.getCurrentUsername() || '';
-    // normalize stored username to avoid whitespace/case mismatches
     this.username = stored ? stored.trim() : null;
     this.newUsername = this.username || '';
     const storedAvatar = this.auth.getLocalAvatar();
-    // do not show existing avatar as a preview on load; only use it as the initial snapshot
     this.initialUsername = this.username || '';
     this.initialAvatar = storedAvatar || null;
-    // Load per-user theme
     this.theme = this.auth.getUserTheme();
-    // Apply theme immediately on init so the UI matches stored preference
     try {
       document.body.classList.toggle('theme-dark', this.theme === 'dark');
       document.documentElement.classList.toggle('theme-dark', this.theme === 'dark');
@@ -51,12 +55,17 @@ export class ConfiguracionComponent implements OnInit {
     }
   }
 
+  /**
+   * Maneja el cambio de archivo para el avatar, generando una vista previa y
+   * preparando el archivo para su aplicación.
+   * @param ev Evento de cambio del input de archivo, del cual se extrae el archivo seleccionado.
+   * @returns void
+   */
   onFileChange(ev: Event) {
     const input = ev.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
     const f = input.files[0];
     this.useFile = f;
-    // clear URL when a file is selected
     this.avatarUrl = '';
     this.avatarPreview = null;
     const reader = new FileReader();
@@ -64,8 +73,12 @@ export class ConfiguracionComponent implements OnInit {
     reader.readAsDataURL(f);
   }
 
+  /**
+   * Maneja el cambio en el campo de URL del avatar, limpiando cualquier selección de archivo y
+   * vista previa relacionada.
+   * @returns void
+   */
   onUrlChange() {
-    // clear file selection when URL is typed
     if (this.avatarUrl) {
       this.useFile = null;
       this.filePreviewDataUrl = null;
@@ -74,31 +87,43 @@ export class ConfiguracionComponent implements OnInit {
     }
   }
 
+  /**
+   * Alterna la vista previa del avatar basado en la URL ingresada, permitiendo al usuario ver 
+   * cómo se verá antes de aplicarlo.
+   * @returns void
+   */
   setAvatarFromUrl() {
     if (!this.avatarUrl) return;
-    // toggle preview for the URL: if already showing this URL, clear it
     if (this.avatarPreview === this.avatarUrl) {
       this.avatarPreview = null;
     } else {
       this.avatarPreview = this.avatarUrl;
-      // clear any file selection when previewing a URL
       this.useFile = null;
       this.filePreviewDataUrl = null;
     }
     if (this.success) setTimeout(() => this.success = null, 3000);
   }
 
+  /**
+   * Alterna la vista previa del avatar basado en el archivo seleccionado, permitiendo al usuario ver
+   * cómo se verá antes de aplicarlo.
+   * @returns void
+   */
   toggleFilePreview() {
     if (!this.useFile || !this.filePreviewDataUrl) return;
     if (this.avatarPreview === this.filePreviewDataUrl) {
       this.avatarPreview = null;
     } else {
       this.avatarPreview = this.filePreviewDataUrl;
-      // clear URL when previewing file
       this.avatarUrl = '';
     }
   }
 
+  /**
+   * Alterna el tema entre claro y oscuro, aplicando la clase correspondiente al body y al elemento 
+   * raíz, y guardando la preferencia en el servicio de autenticación.
+   * @returns void
+   */
   toggleTheme() {
     this.theme = this.theme === 'light' ? 'dark' : 'light';
     this.auth.setUserTheme(this.theme);
@@ -115,41 +140,51 @@ export class ConfiguracionComponent implements OnInit {
     }
   }
 
-  /** Generic apply kept for backward compatibility but not used in template */
+  /**
+   * Aplica el avatar seleccionado, ya sea desde una URL o un archivo, guardándolo en el servicio de 
+   * autenticación y mostrando un mensaje de éxito.
+   * @returns void
+   */
   applyAvatar() {
     const toApply = this.avatarPreview || this.filePreviewDataUrl || (this.avatarUrl || null);
     if (!toApply) return;
     this.saveAppliedAvatar(toApply);
   }
 
-  /** Apply only the URL input as avatar; clears the URL input when done */
+  /**
+   * Aplica el avatar ingresado por URL, guardándolo en el servicio de autenticación y mostrando un mensaje de éxito.
+   * @returns void
+   */
   applyUrlAvatar() {
     const toApply = (this.avatarUrl || '').trim();
     if (!toApply) return;
     this.saveAppliedAvatar(toApply);
-    // clear URL input after applying
     this.avatarUrl = '';
-    // clear visible preview after applying (user requested)
     this.avatarPreview = null;
     this.filePreviewDataUrl = null;
     this.initialAvatar = toApply;
   }
 
-  /** Apply only the currently selected file as avatar; clears file input when done */
+  /**
+   * Aplica el avatar seleccionado desde un archivo, guardándolo en el servicio de autenticación y mostrando un mensaje de éxito.
+   * @returns void
+   */
   applyFileAvatar() {
     const toApply = this.filePreviewDataUrl || this.avatarPreview || null;
     if (!toApply) return;
     this.saveAppliedAvatar(toApply);
-    // clear file selection inputs
     this.useFile = null;
     this.filePreviewDataUrl = null;
     if (this.fileInput && this.fileInput.nativeElement) this.fileInput.nativeElement.value = '';
-    // clear visible preview after applying (user requested)
     this.avatarPreview = null;
     this.initialAvatar = toApply;
   }
 
-  /** Unified preview: uses URL if filled, otherwise the selected file */
+  /**
+   * Maneja la vista previa del avatar basado en la entrada actual, ya sea URL o archivo, 
+   * permitiendo al usuario ver cómo se verá antes de aplicarlo.
+   * @returns void
+   */
   previewAvatar() {
     if (this.avatarUrl) {
       this.setAvatarFromUrl();
@@ -158,7 +193,11 @@ export class ConfiguracionComponent implements OnInit {
     }
   }
 
-  /** Unified apply: applies URL if filled, otherwise the selected file */
+  /**
+   * Aplica el avatar seleccionado, ya sea desde una URL o un archivo, guardándolo en el 
+   * servicio de autenticación y mostrando un mensaje de éxito.
+   * @returns void  
+   */
   applyAvatarUnified() {
     if (this.avatarUrl) {
       this.applyUrlAvatar();
@@ -167,12 +206,22 @@ export class ConfiguracionComponent implements OnInit {
     }
   }
 
+  /**
+   * Guarda el avatar aplicado en el servicio de autenticación y muestra un mensaje de éxito, 
+   * centralizando la lógica de aplicación del avatar.
+   * @returns void
+   * @param toApply La URL o Data URL del avatar a aplicar.
+   */
   private saveAppliedAvatar(toApply: string) {
     try { this.auth.setLocalAvatar(toApply); } catch (e) { console.warn(e); }
     this.success = 'Avatar aplicado correctamente';
     setTimeout(() => this.success = null, 2500);
   }
 
+  /**
+   * Indica si hay cambios pendientes en el nombre de usuario o el avatar.
+   * @returns boolean
+   */
   get hasChanges(): boolean {
     const newName = (this.newUsername || '').trim();
     const nameChanged = newName.length > 0 && newName.toLowerCase() !== (this.initialUsername || '').toLowerCase();
@@ -180,11 +229,19 @@ export class ConfiguracionComponent implements OnInit {
     return nameChanged || avatarChanged;
   }
 
+  /**
+   * Indica si el nombre de usuario ha cambiado.
+   * @returns boolean
+   */
   get isNameChanged(): boolean {
     const newName = (this.newUsername || '').trim();
     return newName.length > 0 && newName.toLowerCase() !== (this.initialUsername || '').toLowerCase();
   }
 
+  /**
+   * Indica si el avatar ha cambiado, ya sea por una nueva URL o un nuevo archivo seleccionado.
+   * @returns boolean
+   */
   async submitChanges() {
     this.error = null; this.success = null;
     const current = this.username || '';
@@ -203,9 +260,7 @@ export class ConfiguracionComponent implements OnInit {
 
     const ok = await this.confirm.confirm(`¿Estás seguro de cambiar tu usuario a "${newName}"?`);
     if (!ok) return;
-    // prepare payload
     const payload: any = { username: newName };
-    // If avatarPreview is a URL, include it in the payload so backend can persist it
     if (this.avatarPreview && /^https?:\/\//i.test(this.avatarPreview)) {
       payload.avatarUrl = this.avatarPreview;
     }
@@ -213,7 +268,6 @@ export class ConfiguracionComponent implements OnInit {
     this.isSaving = true;
     this.auth.updateUser(current, payload).subscribe({
       next: () => {
-        // save avatar locally and clear auth so user must login again
         if (this.avatarPreview) this.auth.setLocalAvatar(this.avatarPreview);
         alert('Usuario actualizado. Se te redirigirá al login.');
         this.auth.logout();

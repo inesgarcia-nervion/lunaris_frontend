@@ -1,13 +1,12 @@
 :root {
-  /* Archivo: register.component.css
-     Descripción: Estilos de la pantalla de registro. Contiene layout,
-     tarjetas, formularios, inputs y reglas responsivas. */
+  
 }
 :host {
   display: block;
   height: 100vh;
 }
 
+/* Evita que el fondo se desplace en pantallas pequeñas. */
 .page-wrap {
   width: 100%;
   height: 100vh;
@@ -51,6 +50,7 @@
   background: rgba(0, 0, 0, 0.05);
 }
 
+/* Estilos para el componente de registro.  */
 .brand {
   text-align: center;
   margin: 18px 0 8px;
@@ -159,6 +159,7 @@
   cursor: pointer;
 }
 
+/* Efecto hover para el botón de submit */
 .signup {
   text-align:center;
   margin-top:14px;

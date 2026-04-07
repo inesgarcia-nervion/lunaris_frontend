@@ -11,6 +11,11 @@ import { ReviewService } from '../../../domain/services/review.service';
 import { ConfirmService } from '../../shared/confirm.service';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
+/**
+ * HeaderComponent es el componente principal que maneja la barra de navegación, 
+ * la búsqueda de libros, la visualización de resultados y detalles del libro 
+ * seleccionado, así como la gestión de listas y reseñas. 
+ */
 @Component({
   selector: 'app-header',
   standalone: true,
@@ -19,11 +24,9 @@ import { PaginationComponent } from '../../shared/pagination/pagination.componen
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-  // Navegación y usuario
   isMenuOpen = false;
   showUserMenu = false;
 
-  // Búsqueda
   searchQuery: string = '';
   searchResults: OpenLibraryBook[] = [];
   loading: boolean = false;
@@ -40,13 +43,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isDarkTheme: boolean = document.documentElement.classList.contains('theme-dark');
   private themeObserver?: MutationObserver;
 
-  // Return only the user's custom lists (exclude reserved profile lists)
   get customLists(): any[] {
     const user = this.auth.getCurrentUsername() || this.listasService.getCurrentUser();
     return (this.listas || []).filter(l => l.owner === user && !this.listasService.isProfileListName(l.nombre));
   }
 
-  // Selectores de detalle
   selectedList: string = '';
   selectedStatus: string = '';
   userRating: number = 0;
@@ -58,7 +59,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isMenuRoute: boolean = false;
   @ViewChild('reviewEditor') reviewEditor?: ElementRef<HTMLElement>;
 
-  // Saga scraping
   sagaData: SagaScraped | null = null;
   sagaLoading: boolean = false;
   sagaExpanded: boolean = false;
@@ -76,11 +76,22 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private confirmService: ConfirmService
   ) { }
 
+  /**
+   * Handler para el clic en el botón de usuario. Detiene la propagación 
+   * del evento para evitar que el clic cierre el menú inmediatamente y 
+   * luego alterna la visibilidad del menú de usuario.
+   * @param event El evento de clic que se dispara al hacer clic en el botón de usuario.
+   */
   onUserButtonClick(event: Event) {
     event.stopPropagation();
     this.toggleUserMenu();
   }
 
+  /**
+   * Handler para clics en el documento. Si el menú de usuario está abierto y el clic ocurre fuera 
+   * del componente, cierra el menú de usuario.
+   * @param event El evento de clic que se dispara al hacer clic en cualquier parte del documento.
+   */
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
     if (this.showUserMenu && !this.elementRef.nativeElement.contains(event.target)) {
@@ -89,7 +100,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Exponer la query actual del servicio para que la plantilla use
+  /**
+   * Getter para la query de búsqueda actual del servicio.
+   * @returns La query de búsqueda actual.
+   */
   get serviceQuery(): string {
     return this.bookSearchService.getSearchQuery();
   }
@@ -105,23 +119,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private subs: Subscription[] = [];
   private updatingStatusOrList = false;
 
+  /**
+   * Inicializa el componente, configurando observadores para cambios de tema, autenticación,
+   * navegación y estado de búsqueda.
+   */
   ngOnInit(): void {
-    // Track theme changes on <html>
     this.themeObserver = new MutationObserver(() => {
       this.isDarkTheme = document.documentElement.classList.contains('theme-dark');
       this.cdr.markForCheck();
     });
     this.themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    // reflect current admin state immediately
     this.isAdmin = this.auth.isAdmin();
     this.username = this.auth.getCurrentUsername();
     this.subs.push(this.auth.isAdmin$.subscribe(v => { this.isAdmin = v; this.cdr.markForCheck(); }));
-    // inicializar estado de ruta
     this.isMenuRoute = this.router.url.startsWith('/menu');
     this.subs.push(this.router.events.subscribe(e => {
       if (e instanceof NavigationEnd) {
         const newIsMenu = e.urlAfterRedirects.startsWith('/menu');
-        // Si el usuario cambia de pestaña a otra que NO sea /menu, limpiar la búsqueda
         if (!newIsMenu && this.isMenuRoute) {
           this.searchQuery = '';
           this.bookSearchService.setSearchQuery('');
@@ -147,15 +161,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.subs.push(this.bookSearchService.selectedBook$.subscribe(b => {
       this.selectedBook = b;
       this.updateSelectedListFromBook(b);
-      // reset user's draft review UI when opening new book
       this.userReview = '';
       this.userRating = 0;
       this.currentUserReview = null;
-      // load reviews for the selected book (if any)
       this.loadReviewsForSelectedBook();
-      // load saga data from scraping
       this.loadSagaData(b);
-      // auto-import book to DB for caching
       if (b) {
         this.bookSearchService.importBook(b).subscribe({
           next: () => {},
@@ -163,14 +173,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
         });
       }
     }));
-    // subscribe to avatar changes so header shows the current avatar immediately
     this.subs.push(this.auth.avatar$.subscribe(a => { this.avatar = a; this.cdr.markForCheck(); }));
-    // listas disponibles para añadir
     this.subs.push(this.listasService.listas$.subscribe(l => {
       this.listas = l || [];
-      // Do not auto-select the first list. Keep `selectedList` empty so the placeholder shows
-      // If the selected book is already in a list, updateSelectedListFromBook will set it.
-      // Avoid overwriting UI state while we're actively adding a book to lists/statuses.
       if (!this.updatingStatusOrList) {
         this.updateSelectedListFromBook(this.selectedBook);
       }
@@ -178,21 +183,39 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }));
   }
 
-  // Helper to render skeleton placeholders while loading
+  /**
+   * Getter que devuelve un array del tamaño del límite de resultados por página 
+   * para mostrar skeleton loaders en la UI mientras se cargan los resultados de 
+   * búsqueda.
+   * @returns Un array con la longitud igual al límite de resultados por página.
+   */
   get skeletonArray(): any[] {
     return Array.from({ length: this.limit });
   }
 
+  /**
+   * Alterna la visibilidad del menú de navegación. Si el menú está abierto, lo cierra; 
+   * si está cerrado, lo abre.
+   */
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
   }
 
+  /**
+   * Alterna la visibilidad del menú de usuario. Si el menú está abierto, lo cierra; 
+   * si está cerrado, lo abre.
+   */
   toggleUserMenu(): void {
     this.showUserMenu = !this.showUserMenu;
   }
+
+  /**
+   * Navega a la ruta especificada. Si la ruta es '/menu', también restablece el estado de búsqueda
+   * para limpiar cualquier resultado o libro seleccionado previamente.
+   * @param path La ruta a la que se desea navegar.
+   */
   navigate(path: string): void {
     console.log('Header navigate called:', path);
-    // If navigating to menu, ensure any open book detail is cleared so Menu shows hero/search correctly
     if (path === '/menu') {
       this.selectedBook = null;
       this.bookSearchService.setSelectedBook(null);
@@ -206,21 +229,37 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.router.navigate([path]);
   }
 
+  /**
+   * Navega a la ruta especificada y cierra el menú de usuario. Este método se utiliza para asegurarse
+   * de que el menú de usuario se cierre automáticamente después de seleccionar una opción de navegación.
+   * @param path La ruta a la que se desea navegar.
+   */
   navigateAndClose(path: string): void {
     this.showUserMenu = false;
     this.navigate(path);
   }
 
+  /**
+   * Cierra la sesión del usuario, restablece el estado de autenticación y navega a la página de inicio de sesión.
+   * También se asegura de cerrar el menú de usuario para una mejor experiencia de usuario.
+   */
   logout(): void {
     this.showUserMenu = false;
     this.auth.logout();
     this.router.navigate(['/login']);
   }
 
+  /**
+   * Maneja el error de carga del avatar del usuario. Si ocurre un error al cargar el avatar, se restablece el 
+   * avatar local a null.
+   */
   onAvatarError(): void {
     try { this.auth.setLocalAvatar(null); } catch (e) { /* ignore */ }
   }
 
+  /**
+   * Limpia los mensajes de error y éxito después de un retraso de 5 segundos. 
+   */
   private clearAlertAfterDelay(): void {
     setTimeout(() => {
       this.error = null;
@@ -229,6 +268,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }, 5000);
   }
 
+  /**
+   * Limpia los mensajes de error y éxito relacionados con las reseñas después de un retraso de 5 segundos.
+   */
   private clearReviewAlertAfterDelay(): void {
     setTimeout(() => {
       this.reviewError = null;
@@ -237,21 +279,27 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }, 5000);
   }
 
+  /**
+   * Realiza una búsqueda de libros basada en el término de búsqueda ingresado por el usuario.
+   * Si el término de búsqueda está vacío, muestra un mensaje de error.
+   */
   search(): void {
     if (!this.searchQuery.trim()) {
       this.error = 'Por favor ingresa un término de búsqueda';
       this.clearAlertAfterDelay();
       return;
     }
-    // Delegar la búsqueda al servicio compartido
     this.bookSearchService.setSearchQuery(this.searchQuery);
     this.bookSearchService.setSelectedBook(null);
     this.bookSearchService.searchCurrent(this.limit);
-    // Navegar a la vista de resultados (reemplaza la vista actual)
     this.router.navigate(['/menu']);
-    // el servicio actualizará los observables a los que estamos suscritos en ngOnInit
   }
 
+  /**
+   * Realiza una búsqueda de libros basada en el autor ingresado por el usuario. 
+   * Si el término de búsqueda está vacío, muestra un mensaje de error.
+   * @returns void
+   */
   searchByAuthor(): void {
     if (!this.searchQuery.trim()) {
       this.error = 'Por favor ingresa un autor';
@@ -264,6 +312,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.router.navigate(['/menu']);
   }
 
+  /**
+   * Importa un libro seleccionado desde los resultados de búsqueda a la base de datos local.
+   * @param book El libro que se desea importar, representado como un objeto OpenLibraryBook.
+   */
   importBook(book: OpenLibraryBook): void {
     this.loading = true;
     this.error = null;
@@ -285,14 +337,27 @@ export class HeaderComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Obtiene la URL de la portada de un libro utilizando el servicio BookSearchService.
+   * @param book El libro para el cual se desea obtener la URL de la portada.
+   * @returns La URL de la portada del libro.
+   */
   getCoverUrl(book: OpenLibraryBook): string {
     return this.bookSearchService.getCoverUrl(book);
   }
 
+  /**
+   * Obtiene el nombre del primer autor de un libro. Si el libro no tiene autores, devuelve "Autor desconocido".
+   * @param book El libro del cual se desea obtener el nombre del primer autor.
+   * @returns El nombre del primer autor del libro o "Autor desconocido" si no hay autores disponibles.
+   */
   getFirstAuthor(book: OpenLibraryBook): string {
     return book.authorNames && book.authorNames.length > 0 ? book.authorNames[0] : 'Autor desconocido';
   }
 
+  /**
+   * Navega a la página anterior de resultados de búsqueda si no se está en la primera página.
+   */
   previousPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
@@ -302,6 +367,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Navega a la página siguiente de resultados de búsqueda si no se está en la última página.
+   */
   nextPage(): void {
     const maxPages = Math.ceil(this.totalResults / this.limit);
     if (this.currentPage < maxPages) {
@@ -312,6 +380,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Navega a una página específica de resultados de búsqueda. Si la página solicitada es la 
+   * misma que la actual, no realiza ninguna acción.
+   * @param page El número de página al que se desea navegar.
+   * @returns void
+   */
   onPageChange(page: number): void {
     if (page === this.currentPage) return;
     this.currentPage = page;
@@ -320,24 +394,41 @@ export class HeaderComponent implements OnInit, OnDestroy {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  /**
+   * Calcula el número total de páginas de resultados de búsqueda basado en el total de resultados 
+   * y el límite por página.
+   * @returns El número total de páginas de resultados de búsqueda.
+   */
   getTotalPages(): number {
     return Math.ceil(this.totalResults / this.limit);
   }
 
+  /**
+   * Determina si hay una página siguiente disponible para navegar en los resultados de búsqueda.
+   * @returns true si hay una página siguiente disponible, false si se está en la última página.
+   */
   hasNextPage(): boolean {
     return this.currentPage < this.getTotalPages();
   }
 
+  /**
+   * Determina si hay una página anterior disponible para navegar en los resultados de búsqueda.
+   * @returns true si hay una página anterior disponible, false si se está en la primera página.
+   */
   hasPreviousPage(): boolean {
     return this.currentPage > 1;
   }
+
+  /**
+   * Navega de regreso a la página de búsqueda o a la lista de origen dependiendo de dónde se 
+   * accedió al detalle del libro.
+   * @returns void
+   */
   backToSearch(): void {
     const origin = this.bookSearchService.getNavigationOrigin();
     if (origin) {
       if (origin.type === 'list' && origin.listId) {
-        // clear selection and navigate back to the originating list
         this.bookSearchService.setSelectedBook(null);
-        // if the origin has a parent (e.g., came from profile -> list -> book), restore parent as origin
         const parentType = (origin as any).parentType;
         const parentListId = (origin as any).parentListId;
         if (parentType) {
@@ -349,7 +440,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
         return;
       }
       if (origin.type === 'profile') {
-        // opened from profile -> return to profile view
         this.bookSearchService.setSelectedBook(null);
         this.bookSearchService.setNavigationOrigin(null);
         this.router.navigate(['/perfil']);
@@ -360,17 +450,21 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.bookSearchService.setSelectedBook(null);
   }
 
+  /**
+   * Intenta extraer el nombre de la saga o serie a la que pertenece un libro utilizando múltiples heurísticas,
+   * incluyendo el título del libro, la serie a la que pertenece y los sujetos asociados.
+   * @param book El libro del cual se desea extraer el nombre de la saga.
+   * @returns El nombre de la saga si se encuentra, de lo contrario, null.
+   */
   getSagaName(book: any): string | null {
     const title = (book.title || '').toLowerCase();
     if (book.series && Array.isArray(book.series) && book.series.length > 0) {
-      // Try entries with "series:Name" prefix — strip the prefix
       for (const s of book.series) {
         if (typeof s === 'string' && !s.includes('=') && /^series:/i.test(s)) {
           const name = s.substring(s.indexOf(':') + 1).trim();
           if (name.length > 0 && name.length < 100) return name;
         }
       }
-      // Fall back to plain names with no internal identifier pattern
       const validSeries = book.series.filter((s: string) =>
         typeof s === 'string' && !s.includes('=') && !/^[A-Za-z_]+:/.test(s)
       );
@@ -383,7 +477,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
         if (subjectLower.includes('saga') || subjectLower.includes('series') ||
             subjectLower.includes('trilogy') || subjectLower.includes('cycle')) {
           let sagaName = subject.split('--')[0].trim();
-          // Strip any "word:" prefix (e.g. "series:", "serie:")
           const prefixMatch = sagaName.match(/^[A-Za-z_]+:(.+)/);
           if (prefixMatch) sagaName = prefixMatch[1].trim();
           if (sagaName.length > 0 && sagaName.length < 100) return sagaName;
@@ -408,12 +501,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return null;
   }
 
+  /**
+   * Determina si un libro pertenece a una saga o serie utilizando la función getSagaName. 
+   * Si getSagaName devuelve un nombre de saga válido, entonces el libro se considera parte 
+   * de una saga.
+   * @param book El libro que se desea verificar.
+   * @returns true si el libro pertenece a una saga, false en caso contrario.
+   */
   isSaga(book: OpenLibraryBook): boolean {
     return this.getSagaName(book) !== null;
   }
 
+  /**
+   * Carga información adicional sobre la saga o serie a la que pertenece un libro.  
+   * @param book El libro del cual se desea cargar información de la saga.
+   * @returns void
+   */
   private loadSagaData(book: OpenLibraryBook | null): void {
-    // No resetear si estamos navegando entre libros de la saga
     if (this.navigatingSagaBook) return;
     this.sagaData = null;
     this.sagaLoading = false;
@@ -435,14 +539,30 @@ export class HeaderComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Obtiene el número de ediciones disponibles para un libro. 
+   * @param book El libro del cual se desea obtener el número de ediciones.
+   * @returns El número de ediciones disponibles para el libro como una cadena. 
+   * Si no se encuentra información de ediciones, devuelve '0'.
+   */
   getEditionCount(book: OpenLibraryBook): string {
     return book.editionCount?.toString() || book.edition_count?.toString() || '0';
   }
 
+  /**
+   * Obtiene las categorías de un libro.
+   * @param book El libro del cual se desea obtener las categorías.
+   * @returns Un arreglo de cadenas que representan las categorías del libro.
+   */
   getCategories(book: any): string[] {
     return this.bookSearchService.getCategories(book);
   }
 
+  /**
+   * Genera un arreglo de cadenas que representan el estado de las estrellas (completa, media o vacía)
+   * @param rating El número de estrellas que se desea convertir en un arreglo de estados de estrellas.
+   * @returns Un arreglo de cadenas que representan el estado de cada estrella ('full', 'half' o 'empty').
+   */
   generateRatingArray(rating: number | undefined): string[] {
     const stars: string[] = [];
     const ratingValue = rating || 0;
@@ -458,31 +578,31 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return stars;
   }
 
+  /**
+   * Agrega el libro seleccionado a la lista personalizada seleccionada o al estado de perfil seleccionado.
+   * @returns void
+   */
   addToList(): void {
     if (!this.selectedBook) return;
 
     const currentUser = this.auth.getCurrentUsername() || this.listasService.getCurrentUser();
-    // Ensure profile lists exist for the user (safe to call)
     this.updatingStatusOrList = true;
     this.listasService.ensureProfileSections(currentUser);
 
     let addedToCustom = false;
     let addedToStatus = false;
 
-    // If a custom list is selected, add to it
     if (this.selectedList) {
       this.listasService.addBookToList(this.selectedList, this.selectedBook);
       addedToCustom = true;
     }
 
-    // If a status is selected and corresponds to a profile list, add to that special list as well
     const status = (this.selectedStatus || '').toString().trim();
     const profileNames = ['Leyendo', 'Leído', 'Plan para leer'];
     if (status && profileNames.includes(status)) {
       const profileList = this.listasService.getAll().find(l => l.owner === currentUser && l.nombre === status);
       if (profileList) {
         this.listasService.addBookToList(profileList.id, this.selectedBook);
-        // Remove the book from other profile lists so a book has only one profile status
         const otherProfileNames = profileNames.filter(n => n !== status);
         for (const otherName of otherProfileNames) {
           const otherList = this.listasService.getAll().find(l => l.owner === currentUser && l.nombre === otherName);
@@ -491,7 +611,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
           }
         }
         addedToStatus = true;
-        // ensure UI reflects the new status immediately
         this.selectedStatus = status;
       }
     }
@@ -503,10 +622,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Prefer the status-specific message when a status was added
-    // Prefer the "lista" message when a custom list was involved (user expects list message)
     if (addedToCustom) {
-      // include the list name when available
       const list = this.listasService.getById(this.selectedList || '');
       const name = list?.nombre || '';
       this.successMessage = name ? `Libro añadido a la lista "${name}" correctamente` : 'Libro añadido a la lista correctamente';
@@ -514,22 +630,27 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.successMessage = 'Estado añadido';
     }
 
-    // Debug logging to help trace UI update issues
-    // eslint-disable-next-line no-console
     console.debug('[Header] addToList result:', { addedToCustom, addedToStatus, selectedList: this.selectedList, selectedStatus: this.selectedStatus, currentUser });
-    // eslint-disable-next-line no-console
     console.debug('[Header] listas after add:', this.listasService.getAll());
-    // Reflect the updated lists immediately in the UI and keep the selected status
     this.updateSelectedListFromBook(this.selectedBook);
     this.updatingStatusOrList = false;
     this.clearAlertAfterDelay();
   }
 
+  /**
+   * Agrega el libro seleccionado a la lista personalizada o estado de perfil seleccionado. 
+   */
   addStatus(): void {
-    // Shortcut to add the selected book to the selected status (profile list)
     this.addToList();
   }
 
+  /**
+   * Actualiza las variables `selectedList` y `selectedStatus` basándose en la presencia del 
+   * libro dado en las listas del usuario.
+   * @param book El libro para el cual se desea actualizar la lista y el estado seleccionados. 
+   * Si es null, se limpian las selecciones.
+   * @returns void
+   */
   private updateSelectedListFromBook(book: OpenLibraryBook | null): void {
     if (!book) {
       this.selectedList = '';
@@ -545,7 +666,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
       }
     }));
     if (matches.length > 0) {
-      // Prefer a custom/user-created list match (not a reserved profile list) so the select shows correctly
       const currentUser = this.auth.getCurrentUsername() || this.listasService.getCurrentUser();
       const customMatch = matches.find(m => !this.listasService.isProfileListName(m.nombre) && m.owner === currentUser);
       if (customMatch) {
@@ -553,11 +673,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
       } else {
         this.selectedList = matches[0].id;
       }
-      // Do not clear `successMessage` here: keep any recently-set success message
     } else {
       this.selectedList = '';
     }
-    // Also detect if the book is present in one of the reserved profile lists for the current user
     const currentUser = this.auth.getCurrentUsername() || this.listasService.getCurrentUser();
     const profileNames = ['Leyendo', 'Leído', 'Plan para leer'];
     let foundStatus = '';
@@ -574,6 +692,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  /**
+   * Agrega un libro a una lista personalizada o estado de perfil directamente desde la tarjeta 
+   * de resultados de búsqueda, sin necesidad de ir al detalle del libro.
+   * @param book El libro que se desea agregar.
+   * @param listId El ID de la lista a la que se desea agregar el libro.
+   * @returns void
+   */
   addBookFromCard(book: OpenLibraryBook, listId: string) {
     if (!listId) { this.error = 'Selecciona una lista'; this.clearAlertAfterDelay(); return; }
 
@@ -587,11 +712,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     let addedToCustom = false;
 
     if (target) {
-      // If the target is a profile list for this user, treat it as a status change
       if (target.owner === currentUser && this.listasService.isProfileListName(target.nombre)) {
-        // add to target profile list
         this.listasService.addBookToList(target.id, book);
-        // remove from other profile lists
         const profileNames = ['Leyendo', 'Leído', 'Plan para leer'];
         const otherProfileNames = profileNames.filter(n => n !== target.nombre);
         for (const otherName of otherProfileNames) {
@@ -601,7 +723,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
         addedToStatus = true;
         this.selectedStatus = target.nombre;
       } else {
-        // custom list
         this.listasService.addBookToList(listId, book);
         addedToCustom = true;
       }
@@ -615,18 +736,26 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.successMessage = name ? `Libro añadido a la lista "${name}" correctamente` : 'Libro añadido correctamente';
     }
 
-    // Refresh UI state
     this.updateSelectedListFromBook(book);
     this.updatingStatusOrList = false;
     this.clearAlertAfterDelay();
   }
 
+  /**
+   * Limpia las suscripciones y el observador de cambios de tema para evitar fugas de memoria cuando el componente se destruye.
+    * @returns void
+   */
   ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe());
     this.themeObserver?.disconnect();
   }
   
-  // Handler for contenteditable review editor. Receives the element reference from template.
+  /**
+   * Handler para el evento de entrada en el editor de reseñas. 
+   * @param el El elemento HTML del editor de reseñas. Si es null o indefinido, 
+   * se restablece la reseña del usuario a una cadena vacía.
+   * @returns void
+   */
   onReviewEditorInput(el: HTMLElement | null | undefined): void {
     try {
       if (!el) {
@@ -635,7 +764,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.userReview = (el as HTMLElement).innerText || '';
       }
     } catch (e) {
-      // Fallback: do not throw template errors
       this.userReview = '';
     }
   }
@@ -655,7 +783,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.currentUserReview = this.reviews.find(r => r.username === currentUser) || null;
         if (this.currentUserReview) {
           this.userReview = this.currentUserReview.comment || '';
-          // set content into editor element if present without triggering re-render
           try { if (this.reviewEditor && this.reviewEditor.nativeElement) this.reviewEditor.nativeElement.innerText = this.userReview; } catch {}
           this.userRating = this.currentUserReview.rating || 0;
         }
@@ -667,10 +794,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Navega al libro principal de una saga o serie. Realiza una búsqueda utilizando 
+   * el título del libro de la saga y selecciona el primer resultado encontrado.
+   * Si no se encuentra ningún libro o si ocurre un error durante la búsqueda, muestra 
+   * un mensaje de error temporal y vuelve a seleccionar el libro anterior.
+   * @param sagaBook El libro de la saga o serie que se desea abrir.
+   * @returns void
+   */
   openSagaBook(sagaBook: SagaBookEntry): void {
     if (!sagaBook.title) return;
     const previousBook = this.selectedBook;
-    // Mostrar pantalla de carga
     this.navigatingSagaBook = true;
     this.sagaLoading = true;
     this.sagaNavigationError = null;
@@ -714,25 +848,33 @@ export class HeaderComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Selecciona un libro para mostrar su detalle. Establece el libro seleccionado 
+   * en el servicio de búsqueda de libros,
+   * restablece la reseña y calificación del usuario, y desplaza la página hacia 
+   * arriba para mostrar el detalle del libro.
+   * @param book El libro que se desea seleccionar.
+   */
   selectBook(book: OpenLibraryBook): void {
     this.selectedBook = book;
     this.userRating = 0;
     this.userReview = '';
-    // ensure editor cleared visually
     try { if (this.reviewEditor && this.reviewEditor.nativeElement) this.reviewEditor.nativeElement.innerText = ''; } catch {}
-    // mark as coming from search/header
     this.bookSearchService.setNavigationOrigin({ type: 'search' });
     this.bookSearchService.setSelectedBook(book);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  /**
+   * Publica o actualiza la reseña del usuario para el libro seleccionado.
+   * @returns void
+   */
   submitReview(): void {
     if (!this.selectedBook || !this.selectedBook.key) {
       this.error = 'No hay libro seleccionado';
       this.clearAlertAfterDelay();
       return;
     }
-    // rating may be decimal, clamp to 0-5 and round to 1 decimal
     let rating = Number(this.userRating) || 0;
     if (rating < 0) rating = 0;
     if (rating > 5) rating = 5;
@@ -749,10 +891,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     };
 
     if (this.currentUserReview && this.currentUserReview.id) {
-      // update
       this.reviewService.update(this.currentUserReview.id, payload).subscribe({
         next: (updated) => {
-          // replace in list
           const idx = this.reviews.findIndex(r => r.id === updated.id);
           if (idx >= 0) this.reviews[idx] = updated;
           this.currentUserReview = updated;
@@ -768,7 +908,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
         }
       });
     } else {
-      // create
       this.reviewService.create(payload).subscribe({
         next: (created) => {
           this.reviews.unshift(created);
@@ -788,6 +927,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Elimina la reseña del usuario para el libro seleccionado. Solicita confirmación 
+   * antes de eliminar y, si se confirma, elimina la reseña utilizando el servicio de 
+   * reseñas. 
+   * @returns void
+   */
   async deleteReview(): Promise<void> {
     if (!this.currentUserReview || !this.currentUserReview.id) return;
     const ok = await this.confirmService.confirm('¿Estás seguro de eliminar tu reseña?');
@@ -813,6 +958,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Elimina una reseña específica por su ID. Solicita confirmación antes de eliminar 
+   * y, si se confirma, elimina la reseña utilizando el servicio de reseñas.
+   * @param id 
+   * @returns void
+   */
   async deleteReviewById(id: number | undefined): Promise<void> {
     if (!id) return;
     const ok = await this.confirmService.confirm('¿Estás seguro de eliminar esta reseña?');

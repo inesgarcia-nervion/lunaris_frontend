@@ -97,7 +97,6 @@
   transition: transform 0.12s ease;
 }
 .libro-cover:hover {
-  /* no movement on image hover; the whole card moves instead */
 }
 .btn-back {
   display: inline-block;
@@ -129,7 +128,7 @@
   border: 1px solid rgba(46,125,50,0.25);
 }
 
-/* Reuse style similar to noticias delete buttons for consistency */
+/* Botón de eliminar/like en noticias */
 .btn-delete-like-news {
   background: transparent;
   color: #d32f2f;
@@ -155,7 +154,6 @@
   cursor: pointer;
   display: -webkit-box;
   -webkit-line-clamp: 2;
-  /* limit to 2 lines */
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -168,7 +166,6 @@
   margin-bottom: 8px;
   display: -webkit-box;
   -webkit-line-clamp: 1;
-  /* single line for author */
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -200,9 +197,7 @@
   cursor: pointer;
   width: 100%;
   height: 100%;
-  /* fill grid cell so cards match height */
   min-height: 320px;
-  /* visual consistency */
   overflow: hidden;
 }
 .libro-card-box:hover {
@@ -211,9 +206,7 @@
   box-shadow: 0 10px 28px rgba(22,31,84,0.06);
 }
 
-/* .delete-box removed: delete button displays inline without extra container */
 
-/* Make the inline 'Eliminar' button inside each book card match the main red delete style */
 .libro-card-box .btn-delete {
   background: #e53935;
   color: white;
@@ -223,7 +216,6 @@
   cursor: pointer;
 }
 
-/* Ensure the muted modifier does not override the red appearance inside cards */
 .libro-card-box .btn-delete.btn-delete--muted,
 .libro-card-box .btn-delete--muted {
   background: #e53935 !important;
@@ -231,13 +223,11 @@
   border: none !important;
 }
 
-/* If you want the card buttons to be smaller, adjust the small modifier here */
 .libro-card-box .btn-delete--small {
   padding: 6px 8px;
   border-radius: 6px;
 }
 
-/* Responsive tweak: ensure button width doesn't overflow card on tiny screens */
 .libro-card-box .btn-delete {
   max-width: 100%;
 }

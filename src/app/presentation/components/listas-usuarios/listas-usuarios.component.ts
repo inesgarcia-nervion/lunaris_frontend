@@ -8,6 +8,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
+/**
+ * Componente para mostrar las listas de usuario (excepto las del perfil) 
+ * con búsqueda, paginación y gestión de listas.
+ */
 @Component({
   selector: 'app-listas-usuarios',
   standalone: true,
@@ -19,7 +23,6 @@ export class ListasUsuariosComponent implements OnInit {
   search: string = '';
   listas: any[] = [];
   filteredListas: any[] = [];
-  // Pagination (client-side)
   pageSize = 8;
   currentPage = 1;
   pagedListas: any[] = [];
@@ -39,8 +42,13 @@ export class ListasUsuariosComponent implements OnInit {
     private confirm: ConfirmService
   ) {}
 
+  /**
+   * Al iniciar el componente, se cargan las listas de usuario 
+   * (filtrando las del perfil y privadas si no es admin),
+   * se establece el usuario actual y se configuran las suscripciones 
+   * para actualizar la vista cuando cambien las listas o favoritos.
+   */
   ngOnInit(): void {
-    // Cargar listas desde servicio (localStorage por ahora)
     this.listas = this.filterOutProfileLists(this.listasService.getAll());
     this.filteredListas = this.listas;
     this.updatePagination();
@@ -50,6 +58,11 @@ export class ListasUsuariosComponent implements OnInit {
     console.log('ListasUsuariosComponent initialized; current searchQuery:', this.bookSearchService.getSearchQuery());
   }
 
+  /**
+   * Edita el nombre de una lista si el usuario es el propietario y no es una lista de perfil.
+   * @param listId El ID de la lista a editar.
+   * @returns void
+   */
   editList(listId: string): void {
     const lista = this.listasService.getById(listId);
     if (!lista) return;
@@ -65,6 +78,12 @@ export class ListasUsuariosComponent implements OnInit {
     this.listasService.updateListName(listId, nombre);
   }
 
+  /**
+   * Elimina una lista si el usuario es el propietario y no es una lista de perfil, 
+   * solicitando confirmación antes de la eliminación.
+   * @param listId El ID de la lista a eliminar.
+   * @returns void
+   */
   async deleteList(listId: string): Promise<void> {
     const lista = this.listasService.getById(listId);
     if (!lista) return;
@@ -78,6 +97,11 @@ export class ListasUsuariosComponent implements OnInit {
     this.listasService.deleteList(listId);
   }
 
+  /**
+   * Filtra las listas mostradas según el término de búsqueda ingresado,
+   * actualizando la paginación para mostrar los resultados filtrados.
+   * @returns void  
+   */
   onSearch(): void {
     const term = this.search.toLowerCase();
     this.filteredListas = this.listas.filter(l => l.nombre.toLowerCase().includes(term));
@@ -85,25 +109,40 @@ export class ListasUsuariosComponent implements OnInit {
     this.updatePagination();
   }
 
+  /**
+   * Actualiza la lista de listas mostradas según la página actual y el tamaño de página,
+   * aplicando la paginación a las listas filtradas.
+   * @returns void
+   */
   updatePagination(): void {
     const rest = this.filteredListas.slice(1);
     const start = (this.currentPage - 1) * this.pageSize;
     this.pagedListas = rest.slice(start, start + this.pageSize);
   }
 
+  /**
+   * Maneja el cambio de página en la paginación, actualizando la página actual y recalculando las listas a mostrar.
+   * @param page El número de página seleccionado.
+   * @returns void
+   */
   onPageChange(page: number): void {
     this.currentPage = page;
     this.updatePagination();
     this.cdr.markForCheck();
   }
 
+  /**
+   * Filtra las listas para excluir las listas de perfil (Leyendo, Leído, Plan para leer) 
+   * y las listas privadas si el usuario no es admin.
+   * @param listas Las listas a filtrar.
+   * @returns Las listas filtradas.
+   */
   private filterOutProfileLists(listas: any[]): any[] {
     if (!Array.isArray(listas)) return [];
     const skip = new Set(['leyendo', 'leído', 'leido', 'plan para leer']);
     return listas.filter(l => {
       try {
         const nombre = (l.nombre || '').toString().toLowerCase();
-        // Exclude profile lists and exclude private lists for non-admins
         const isProfile = skip.has(nombre);
         const isPrivate = !!l.isPrivate;
         if (isProfile) return false;
@@ -115,18 +154,27 @@ export class ListasUsuariosComponent implements OnInit {
     });
   }
 
+  /**
+   * Muestra el input para crear una nueva lista. Al confirmar, se valida 
+   * el nombre (no vacío, no duplicado para el usuario), se crea la lista, 
+   * se navega a su vista detalle y se limpia el estado del input. 
+   * Al cancelar, simplemente se oculta el input y se limpia el estado.
+   * @returns void
+   */
   crearLista(): void {
-    // Muestra el input inline para crear una nueva lista
     this.showCreateInput = true;
-    // focus handled in template via autofocus attribute
   }
 
+  /**
+   * Valida y crea una nueva lista con el nombre ingresado, asignando el 
+   * usuario actual como propietario.
+   * @returns void
+   */
   confirmCreate(): void {
     const name = (this.newListName || '').trim();
     if (!name) {
       return;
     }
-    // Check for duplicate name for the current user
     const duplicate = this.listasService.getAll().some(
       l => l.owner === this.currentUser && (l.nombre || '').toLowerCase() === name.toLowerCase()
     );
@@ -138,33 +186,50 @@ export class ListasUsuariosComponent implements OnInit {
       return;
     }
     this.createError = '';
-    // create list with current user as owner (ListasService handles owner assignment)
     const nueva = this.listasService.addList(name, !!this.newListPrivate);
-    // filteredListas se actualizará por suscripción
-    // marcar el origen para que al volver desde la vista detalle se pueda regresar aquí
     this.bookSearchService.setNavigationOrigin({ type: 'listas' });
     this.router.navigate(['/listas', nueva.id]);
-    // force change detection to ensure template updates (handles edge cases)
     this.cdr.detectChanges();
-    // limpiar estado del input
     this.newListName = '';
     this.showCreateInput = false;
     this.newListPrivate = false;
   }
 
+  /**
+   * Cancela la creación de una nueva lista, ocultando el input y limpiando 
+   * el estado del nombre ingresado.
+   * @returns void
+   */
   cancelCreate(): void {
     this.newListName = '';
     this.showCreateInput = false;
   }
 
-  // Template helper: accept unknown (from localStorage) and return cover URL
+  /**
+   * Obtiene la URL de la portada de un libro para usar en la plantilla.
+   * @param book El libro del cual obtener la portada.
+   * @returns La URL de la portada.
+   */
   getCoverForTemplate(book: unknown): string {
     return this.bookSearchService.getCoverUrl(book as OpenLibraryBook);
   }
 
+  /**
+   * Obtiene el avatar del propietario de una lista para mostrarlo en la plantilla,
+   * devolviendo null si no hay propietario o no se encuentra el avatar.
+   * @param owner El nombre de usuario del propietario de la lista.
+   * @returns La URL del avatar del propietario o null si no se encuentra.
+   */
   getOwnerAvatar(owner?: string | null): string | null {
     return this.auth.getLocalAvatar(owner) || null;
   }
+
+  /**
+   * Obtiene el título de un libro para mostrarlo en la plantilla, devolviendo una 
+   * cadena vacía si no se encuentra el título.
+   * @param book El libro del cual obtener el título.
+   * @returns El título del libro o una cadena vacía si no se encuentra.
+   */
   getTitleForTemplate(book: unknown): string {
     try {
       return (book as OpenLibraryBook).title || '';
@@ -173,20 +238,39 @@ export class ListasUsuariosComponent implements OnInit {
     }
   }
 
+  /**
+   * Abre la vista de detalle de un libro al hacer clic en él desde una lista,
+   * estableciendo el libro seleccionado en el servicio de búsqueda y navegando a la 
+   * ruta de detalle.
+   * @param book El libro que se desea abrir en detalle.
+   * @returns void
+   */
   openBookDetailFromList(book: unknown): void {
     const b = book as OpenLibraryBook;
     if (!b) return;
-    // set selected book in shared service and navigate to menu (where detail view lives)
     this.bookSearchService.setSelectedBook(b);
     this.bookSearchService.setSearchQuery('');
     this.router.navigate(['/menu']);
   }
 
+  /**
+   * Abre la vista de detalle de una lista al hacer clic en ella, estableciendo el 
+   * origen de navegación en el servicio de búsqueda y navegando a la ruta de detalle 
+   * de la lista.
+   * @param listId El ID de la lista que se desea abrir en detalle.
+   */
   openListFromListas(listId: string): void {
     this.bookSearchService.setNavigationOrigin({ type: 'listas' });
     this.router.navigate(['/listas', listId]);
   }
 
+  /**
+   * Verifica si una lista está marcada como favorita por el usuario actual, devolviendo 
+   * true o false según corresponda. Si ocurre algún error al verificar, se devuelve false 
+   * por defecto.
+   * @param listId El ID de la lista que se desea verificar.
+   * @returns true si la lista está marcada como favorita, false en caso contrario.
+   */
   isFavorited(listId: string): boolean {
     try {
       return this.listasService.isFavorited(listId);
@@ -195,10 +279,16 @@ export class ListasUsuariosComponent implements OnInit {
     }
   }
 
+  /**
+   * Alterna el estado de favorito de una lista para el usuario actual, deteniendo la 
+   * propagación del evento para evitar que se active la navegación al hacer clic en el 
+   * ícono de favorito. 
+   * @param listId El ID de la lista cuyo estado de favorito se desea alternar.
+   * @param event El evento que desencadenó la acción, opcional.
+   */
   toggleFavorite(listId: string, event?: Event): void {
     if (event) event.stopPropagation();
     this.listasService.toggleFavorite(listId);
-    // ensure view updates
     this.cdr.markForCheck();
   }
 }

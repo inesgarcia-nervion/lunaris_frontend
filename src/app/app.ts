@@ -7,6 +7,13 @@ import { Subscription } from 'rxjs';
 import { ListasService } from './domain/services/listas.service';
 import { AuthService } from './domain/services/auth.service';
 
+/**
+ * Componente raíz de la aplicación Angular, que actúa como el contenedor principal para toda la aplicación.
+ * 
+ * Este componente se encarga de gestionar la navegación, mostrar u ocultar el encabezado y pie de página
+ * según la ruta actual, y aplicar el tema oscuro si el usuario lo ha configurado. También se encarga de 
+ * asignar listas sin propietario al usuario actual al iniciar la aplicación.
+ */
 @Component({
   selector: 'app-root',
   imports: [CommonModule, RouterOutlet, HeaderComponent, ConfirmDialogComponent],
@@ -22,12 +29,21 @@ export class App implements OnInit, OnDestroy {
 
   constructor(private router: Router, private listasService: ListasService, public auth: AuthService) {}
 
+  /**
+   * Navega a la página de peticiones, que muestra las solicitudes de los usuarios para agregar 
+   * nuevos libros a la plataforma.
+   */
   navigateToPeticiones(): void {
     this.router.navigate(['/peticiones']);
   }
 
+  /**
+   * Inicializa el componente raíz, asignando listas sin propietario al usuario actual, y configurando la
+   * visibilidad del encabezado y pie de página según la ruta actual. También se suscribe a los eventos de 
+   * navegación para actualizar la visibilidad del encabezado y pie de página, y aplicar el tema oscuro 
+   * según la configuración del usuario en cada ruta.
+   */
   ngOnInit(): void {
-    // Apply saved theme for the logged-in user
     const currentUser = this.auth.getCurrentUsername();
     if (currentUser) {
       const savedTheme = this.auth.getUserTheme(currentUser);
@@ -37,7 +53,6 @@ export class App implements OnInit, OnDestroy {
       }
     }
 
-    // If user already logged in, assign ownership to any lists created before owner support
     try {
       const current = this.listasService.getCurrentUser();
       if (current) this.listasService.assignUnownedListsToCurrentUser(current);
@@ -79,6 +94,9 @@ export class App implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Destruye el componente raíz, cancelando todas las suscripciones para evitar fugas de memoria. 
+   */
   ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe());
   }

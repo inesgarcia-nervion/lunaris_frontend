@@ -4,6 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 
+/**
+ * Componente para restablecer la contraseña de un usuario. 
+ * 
+ * Permite  validar el token recibido por correo, ingresar una nueva contraseña y 
+ * confirmarla. Muestra mensajes de éxito o error según el resultado de la operación.
+ */
 @Component({
   selector: 'app-reset-password',
   standalone: true,
@@ -32,6 +38,10 @@ export class ResetPasswordComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) {}
 
+  /**
+   * Al inicializar el componente, se obtiene el token de la URL y se valida con el backend.
+   * @returns void
+   */
   ngOnInit() {
     this.token = this.route.snapshot.queryParamMap.get('token') || '';
     
@@ -41,7 +51,6 @@ export class ResetPasswordComponent implements OnInit {
       return;
     }
 
-    // Validar el token
     this.http.get<any>(`${this.backendBase}/auth/validate-token?token=${this.token}`).subscribe({
       next: (res) => {
         this.validating = false;
@@ -57,14 +66,27 @@ export class ResetPasswordComponent implements OnInit {
     });
   }
 
+  /**
+   * Alterna la visibilidad de la contraseña ingresada para facilitar su revisión por parte del usuario.
+    * @returns void
+   */
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
 
+  /**
+   * Alterna la visibilidad de la contraseña de confirmación para facilitar su revisión por parte del usuario.
+   * @returns void
+   */
   toggleConfirmPassword() {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
+  /**
+   * Valida los campos de contraseña, muestra errores si es necesario y envía la nueva contraseña al 
+   * backend para su actualización.
+   * @returns void
+   */
   submit() {
     this.error = null;
     this.message = null;

@@ -4,6 +4,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { NewsService, NewsItem } from '../../../domain/services/news.service';
 
+/**
+ * El componente NoticiasDetailComponent es responsable de mostrar 
+ * los detalles de una noticia específica en la aplicación.
+ * 
+ * Este componente se inicializa obteniendo el ID de la noticia 
+ * desde la ruta, luego busca la noticia correspondiente en el 
+ * servicio de noticias.
+ */
 @Component({
   selector: 'app-noticia-detail',
   standalone: true,

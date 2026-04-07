@@ -4,7 +4,7 @@
   align-items: center;
 }
 
-/* Make the crown sit over the top-right of the avatar */
+/* Corona para el avatar del administrador */
 .avatar-wrapper {
   position: relative;
   display: inline-block;
@@ -41,7 +41,7 @@
   justify-content:center;
   background:var(--bg-secondary);
 }
-/* Ensure avatar image fits inside the circular container */
+/* Asegura que la imagen del avatar se ajuste dentro del contenedor circular */
 .avatar img {
   width: 100%;
   height: 100%;
@@ -96,7 +96,7 @@
   box-shadow: 0 8px 18px rgba(0,0,0,0.12);
 }
 
-/* Grid layout for paged reading sections: 4 columns × 3 rows */
+/* Layout de cuadrícula para secciones de lectura paginadas: 4 columnas × 3 filas */
 .books-paged-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -269,7 +269,6 @@
   transform: translateY(-2px) scale(0.99);
 }
 
-/* privacy pill */
 .privacy-pill{
   font-size:0.72rem;
   padding:6px 10px;
@@ -296,7 +295,7 @@
   color: #666;
 }
 
-/* Match the delete button style used in noticias component */
+/* Coincide con el estilo del botón de eliminación utilizado en el componente de noticias */
 .btn-delete-like-news {
   background: transparent;
   color: #d32f2f;
@@ -316,7 +315,7 @@
   transform: translateY(0);
 }
 
-/* Additional responsive breakpoints */
+/* Puntos de interrupción adicionales para diseño responsivo */
 @media (max-width: 768px) {
   .lists-grid-profile {
     grid-template-columns: repeat(2, 1fr);

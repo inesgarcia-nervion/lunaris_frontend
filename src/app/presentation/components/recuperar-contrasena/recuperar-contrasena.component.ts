@@ -4,6 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 
+/**
+ * Componente para recuperar la contraseña. 
+ * 
+ * Permite al usuario ingresar su correo electrónico para 
+ * recibir instrucciones de recuperación.
+ * Valida que el campo de correo electrónico no esté vacío 
+ * antes de enviar la solicitud.
+ * Muestra mensajes de éxito o error según corresponda.
+ */
 @Component({
   selector: 'app-recuperar-contrasena',
   standalone: true,
@@ -21,6 +30,12 @@ export class RecuperarContrasenaComponent {
 
   constructor(public router: Router, private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
+  /**
+   * Envía la solicitud de recuperación de contraseña al backend.
+   * Valida que el campo de correo electrónico no esté vacío.
+   * Muestra un mensaje de éxito si la solicitud se envía correctamente o un mensaje de error si falla.
+   * @returns void
+   */
   submit() {
     this.error = null;
     this.message = null;

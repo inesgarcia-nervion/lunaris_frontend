@@ -3,6 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PeticionesService } from '../../../domain/services/peticiones.service';
 
+/**
+ * Componente para enviar peticiones de libros. Permite al usuario ingresar 
+ * el título y autor del libro que desea solicitar.
+ * Valida que ambos campos estén completos antes de enviar la petición. 
+ * Muestra mensajes de éxito o error según corresponda.
+ */
 @Component({
   selector: 'app-peticiones',
   standalone: true,
@@ -19,6 +25,11 @@ export class PeticionesComponent {
 
   constructor(private peticiones: PeticionesService, private cdr: ChangeDetectorRef, private ngZone: NgZone) {}
 
+  /**
+   * Envía la petición de libro al servicio. Valida que el título y autor no estén vacíos.
+   * Muestra un mensaje de éxito si la petición se envía correctamente o un mensaje de error si falla.
+   * @returns void
+   */
   submit() {
     this.error = null;
     this.success = null;

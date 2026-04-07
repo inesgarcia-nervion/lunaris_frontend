@@ -6,6 +6,14 @@ import { ListasService, ListaItem } from '../../../domain/services/listas.servic
 import { AuthService } from '../../../domain/services/auth.service';
 import { BookSearchService } from '../../../domain/services/book-search.service';
 
+/**
+ * Muestra el perfil del usuario actual, incluyendo su avatar, nombre de usuario, 
+ * y sus listas de libros organizadas en secciones fijas (Leyendo, Leído, Plan para leer) 
+ * y otras listas personalizadas. 
+ * 
+ * Permite navegar a detalles de libros y listas, y gestionar
+ * favoritos. Se actualiza en tiempo real ante cambios en las listas o el avatar.
+ */
 @Component({
   selector: 'app-perfil',
   standalone: true,
@@ -18,16 +26,13 @@ export class PerfilComponent implements OnInit {
   avatar: string | null = null;
   isAdmin: boolean = false;
 
-  // Profile fixed sections
   leyendo: any[] = [];
   leido: any[] = [];
   planParaLeer: any[] = [];
-  // ids for the special lists so we can navigate to them
   leyendoId: string | null = null;
   leidoId: string | null = null;
   planParaLeerId: string | null = null;
 
-  // Pagination for reading sections in profile preview: show 4 items per section
   pageSize = 4;
   leyendoPage = 1;
   leidoPage = 1;
@@ -36,12 +41,10 @@ export class PerfilComponent implements OnInit {
   pagedLeido: any[] = [];
   pagedPlanParaLeer: any[] = [];
 
-  // Other lists created by user
   userLists: ListaItem[] = [];
   pagedUserLists: ListaItem[] = [];
   userListsPage = 1;
   readonly userListsPageSize = 4;
-  // Lists favorited by current user (owned by other users)
   favoriteLists: ListaItem[] = [];
 
   constructor(
@@ -51,36 +54,53 @@ export class PerfilComponent implements OnInit {
     private router: Router
   ) {}
 
+  /**
+   * Alterna el estado de favorito de una lista. Si la lista ya está en 
+   * favoritos, se elimina; si no, se agrega.
+   * @param listId El ID de la lista a alternar en favoritos.
+   * @param event El evento de clic, utilizado para detener la propagación 
+   * y evitar que se active la navegación al hacer clic en el botón de favorito.
+   */
   toggleFavorite(listId: string, event?: Event) {
     if (event) event.stopPropagation();
     this.listasService.toggleFavorite(listId);
   }
 
+  /**
+   * Maneja el error de carga del avatar, estableciendo el avatar local a null 
+   * para mostrar un avatar por defecto.
+   */
   onAvatarError(): void {
     try { this.authService.setLocalAvatar(null); } catch (e) { /* ignore */ }
   }
 
+  /**
+   * Inicializa el componente cargando el nombre de usuario, verificando si es admin,
+   * y suscribiéndose a cambios en el avatar y las listas. También asegura que las 
+   * secciones de perfil estén creadas para el usuario actual.
+   */
   ngOnInit(): void {
     this.username = this.authService.getCurrentUsername();
     this.isAdmin = this.authService.isAdmin();
-    // subscribe to avatar changes so perfil updates immediately
     try {
       this.avatar = this.authService.getLocalAvatar();
       this.authService.avatar$.subscribe(a => this.avatar = a);
     } catch (e) {
       console.warn('Unable to read avatar', e);
     }
-    // Ensure the 3 mandatory sections exist for this user
     this.listasService.ensureProfileSections(this.username);
     this.loadLists();
-    // react to listas changes so profile updates live
     this.listasService.listas$.subscribe(() => this.loadLists());
     this.listasService.favorites$.subscribe(() => this.loadLists());
   }
 
+  /**
+   * Carga las listas del usuario, identificando las secciones fijas (Leyendo, Leído, Plan para leer)
+   * y separándolas de las listas personalizadas. También carga las listas que el usuario ha marcado 
+   * como favoritas pero que son propiedad de otros usuarios.
+   */
   loadLists() {
     const all = this.listasService.getByOwner(this.username);
-    // find the special lists by name and record ids
     const lLeyendo = all.find(l => l.nombre === 'Leyendo');
     const lLeido = all.find(l => l.nombre === 'Leído');
     const lPlan = all.find(l => l.nombre === 'Plan para leer');
@@ -97,44 +117,114 @@ export class PerfilComponent implements OnInit {
     this.leidoId = lLeido?.id || null;
     this.planParaLeerId = lPlan?.id || null;
 
-    // other lists are those owned by user but not the three special ones
     this.userLists = all.filter(l => !['Leyendo', 'Leído', 'Plan para leer'].includes(l.nombre));
     this.userListsPage = 1;
     this.updatePagedUserLists();
 
-    // favorites: lists the current user favorited but which are owned by others
     this.favoriteLists = this.listasService.getFavoriteListsForUser(this.username).filter(l => l.owner && l.owner !== this.username);
   }
 
-  // wrapper helpers for template
-  getCoverUrl(book: any): string { return this.bookSearchService.getCoverUrl(book); }
-  navigate(path: string) { this.router.navigateByUrl(path); }
+  /**
+   * Obtiene la URL de la portada de un libro utilizando el servicio de búsqueda de libros.
+   * @param book El libro para el cual se desea obtener la URL de la portada.
+   * @returns La URL de la portada del libro.
+   */
+  getCoverUrl(book: any): string { 
+    return this.bookSearchService.getCoverUrl(book); 
+  }
 
+  /**
+   * Navega a una ruta específica dentro de la aplicación utilizando el router de Angular.
+   * @param path La ruta a la que se desea navegar.
+   */
+  navigate(path: string) { 
+    this.router.navigateByUrl(path); 
+  }
+
+  /**
+   * Actualiza las secciones de lectura paginadas (Leyendo, Leído, Plan para leer) según 
+   * la página actual.
+   * Calcula el índice de inicio para cada sección y actualiza los arrays paginados que 
+   * se muestran en la interfaz.
+   */
   updatePaginationLeyendo(): void {
     const start = (this.leyendoPage - 1) * this.pageSize;
     this.pagedLeyendo = this.leyendo.slice(start, start + this.pageSize);
   }
+
+  /**
+   * Actualiza la sección de libros "Leído" según la página actual. Calcula el índice de inicio
+   * para la sección "Leído" y actualiza el array paginado que se muestra en la interfaz.
+   */
   updatePaginationLeido(): void {
     const start = (this.leidoPage - 1) * this.pageSize;
     this.pagedLeido = this.leido.slice(start, start + this.pageSize);
   }
+
+  /**
+   * Actualiza la sección de libros "Plan para leer" según la página actual. Calcula el índice de inicio
+   * para la sección "Plan para leer" y actualiza el array paginado que se muestra en la interfaz.
+   */
   updatePaginationPlan(): void {
     const start = (this.planParaLeerPage - 1) * this.pageSize;
     this.pagedPlanParaLeer = this.planParaLeer.slice(start, start + this.pageSize);
   }
-  onLeyendoPageChange(page: number): void { this.leyendoPage = page; this.updatePaginationLeyendo(); }
-  onLeidoPageChange(page: number): void { this.leidoPage = page; this.updatePaginationLeido(); }
-  onPlanParaLeerPageChange(page: number): void { this.planParaLeerPage = page; this.updatePaginationPlan(); }
 
+  /**
+   * Maneja el cambio de página para la sección "Leyendo". Actualiza la página actual y llama a la función
+   * de actualización de paginación para reflejar los cambios en la interfaz.
+   * @param page El número de página seleccionado por el usuario.
+   */
+  onLeyendoPageChange(page: number): void { 
+    this.leyendoPage = page; this.updatePaginationLeyendo(); 
+  }
+
+  /**
+   * Maneja el cambio de página para la sección "Leído". Actualiza la página actual y llama a la función
+   * de actualización de paginación para reflejar los cambios en la interfaz.
+   * @param page El número de página seleccionado por el usuario.
+   */
+  onLeidoPageChange(page: number): void { 
+    this.leidoPage = page; this.updatePaginationLeido(); 
+  }
+
+  /**
+   * Maneja el cambio de página para la sección "Plan para leer". Actualiza la página actual y llama a 
+   * la función
+   * de actualización de paginación para reflejar los cambios en la interfaz.
+   * @param page El número de página seleccionado por el usuario.
+   */
+  onPlanParaLeerPageChange(page: number): void { 
+    this.planParaLeerPage = page; this.updatePaginationPlan(); 
+  }
+
+  /**
+   * Actualiza la sección de listas personalizadas del usuario según la página actual. Calcula el índice de inicio
+   * para las listas personalizadas y actualiza el array paginado que se muestra en la interfaz.
+   * Esto permite mostrar un número limitado de listas por página y navegar entre ellas.
+   */
   updatePagedUserLists(): void {
     const start = (this.userListsPage - 1) * this.userListsPageSize;
     this.pagedUserLists = this.userLists.slice(start, start + this.userListsPageSize);
   }
-  onUserListsPageChange(page: number): void { this.userListsPage = page; this.updatePagedUserLists(); }
 
+  /**
+   * Maneja el cambio de página para las listas personalizadas del usuario. Actualiza la página actual y llama a la función
+   * de actualización de paginación para reflejar los cambios en la interfaz.
+   * @param page El número de página seleccionado por el usuario.
+   */
+  onUserListsPageChange(page: number): void { 
+    this.userListsPage = page; this.updatePagedUserLists(); 
+  }
+
+  /**
+   * Navega a la vista de detalles de una lista específica. Antes de navegar, establece el origen de navegación en el 
+   * servicio de búsqueda de libros
+   * @param id El ID de la lista a la que se desea navegar. Si el ID es null, no se realiza ninguna acción.
+   * @returns void
+   */
   navigateToList(id: string | null) {
     if (!id) return;
-    // mark navigation origin so ListaDetalle can return to profile when user hits back
     this.bookSearchService.setNavigationOrigin({ type: 'profile', listId: id });
     this.router.navigate(['/listas', id]);
   }
