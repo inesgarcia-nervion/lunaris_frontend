@@ -60,3 +60,16 @@
   .card-actions button {
     width: 100%;
   }
+  .card-badge {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:14px;
+  }
+  .card-badge .badge {
+    background:#007bff;
+    color:#fff;
+    padding:2px 8px;
+    border-radius:999px;
+    font-weight:600;
+  }

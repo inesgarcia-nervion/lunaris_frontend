@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 import { PeticionesService, BookRequestDto } from '../../../domain/services/peticiones.service';
 import { ConfirmService } from '../../shared/confirm.service';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
@@ -22,13 +23,15 @@ import { PaginationComponent } from '../../shared/pagination/pagination.componen
 })
 export class AdminPeticionesComponent implements OnInit {
   requests: BookRequestDto[] = [];
+  groupedRequests: Array<{ key: string; title: string; author: string; ids: number[]; count: number; }> = [];
   loading = false;
   error: string | null = null;
   deletingId: number | null = null;
+  deletingGroupKey: string | null = null;
 
   pageSize = 9;
   currentPage = 1;
-  pagedRequests: BookRequestDto[] = [];
+  pagedRequests: Array<{ key: string; title: string; author: string; ids: number[]; count: number; }> = [];
 
   constructor(private peticiones: PeticionesService, private cdr: ChangeDetectorRef, private confirm: ConfirmService) {}
 
@@ -54,6 +57,7 @@ export class AdminPeticionesComponent implements OnInit {
       next: (r) => {
         this.requests = r;
         this.currentPage = 1;
+        this.buildGroups();
         this.updatePagination();
         this.loading = false;
         this.cdr.detectChanges();
@@ -74,10 +78,10 @@ export class AdminPeticionesComponent implements OnInit {
    * de página o se elimina una petición.
    */
   updatePagination(): void {
-    const totalPages = Math.max(1, Math.ceil(this.requests.length / this.pageSize));
+    const totalPages = Math.max(1, Math.ceil(this.groupedRequests.length / this.pageSize));
     if (this.currentPage > totalPages) this.currentPage = totalPages;
     const start = (this.currentPage - 1) * this.pageSize;
-    this.pagedRequests = this.requests.slice(start, start + this.pageSize);
+    this.pagedRequests = this.groupedRequests.slice(start, start + this.pageSize);
   }
 
   /**
@@ -100,25 +104,48 @@ export class AdminPeticionesComponent implements OnInit {
    * @returns Una promesa que se resuelve cuando la operación de eliminación se completa.
    */
   async remove(id?: number): Promise<void> {
-    if (id == null) {
-      this.error = 'Id de petición inválido';
+    this.error = 'Id de petición inválido';
+    return;
+  }
+
+  /** Elimina todas las peticiones agrupadas (mismo título+autor) */
+  async removeGroup(group?: { key: string; title: string; author: string; ids: number[]; count: number; }): Promise<void> {
+    if (!group) {
+      this.error = 'Grupo inválido';
       return;
     }
-    const ok = await this.confirm.confirm('¿Estás seguro de eliminar esta petición?');
+    const ok = await this.confirm.confirm('¿Estás seguro de eliminar todas las peticiones de este libro?');
     if (!ok) return;
-    this.deletingId = id;
-    this.peticiones.delete(id).subscribe({
-      next: () => {
+    this.deletingGroupKey = group.key;
+    const ids = [...group.ids];
+    for (const id of ids) {
+      try {
+        await firstValueFrom(this.peticiones.delete(id));
         this.requests = this.requests.filter(x => x.id !== id);
-        this.updatePagination();
-        this.deletingId = null;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.error = 'Error al eliminar';
-        this.deletingId = null;
-        this.cdr.detectChanges();
+      } catch (e) {
+        // continuar con los siguientes
       }
-    });
+    }
+    this.buildGroups();
+    this.updatePagination();
+    this.deletingGroupKey = null;
+    this.cdr.detectChanges();
+  }
+
+  private buildGroups(): void {
+    const map = new Map<string, { key: string; title: string; author: string; ids: number[]; count: number; }>();
+    for (const r of this.requests) {
+      const title = (r.title || '').trim();
+      const author = (r.author || '').trim();
+      const key = `${title.toLowerCase()}|${author.toLowerCase()}`;
+      const existing = map.get(key);
+      if (existing) {
+        existing.ids.push(r.id as number);
+        existing.count = existing.ids.length;
+      } else {
+        map.set(key, { key, title, author, ids: [r.id as number], count: 1 });
+      }
+    }
+    this.groupedRequests = Array.from(map.values());
   }
 }
