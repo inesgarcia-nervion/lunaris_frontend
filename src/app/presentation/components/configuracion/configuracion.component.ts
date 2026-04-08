@@ -83,7 +83,9 @@ export class ConfiguracionComponent implements OnInit {
       this.useFile = null;
       this.filePreviewDataUrl = null;
       this.avatarPreview = null;
-      if (this.fileInput?.nativeElement) this.fileInput.nativeElement.value = '';
+      if (this.fileInput?.nativeElement) {
+        this.fileInput.nativeElement.value = '';
+      }
     }
   }
 
@@ -159,6 +161,7 @@ export class ConfiguracionComponent implements OnInit {
     const toApply = (this.avatarUrl || '').trim();
     if (!toApply) return;
     this.saveAppliedAvatar(toApply);
+    console.log('Applied avatar URL:', toApply);
     this.avatarUrl = '';
     this.avatarPreview = null;
     this.filePreviewDataUrl = null;

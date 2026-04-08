@@ -1,5 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
+import { RouterTestingModule } from '@angular/router/testing';
+import { ListasService } from './domain/services/listas.service';
+import { AuthService } from './domain/services/auth.service';
 
 /**
  * Pruebas unitarias para el componente raíz `App` de la aplicación Angular. 
@@ -8,9 +11,25 @@ import { App } from './app';
  * título se renderiza como se espera. 
  */
 describe('App', () => {
+  const listasMock = {
+    getCurrentUser: vi.fn().mockReturnValue(null),
+    assignUnownedListsToCurrentUser: vi.fn(),
+    listas$: { subscribe: () => ({ unsubscribe: () => {} }) }
+  };
+
+  const authMock = {
+    getCurrentUsername: vi.fn().mockReturnValue(null),
+    getUserTheme: vi.fn().mockReturnValue('light'),
+    isAdmin: vi.fn().mockReturnValue(false)
+  };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [App],
+      imports: [App, RouterTestingModule],
+      providers: [
+        { provide: ListasService, useValue: listasMock },
+        { provide: AuthService, useValue: authMock }
+      ]
     }).compileComponents();
   });
 
@@ -20,10 +39,9 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', async () => {
+  it('should have title lunaris_frontend', () => {
     const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, lunaris_frontend');
+    const app = fixture.componentInstance;
+    expect((app as any).title()).toBe('lunaris_frontend');
   });
 });
