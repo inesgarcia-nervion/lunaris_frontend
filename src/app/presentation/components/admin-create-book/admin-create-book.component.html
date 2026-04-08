@@ -154,7 +154,7 @@
         <button
           type="submit"
           class="btn btn-primary"
-          [disabled]="loading"
+          [disabled]="loading || !hasCreateBookChanges()"
         >
           {{ loading ? 'Creando...' : 'Crear Libro' }}
         </button>

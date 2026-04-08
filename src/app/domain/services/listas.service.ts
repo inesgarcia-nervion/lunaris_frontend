@@ -119,6 +119,17 @@ export class ListasService {
     this.listasSubject.next(listas);
   }
 
+  updateListPrivacy(id: string, isPrivate: boolean) {
+    const listas = this.getAll().map(l => {
+      if (l.id === id) {
+        return { ...l, isPrivate };
+      }
+      return l;
+    });
+    this.saveToStorage(listas);
+    this.listasSubject.next(listas);
+  }
+
 
   /**
    * Asigna todas las listas sin propietario (owner) al usuario actual, actualizando el 

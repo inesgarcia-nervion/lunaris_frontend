@@ -40,6 +40,23 @@ export class AdminCreateBookComponent implements OnInit {
   isAdmin: boolean = false;
   currentUserId: number | null = null;
 
+  // Detecta si hay contenido en el formulario para habilitar el botón Crear
+  hasCreateBookChanges(): boolean {
+    try {
+      if ((this.title || '').trim()) return true;
+      if ((this.author || '').trim()) return true;
+      if ((this.description || '').trim()) return true;
+      if ((this.coverImage || '').trim()) return true;
+      if ((this.filePreview || '').trim()) return true;
+      if ((this.selectedGenreIds || []).length > 0) return true;
+      if (this.releaseYear != null) return true;
+      if (this.score != null) return true;
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
   /**
    * Constructor del componente.
    * @param bookService Servicio para manejar operaciones relacionadas con libros (crear, obtener géneros, etc).

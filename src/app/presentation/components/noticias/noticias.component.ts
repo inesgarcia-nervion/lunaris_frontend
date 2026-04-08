@@ -26,6 +26,7 @@ export class NoticiasComponent implements OnInit {
   body = '';
   imageData: string | null = null;
   isAdmin = false;
+  error: string | null = null;
   pendingDeleteId: string | null = null;
 
   pageSize = 5;
@@ -35,6 +36,17 @@ export class NoticiasComponent implements OnInit {
   @ViewChild('bodyEditor') bodyEditorRef?: ElementRef<HTMLElement>;
   @ViewChild('fileInput') fileInputRef?: ElementRef<HTMLInputElement>;
   showCreateModal = false;
+
+  // Detectar cambios en el formulario de creación para habilitar/deshabilitar el botón
+  hasCreateChanges(): boolean {
+    try {
+      if ((this.title || '').trim()) return true;
+      if ((this.text || '').trim()) return true;
+      if ((this.body || '').trim()) return true;
+      if (this.imageData) return true;
+      return false;
+    } catch (_) { return false; }
+  }
 
   /**
    * Al inicializar el componente, se cargan todas las noticias desde el servicio 
@@ -108,10 +120,15 @@ export class NoticiasComponent implements OnInit {
    */
   addNews() {
     if (!this.isAdmin) return;
+    this.error = null;
     const title = this.title.trim();
     const text = this.text.trim();
     const body = this.body.trim();
-    if (!title || !body) return alert('Título y contenido (body) son obligatorios');
+    if (!title || !body) {
+      this.error = 'Título y contenido (body) son obligatorios';
+      setTimeout(() => { try { this.error = null; this.cdr.detectChanges(); } catch(_){} }, 3000);
+      return;
+    }
     this.newsService.addNews({ title, text, body, image: this.imageData || undefined });
     this.title = '';
     this.text = '';
@@ -199,6 +216,7 @@ export class NoticiasComponent implements OnInit {
     this.text = '';
     this.body = '';
     this.imageData = null;
+    this.error = null;
     try { if (this.fileInputRef?.nativeElement) this.fileInputRef.nativeElement.value = ''; } catch (_) {}
     try { if (this.bodyEditorRef?.nativeElement) this.bodyEditorRef.nativeElement.innerHTML = ''; } catch (_) {}
     try { this.cdr.detectChanges(); } catch (_) {}

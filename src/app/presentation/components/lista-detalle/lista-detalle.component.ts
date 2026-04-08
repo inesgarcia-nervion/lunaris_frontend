@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ListasService, ListaItem } from '../../../domain/services/listas.service';
 import { ConfirmService } from '../../shared/confirm.service';
 import { Subscription } from 'rxjs';
@@ -15,7 +16,7 @@ import { PaginationComponent } from '../../shared/pagination/pagination.componen
 @Component({
   selector: 'app-lista-detalle',
   standalone: true,
-  imports: [CommonModule, PaginationComponent],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: './lista-detalle.component.html',
   styleUrls: ['./lista-detalle.component.css']
 })
@@ -27,6 +28,13 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
   private subs: Subscription[] = [];
   private currentId: string = '';
   currentUser: string | null = null;
+
+  // Estado para la ventana de edición
+  editingList = false;
+  editNombre = '';
+  editIsPrivate = false;
+  editOriginalNombre = '';
+  editOriginalIsPrivate = false;
 
   constructor(private route: ActivatedRoute, private listas: ListasService, private router: Router, private bookSearch: BookSearchService, private location: Location, private confirm: ConfirmService) {}
 
@@ -230,6 +238,42 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
     if (!nombre) return;
     this.listas.updateListName(this.lista.id, nombre);
     this.lista = this.listas.getById(this.currentId);
+  }
+
+  openEditModal(): void {
+    if (!this.lista) return;
+    if (!this.lista.owner || this.lista.owner !== this.currentUser) return;
+    if (this.isProfileList(this.lista.nombre)) {
+      alert('El nombre de esta lista no se puede editar.');
+      return;
+    }
+    this.editNombre = this.lista.nombre;
+    this.editIsPrivate = !!this.lista.isPrivate;
+    this.editOriginalNombre = this.lista.nombre;
+    this.editOriginalIsPrivate = !!this.lista.isPrivate;
+    this.editingList = true;
+  }
+
+  saveEdit(): void {
+    if (!this.lista) return;
+    const nombre = this.editNombre.trim();
+    if (!nombre) return;
+    this.listas.updateListName(this.lista.id, nombre);
+    this.listas.updateListPrivacy(this.lista.id, this.editIsPrivate);
+    this.lista = this.listas.getById(this.currentId);
+    this.editingList = false;
+  }
+
+  cancelEdit(): void {
+    this.editingList = false;
+  }
+
+  hasChanges(): boolean {
+    const original = (this.editOriginalNombre || '').trim();
+    const current = (this.editNombre || '').trim();
+    if (original !== current) return true;
+    if (!!this.editOriginalIsPrivate !== !!this.editIsPrivate) return true;
+    return false;
   }
 
   /**

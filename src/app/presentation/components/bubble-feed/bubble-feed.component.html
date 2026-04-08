@@ -56,7 +56,7 @@
 
           <!-- Acciones: botones Guardar/Cancelar para edición -->
           <div class="create-actions">
-            <button (click)="publish()" [disabled]="( !newText.trim() && !newImagePreviews.length )">Guardar</button>
+            <button (click)="publish()" [disabled]="!editHasChanges()">Guardar</button>
             <button class="cancel" (click)="cancelCreate()">Cancelar</button>
           </div>
         </div>
@@ -119,7 +119,7 @@
 
         <!-- Acciones: botones Publicar/Cancelar para creación -->
         <div class="create-actions">
-          <button (click)="publish()" [disabled]="( !newText.trim() && !newImagePreviews.length )">Publicar</button>
+          <button (click)="publish()" [disabled]="editingId != null ? !editHasChanges() : ( !newText.trim() && !newImagePreviews.length )">Publicar</button>
           <button class="cancel" (click)="cancelCreate()">Cancelar</button>
         </div>
       </div>

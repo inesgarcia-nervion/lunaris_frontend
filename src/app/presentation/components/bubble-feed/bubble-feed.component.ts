@@ -31,6 +31,9 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
   editingId: number | null = null;
   editInline = false;
   imageError: string | null = null;
+  // originales para detectar cambios cuando se edita
+  editOriginalText = '';
+  editOriginalImagePreviews: string[] = [];
 
   selected?: BubblePost;
   selectedImageIndex = 0;
@@ -629,6 +632,8 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     this.editingId = p.id;
     this.newText = p.text || '';
     this.newImagePreviews = (p.imageUrls && p.imageUrls.slice()) || (p.imageUrl ? [p.imageUrl] : []);
+    this.editOriginalText = p.text || '';
+    this.editOriginalImagePreviews = (p.imageUrls && p.imageUrls.slice()) || (p.imageUrl ? [p.imageUrl] : []);
     this.newImagePreviewIndex = 0;
     this.editInline = false;
     this.creating = true;
@@ -648,5 +653,21 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     if (this.imageObjectUrl) { try { URL.revokeObjectURL(this.imageObjectUrl); } catch {} this.imageObjectUrl = null; }
     this.newImagePreviews = [];
     this.newImagePreviewIndex = 0;
+    this.editOriginalText = '';
+    this.editOriginalImagePreviews = [];
+  }
+
+  editHasChanges(): boolean {
+    if (this.editingId == null) return false;
+    const orig = (this.editOriginalText || '').trim();
+    const curr = (this.newText || '').trim();
+    if (orig !== curr) return true;
+    const a = this.editOriginalImagePreviews || [];
+    const b = this.newImagePreviews || [];
+    if (a.length !== b.length) return true;
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) return true;
+    }
+    return false;
   }
 }

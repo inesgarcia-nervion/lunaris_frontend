@@ -12,7 +12,7 @@
       </div>
       <div style="display:flex; align-items:center; gap:8px;">
         <div *ngIf="lista.owner && lista.owner === currentUser && !isProfileList(lista.nombre)" class="lista-actions">
-        <button class="btn-edit-list" (click)="editListName()">Editar</button>
+        <button class="btn-edit-list" (click)="openEditModal()">Editar</button>
         <button class="btn-delete" (click)="confirmAndDeleteList()">Eliminar lista</button>
       </div>
         <button *ngIf="lista.owner && lista.owner !== currentUser && isFavorited()" class="btn-delete-like-news" (click)="$event.stopPropagation(); confirmAndRemoveFavorite()">Eliminar favorito</button>
@@ -47,4 +47,29 @@
   <ng-template #notFound>
     <p>Lista no encontrada.</p>
   </ng-template>
+</div>
+
+<!-- Modal de edición de lista -->
+<div *ngIf="editingList" class="edit-list-overlay">
+  <div class="edit-list-modal" role="dialog" aria-modal="true" aria-label="Editar lista">
+    <button class="close-edit-modal" (click)="cancelEdit()">✕</button>
+    <div class="edit-list-header">
+      <h3>Editar lista</h3>
+    </div>
+    <div class="edit-list-body">
+      <label class="edit-list-label" for="edit-list-nombre">Nombre</label>
+      <input id="edit-list-nombre" class="edit-list-input" type="text" [(ngModel)]="editNombre" maxlength="100" placeholder="Nombre de la lista" />
+      <div class="edit-list-privacy">
+        <span class="edit-list-label">Visibilidad</span>
+        <div class="privacy-toggle">
+          <button class="privacy-btn" [class.active]="!editIsPrivate" (click)="editIsPrivate = false">Pública</button>
+          <button class="privacy-btn" [class.active]="editIsPrivate" (click)="editIsPrivate = true">Privada</button>
+        </div>
+      </div>
+    </div>
+    <div class="edit-list-actions">
+      <button class="btn-save-list" (click)="saveEdit()" [disabled]="!editNombre.trim() || !hasChanges()">Guardar</button>
+      <button class="btn-cancel-list" (click)="cancelEdit()">Cancelar</button>
+    </div>
+  </div>
 </div>

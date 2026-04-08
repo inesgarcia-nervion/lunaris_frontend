@@ -21,8 +21,11 @@
         <img [src]="imageData" alt="preview" />
       </div>
       <div class="modal-actions">
-        <button (click)="addNews()">Crear</button>
+        <button (click)="addNews()" [disabled]="!hasCreateChanges()">Crear</button>
         <button class="cancel" (click)="closeCreateModal()">Cancelar</button>
+      </div>
+      <div *ngIf="error" class="form-message form-message-error">
+        {{ error }}
       </div>
     </div>
   </div>
@@ -43,14 +46,8 @@
         <img [src]="n.image" alt="imagen noticia" />
       </div>
       <div *ngIf="isAdmin" class="news-actions">
-        <ng-container *ngIf="pendingDeleteId !== n.id">
-          <button class="btn-delete" (click)="$event.stopPropagation(); requestInlineDelete(n.id)">Eliminar</button>
-        </ng-container>
-        <ng-container *ngIf="pendingDeleteId === n.id" class="inline-confirm">
-          <span>¿Eliminar?</span>
-          <button class="confirm-yes" (click)="$event.stopPropagation(); removeConfirmed(n.id)">Sí</button>
-          <button class="confirm-no" (click)="$event.stopPropagation(); cancelRemove()">No</button>
-        </ng-container>
+        <!-- Usar el diálogo global de confirmación para mantener consistencia visual -->
+        <button class="btn-delete" (click)="$event.stopPropagation(); confirmRemove(n.id)">Eliminar</button>
       </div>
     </div>
   </div>

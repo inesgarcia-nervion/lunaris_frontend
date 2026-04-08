@@ -284,3 +284,155 @@
     flex-wrap: wrap;
   }
 }
+
+/* Modal de edición de lista */
+.edit-list-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  z-index: 1000;
+}
+
+.edit-list-modal {
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 28px 28px 24px;
+  box-sizing: border-box;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+
+.close-edit-modal {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  border: none;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+}
+.close-edit-modal:hover {
+  background: rgba(0,0,0,0.75);
+}
+
+.edit-list-header h3 {
+  margin: 0 0 20px 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.edit-list-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.edit-list-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.edit-list-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  box-sizing: border-box;
+  outline: none;
+}
+.edit-list-input:focus {
+  border-color: #6c63ff;
+  box-shadow: 0 0 0 2px rgba(108,99,255,0.15);
+}
+
+.edit-list-privacy {
+  display: flex;
+  flex-direction: column;
+}
+
+.privacy-toggle {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.privacy-btn {
+  flex: 1;
+  padding: 9px 0;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.privacy-btn.active {
+  background: #6c63ff;
+  color: #fff;
+  border-color: #6c63ff;
+  font-weight: 600;
+}
+.privacy-btn:not(.active):hover {
+  background: var(--bg-hover);
+}
+
+.edit-list-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.btn-save-list {
+  background: #6c63ff;
+  color: #fff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-save-list:hover:not(:disabled) {
+  background: #5a52d5;
+}
+.btn-save-list:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-cancel-list {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.btn-cancel-list:hover {
+  background: var(--bg-hover);
+}
