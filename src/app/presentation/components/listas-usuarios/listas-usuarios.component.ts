@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { BookSearchService, OpenLibraryBook } from '../../../domain/services/book-search.service';
 import { AuthService } from '../../../domain/services/auth.service';
 import { ListasService } from '../../../domain/services/listas.service';
@@ -32,11 +33,13 @@ export class ListasUsuariosComponent implements OnInit {
   currentUser: string | null = null;
   createError: string = '';
   private errorTimer: any = null;
+  listSuccess: string | null = null;
 
   constructor(
     public bookSearchService: BookSearchService,
     private cdr: ChangeDetectorRef,
     private listasService: ListasService,
+    private route: ActivatedRoute,
     public router: Router,
     public auth: AuthService,
     private confirm: ConfirmService
@@ -55,6 +58,12 @@ export class ListasUsuariosComponent implements OnInit {
     this.currentUser = this.listasService.getCurrentUser();
     this.listasService.listas$.subscribe(l => { this.listas = this.filterOutProfileLists(l || []); this.filteredListas = this.listas; this.updatePagination(); this.cdr.markForCheck(); });
     this.listasService.favorites$.subscribe(() => { this.cdr.markForCheck(); });
+    this.route.queryParams.subscribe((q: Record<string, any>) => {
+      if (q && q['msg']) {
+        this.listSuccess = q['msg'];
+        setTimeout(() => { this.listSuccess = null; try { this.cdr.markForCheck(); } catch(_){} }, 5000);
+      }
+    });
     console.log('ListasUsuariosComponent initialized; current searchQuery:', this.bookSearchService.getSearchQuery());
   }
 
@@ -95,6 +104,8 @@ export class ListasUsuariosComponent implements OnInit {
     const ok = await this.confirm.confirm(`¿Estás seguro de eliminar la lista "${lista.nombre}"?`);
     if (!ok) return;
     this.listasService.deleteList(listId);
+    this.listSuccess = 'Lista eliminada';
+    setTimeout(() => { this.listSuccess = null; try { this.cdr.markForCheck(); } catch(_){} }, 5000);
   }
 
   /**

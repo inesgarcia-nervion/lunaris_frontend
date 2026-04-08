@@ -2,6 +2,7 @@
 <!-- Contenedor principal de noticias: lista y creación -->
 <div class="noticias-container">
   <h1>Noticias</h1>
+  <div *ngIf="newsSuccess" class="review-alert review-success">{{ newsSuccess }}</div>
 
   <!-- Botón flotante para crear noticias (solo admins) -->
   <button *ngIf="isAdmin" class="floating-create" (click)="openCreateModal()" aria-label="Crear noticia">+</button>

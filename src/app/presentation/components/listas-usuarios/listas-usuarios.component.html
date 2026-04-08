@@ -4,6 +4,7 @@
     <h1 class="listas-title">Listas de usuarios</h1>
     <button class="btn-add-circle" (click)="crearLista()" aria-label="Crear nueva lista">+</button>
   </div>
+  <div *ngIf="listSuccess" class="review-alert review-success">{{ listSuccess }}</div>
   <!-- Input inline para crear nueva lista -->
   <!-- Fila de creación: input, checkbox privada y botones -->
   <div *ngIf="showCreateInput" class="create-list-row">

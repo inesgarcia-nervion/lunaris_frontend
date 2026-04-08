@@ -91,11 +91,19 @@ export class RegisterComponent implements OnInit, OnDestroy {
     }
     
     this.loading = true;
+    if (!this.isValidEmail(this.email)) {
+      this.loading = false;
+      this.error = 'Por favor, introduce un correo electrónico válido';
+      this.cdr.detectChanges();
+      return;
+    }
     this.auth.register(this.username, this.email, this.password).subscribe({
       next: () => {
         this.loading = false;
         this.success = '¡Cuenta creada correctamente! Redirigiendo al login...';
-        this.clearForm();
+        this.username = '';
+        this.email = '';
+        this.password = '';
         this.cdr.detectChanges();
         setTimeout(() => this.router.navigate(['/login']), 2000);
       },
@@ -106,7 +114,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
         } else if (err.status === 0) {
           this.error = 'No se puede conectar con el servidor';
         } else {
-          this.error = 'Error al crear la cuenta. Inténtalo de nuevo.';
+          this.error = 'Error al crear la cuenta. Correo ya existente';
         }
         this.cdr.detectChanges();
         console.error(err);
@@ -122,5 +130,16 @@ export class RegisterComponent implements OnInit, OnDestroy {
    */
   togglePassword(): void {
     this.showPassword = !this.showPassword;
+  }
+
+  /**
+   * Valida que el formato del correo electrónico sea correcto utilizando una expresión regular.
+   * @param email El correo electrónico a validar.
+   * @returns true si el correo electrónico es válido, false en caso contrario.
+   */
+  private isValidEmail(email: string): boolean {
+    if (!email) return false;
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email.trim());
   }
 }

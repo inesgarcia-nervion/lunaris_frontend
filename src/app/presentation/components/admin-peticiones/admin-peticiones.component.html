@@ -1,7 +1,7 @@
 <!-- Contenedor admin-peticiones: lista de peticiones y acciones -->
 <div class="admin-peticiones">
   <h2>Peticiones de libros</h2>
-
+  <div *ngIf="deleteSuccess" class="review-alert review-success">{{ deleteSuccess }}</div>
   <!-- Mensajes de estado -->
   <div *ngIf="loading">Cargando...</div>
   <div *ngIf="error" class="error">{{error}}</div>

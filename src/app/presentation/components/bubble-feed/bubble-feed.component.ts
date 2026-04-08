@@ -6,6 +6,7 @@ import { Location } from '@angular/common';
 import { BubblePostComponent, BubblePost } from '../bubble-post/bubble-post.component';
 import { ConfirmService } from '../../shared/confirm.service';
 import { AuthService } from '../../../domain/services/auth.service';
+import { BookSearchService } from '../../../domain/services/book-search.service';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
 /**
@@ -22,6 +23,7 @@ import { PaginationComponent } from '../../shared/pagination/pagination.componen
 })
 export class BubbleFeedComponent implements OnInit, OnDestroy {
   posts: BubblePost[] = [];
+  postSuccess: string | null = null;
 
   creating = false;
   newText = '';
@@ -50,7 +52,7 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
   imageLoading = false;
   private imageObjectUrl: string | null = null;
 
-  constructor(public auth: AuthService, private zone: NgZone, private cdr: ChangeDetectorRef, private route: ActivatedRoute, private router: Router, private location: Location, private confirm: ConfirmService) {}
+  constructor(public auth: AuthService, private zone: NgZone, private cdr: ChangeDetectorRef, private route: ActivatedRoute, private router: Router, private location: Location, private confirm: ConfirmService, private bookSearchService: BookSearchService) {}
 
   /**
    * Al iniciar el componente, se cargan las publicaciones persistidas desde localStorage.
@@ -136,6 +138,13 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
    */
   ngOnDestroy(): void {
     try { document.body.style.overflow = ''; } catch (_) {}
+  }
+
+  private clearPostAlertAfterDelay(): void {
+    setTimeout(() => {
+      this.postSuccess = null;
+      try { this.cdr.detectChanges(); } catch (_) {}
+    }, 5000);
   }
 
   get selectedImages(): string[] {
@@ -264,6 +273,8 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     if (this.selected && this.selected.id === id) this.selected = undefined;
     if (this.pendingDeleteId === id) this.pendingDeleteId = null;
     this.savePosts();
+    this.postSuccess = 'Publicación eliminada';
+    this.clearPostAlertAfterDelay();
   }
 
   /**

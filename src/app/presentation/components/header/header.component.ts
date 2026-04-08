@@ -875,9 +875,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.clearAlertAfterDelay();
       return;
     }
-    let rating = Number(this.userRating) || 0;
-    if (rating < 0) rating = 0;
-    if (rating > 5) rating = 5;
+    let rating = Number(this.userRating);
+    if (isNaN(rating)) rating = 0;
+    if (rating < 0 || rating > 5) {
+      this.reviewError = 'La puntuación debe estar entre 0 y 5';
+      this.clearReviewAlertAfterDelay();
+      return;
+    }
     rating = Math.round(rating * 10) / 10;
 
     const payload: any = {
@@ -919,7 +923,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Error creando reseña:', err);
-          this.reviewError = 'Error al publicar la reseña';
+          this.reviewError = (err?.error && err.error.message) ? err.error.message : 'Error al publicar la reseña';
           this.clearReviewAlertAfterDelay();
           
         }

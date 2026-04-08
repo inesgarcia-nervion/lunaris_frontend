@@ -534,22 +534,23 @@
 }
 
 .review-alert {
-  padding: 10px 14px;
-  margin: 0 0 12px 0;
-  border-radius: 6px;
-  font-weight: 500;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  padding: 14px 18px;
+  margin: 0 0 16px 0;
+  border-radius: 5px;
+  font-weight: 600;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
   display: block;
+  animation: slideIn 0.25s ease;
 }
 .review-error {
   background-color: #fff5f5;
   color: #b00020;
-  border-left: 4px solid #b00020;
+  border-left: 5px solid #b00020;
 }
 .review-success {
-  background-color: #f1fbf2;
+  background-color: #e8f5e9;
   color: #1b5e20;
-  border-left: 4px solid #1b5e20;
+  border-left: 5px solid #1b5e20;
 }
 
 

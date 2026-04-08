@@ -1,6 +1,7 @@
 <!-- Componente: bubble-feed -->
 <div class="bubble-container">
   <h2>Bubble</h2>
+  <div *ngIf="postSuccess" class="review-alert review-success">{{ postSuccess }}</div>
 
   <!-- Sección: posts (lista de publicaciones) -->
   <section class="posts">

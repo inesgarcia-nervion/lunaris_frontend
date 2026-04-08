@@ -2,6 +2,7 @@ import { Component, OnInit, ElementRef, ViewChild, ChangeDetectorRef } from '@an
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NewsService, NewsItem } from '../../../domain/services/news.service';
+import { BookSearchService } from '../../../domain/services/book-search.service';
 import { ConfirmService } from '../../shared/confirm.service';
 import { AuthService } from '../../../domain/services/auth.service';
 import { Router } from '@angular/router';
@@ -21,6 +22,7 @@ import { PaginationComponent } from '../../shared/pagination/pagination.componen
 export class NoticiasComponent implements OnInit {
   
   news: NewsItem[] = [];
+  newsSuccess: string | null = null;
   title = '';
   text = '';
   body = '';
@@ -65,7 +67,7 @@ export class NoticiasComponent implements OnInit {
     this.auth.isAdmin$.subscribe(v => this.isAdmin = v);
   }
 
-  constructor(private newsService: NewsService, private auth: AuthService, private router: Router, private cdr: ChangeDetectorRef, private confirm: ConfirmService) {}
+  constructor(private newsService: NewsService, private auth: AuthService, private router: Router, private cdr: ChangeDetectorRef, private confirm: ConfirmService, private bookSearchService: BookSearchService) {}
 
   /**
    * Navega a la página de detalles de una noticia específica.
@@ -234,6 +236,8 @@ export class NoticiasComponent implements OnInit {
     const ok = await this.confirm.confirm('¿Estás seguro de eliminar esta noticia?');
     if (!ok) return;
     this.newsService.removeNews(id);
+    this.newsSuccess = 'Noticia eliminada';
+    setTimeout(() => { this.newsSuccess = null; try { this.cdr.detectChanges(); } catch(_){} }, 5000);
   }
 
   /**
@@ -259,6 +263,8 @@ export class NoticiasComponent implements OnInit {
     if (!this.isAdmin) return;
     this.newsService.removeNews(id);
     this.pendingDeleteId = null;
+    this.newsSuccess = 'Noticia eliminada';
+    setTimeout(() => { this.newsSuccess = null; try { this.cdr.detectChanges(); } catch(_){} }, 5000);
   }
 
   /**

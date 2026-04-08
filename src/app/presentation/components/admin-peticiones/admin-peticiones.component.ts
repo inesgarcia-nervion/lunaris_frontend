@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
 import { PeticionesService, BookRequestDto } from '../../../domain/services/peticiones.service';
+import { BookSearchService } from '../../../domain/services/book-search.service';
 import { ConfirmService } from '../../shared/confirm.service';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
@@ -23,6 +24,7 @@ import { PaginationComponent } from '../../shared/pagination/pagination.componen
 })
 export class AdminPeticionesComponent implements OnInit {
   requests: BookRequestDto[] = [];
+  deleteSuccess: string | null = null;
   groupedRequests: Array<{ key: string; title: string; author: string; ids: number[]; count: number; }> = [];
   loading = false;
   error: string | null = null;
@@ -33,7 +35,7 @@ export class AdminPeticionesComponent implements OnInit {
   currentPage = 1;
   pagedRequests: Array<{ key: string; title: string; author: string; ids: number[]; count: number; }> = [];
 
-  constructor(private peticiones: PeticionesService, private cdr: ChangeDetectorRef, private confirm: ConfirmService) {}
+  constructor(private peticiones: PeticionesService, private cdr: ChangeDetectorRef, private confirm: ConfirmService, private bookSearchService: BookSearchService) {}
 
   /**
    * Carga las peticiones al inicializar el componente. Muestra un mensaje de carga 
@@ -104,8 +106,23 @@ export class AdminPeticionesComponent implements OnInit {
    * @returns Una promesa que se resuelve cuando la operación de eliminación se completa.
    */
   async remove(id?: number): Promise<void> {
-    this.error = 'Id de petición inválido';
-    return;
+    if (!id) { this.error = 'Id de petición inválido'; return; }
+    const ok = await this.confirm.confirm('¿Estás seguro de eliminar esta petición?');
+    if (!ok) return;
+    try {
+      this.deletingId = id;
+      await firstValueFrom(this.peticiones.delete(id));
+      this.requests = this.requests.filter(x => x.id !== id);
+      this.buildGroups();
+      this.updatePagination();
+      this.deleteSuccess = 'Petición eliminada';
+      setTimeout(() => { this.deleteSuccess = null; try { this.cdr.detectChanges(); } catch(_){} }, 5000);
+    } catch (e) {
+      this.error = 'Error eliminando la petición';
+    } finally {
+      this.deletingId = null;
+      this.cdr.detectChanges();
+    }
   }
 
   /** Elimina todas las peticiones agrupadas (mismo título+autor) */

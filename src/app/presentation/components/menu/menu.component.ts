@@ -206,11 +206,15 @@ export class MenuComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Maneja la sumisión de una reseña por parte del usuario. Actualmente 
-   * solo muestra un mensaje de éxito, pero en una implementación completa 
-   * debería enviar la reseña al backend a través del servicio de reseñas.
+   * Maneja la acción de enviar una reseña de usuario para el libro seleccionado.
+   * @returns void
    */
   submitReview(): void {
+    if (this.userRating && (isNaN(Number(this.userRating)) || this.userRating < 0 || this.userRating > 5)) {
+      this.error = 'La puntuación debe estar entre 0 y 5';
+      setTimeout(() => { this.error = null; try { this.cdr.markForCheck(); } catch {} }, 5000);
+      return;
+    }
     if (this.userReview.trim()) {
       this.bookSearchService.setSuccess('Review enviado correctamente');
     }
