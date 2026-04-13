@@ -472,6 +472,8 @@ export class BookSearchService {
     source?: string;
     userId?: number;
     genreIds?: number[];
+    sagaName?: string;
+    sagaId?: number;
   }): Observable<any> {
     return this.http.post(`${this.apiUrl}/books`, bookData);
   }

@@ -27,6 +27,7 @@ export class AdminCreateBookComponent implements OnInit {
   coverImage: string = '';
   releaseYear: number | null = null;
   score: number | null = null;
+  sagaName: string = '';
 
   allGenres: { id: number; name: string }[] = [];
   selectedGenreIds: number[] = [];
@@ -277,6 +278,8 @@ export class AdminCreateBookComponent implements OnInit {
       source: 'custom', // Marcamos como libro creado manualmente
       userId: this.currentUserId || undefined,
       genreIds: this.selectedGenreIds.length > 0 ? this.selectedGenreIds : undefined
+      ,
+      sagaName: this.sagaName && this.sagaName.trim().length > 0 ? this.sagaName.trim() : undefined
     };
 
     this.bookService.createBook(bookData).subscribe({

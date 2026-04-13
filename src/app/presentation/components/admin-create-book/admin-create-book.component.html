@@ -113,6 +113,19 @@
           </span>
         </div>
       </div>
+      
+      <!-- Saga (opcional) -->
+      <div class="form-group">
+        <label for="sagaName">Saga (opcional — nombre exacto)</label>
+        <input
+          type="text"
+          id="sagaName"
+          [(ngModel)]="sagaName"
+          name="sagaName"
+          placeholder="Nombre exacto de la saga (ej: La Saga Prueba)"
+          [disabled]="loading"
+        />
+      </div>
 
       <!-- Portada -->
       <div class="form-group">
