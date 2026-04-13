@@ -53,11 +53,15 @@
       <div class="form-group">
         <label for="releaseYear">Año de Lanzamiento</label>
         <input
-          type="number"
+          type="text"
           id="releaseYear"
-          [(ngModel)]="releaseYear"
+          [value]="releaseYear !== null ? releaseYear : ''"
+          (input)="onYearInput($event)"
           name="releaseYear"
           placeholder="Ej: 2023"
+          maxlength="4"
+          pattern="^[0-9]{4}$"
+          inputmode="numeric"
           [disabled]="loading"
         />
       </div>

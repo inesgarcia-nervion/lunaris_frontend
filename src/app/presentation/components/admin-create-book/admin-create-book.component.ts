@@ -190,6 +190,22 @@ export class AdminCreateBookComponent implements OnInit {
   }
 
   /**
+   * Maneja la entrada del campo 'Año de Lanzamiento', permitiendo solo dígitos
+   * y limitando a 4 caracteres. Convierte el valor a number o null.
+   */
+  onYearInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const digits = (input.value || '').replace(/\D/g, '').slice(0, 4);
+    input.value = digits;
+    if (!digits) {
+      this.releaseYear = null;
+      return;
+    }
+    const num = parseInt(digits, 10);
+    this.releaseYear = Number.isNaN(num) ? null : num;
+  }
+
+  /**
    * Establece la imagen de portada a partir de la URL ingresada en el campo correspondiente.
    * @returns void
    */
@@ -242,9 +258,11 @@ export class AdminCreateBookComponent implements OnInit {
       return;
     }
 
-    if (this.releaseYear !== null && this.releaseYear < 1000) {
-      this.error = 'El año de lanzamiento debe ser válido';
-      return;
+    if (this.releaseYear !== null) {
+      if (!Number.isInteger(this.releaseYear) || this.releaseYear < 1000 || this.releaseYear > 9999) {
+        this.error = 'El año de lanzamiento debe tener 4 dígitos (ej: 2026)';
+        return;
+      }
     }
 
     this.loading = true;
