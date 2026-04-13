@@ -274,7 +274,9 @@ export class AdminCreateBookComponent implements OnInit {
       error: (err) => {
         this.loading = false;
         console.error('Error creando libro:', err);
-        if (err.status === 400) {
+        if (err.status === 409) {
+          this.error = err.error || 'Ya existe un libro con el mismo título y autor';
+        } else if (err.status === 400) {
           this.error = 'Error en los datos enviados';
         } else if (err.status === 0) {
           this.error = 'No se puede conectar con el servidor';
