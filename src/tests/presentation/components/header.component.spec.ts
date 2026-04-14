@@ -9,6 +9,9 @@ import { Router, NavigationEnd } from '@angular/router';
 import { ElementRef } from '@angular/core';
 import { Subject, BehaviorSubject, of, throwError } from 'rxjs';
 
+/**
+ * Pruebas para HeaderComponent.
+ */
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
@@ -29,6 +32,9 @@ describe('HeaderComponent', () => {
   let avatarSubject: BehaviorSubject<string | null>;
   let listasSubject: BehaviorSubject<any[]>;
 
+  /**
+   * Función de configuración común para las pruebas, que inicializa los mocks y el componente.
+   */
   function setup() {
     loadingSubject = new BehaviorSubject(false);
     errorSubject = new BehaviorSubject<string | null>(null);
@@ -125,18 +131,24 @@ describe('HeaderComponent', () => {
     component = fixture.componentInstance;
   }
 
+  /**
+   * Limpia los mocks y el módulo de prueba después de cada prueba.
+   */
   afterEach(() => {
     TestBed.resetTestingModule();
     vi.clearAllMocks();
   });
 
+  /**
+   * Pruebas para ngOnInit.
+   */
   describe('ngOnInit', () => {
     it('should initialize with isAdmin and username from auth service', () => {
       setup();
       authMock.isAdmin.mockReturnValue(true);
       fixture.detectChanges();
 
-      expect(component.isAdmin).toBe(false); // initial value; isAdmin$ hasn't emitted yet
+      expect(component.isAdmin).toBe(false); 
       isAdminSubject.next(true);
       expect(component.isAdmin).toBe(true);
     });
@@ -169,6 +181,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para ngOnDestroy.
+   */
   describe('ngOnDestroy', () => {
     it('should unsubscribe all subscriptions', () => {
       setup();
@@ -178,6 +193,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para toggleMenu.
+   */
   describe('toggleMenu()', () => {
     it('should toggle isMenuOpen', () => {
       setup();
@@ -192,6 +210,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para toggleUserMenu.
+   */
   describe('toggleUserMenu()', () => {
     it('should toggle showUserMenu', () => {
       setup();
@@ -205,6 +226,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para onUserButtonClick.
+   */
   describe('onUserButtonClick()', () => {
     it('should stop propagation and toggle user menu', () => {
       setup();
@@ -218,6 +242,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para navigate.
+   */
   describe('navigate()', () => {
     it('should call router.navigate with the path', () => {
       setup();
@@ -239,6 +266,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para navigateAndClose.
+   */
   describe('navigateAndClose()', () => {
     it('should close user menu and navigate', () => {
       setup();
@@ -252,6 +282,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para logout.
+   */
   describe('logout()', () => {
     it('should call auth.logout and navigate to /login', () => {
       setup();
@@ -264,6 +297,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para search.
+   */
   describe('search()', () => {
     it('should call searchCurrent when query is not empty', () => {
       setup();
@@ -291,6 +327,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para searchByAuthor.
+   */
   describe('searchByAuthor()', () => {
     it('should call searchByAuthorCurrent when query is not empty', () => {
       setup();
@@ -316,6 +355,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para getCoverUrl.
+   */
   describe('getCoverUrl()', () => {
     it('should delegate to bookSearchService', () => {
       setup();
@@ -329,6 +371,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para getFirstAuthor.
+   */
   describe('getFirstAuthor()', () => {
     it('should return first author name from authorNames', () => {
       setup();
@@ -351,6 +396,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para importBook.
+   */
   describe('importBook()', () => {
     it('should call bookSearchService.importBook', () => {
       setup();
@@ -377,6 +425,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para previousPage() / nextPage().
+   */
   describe('previousPage() / nextPage()', () => {
     it('should decrement currentPage on previousPage', () => {
       setup();
@@ -411,6 +462,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para onPageChange.
+   */
   describe('onPageChange()', () => {
     it('should change page and search', () => {
       setup();
@@ -435,6 +489,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para getTotalPages() / hasNextPage() / hasPreviousPage().
+   */
   describe('getTotalPages() / hasNextPage() / hasPreviousPage()', () => {
     it('should calculate totalPages correctly', () => {
       setup();
@@ -471,6 +528,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para backToSearch.
+   */
   describe('backToSearch()', () => {
     it('should clear selected book when origin is null', () => {
       setup();
@@ -503,6 +563,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para backButtonLabel getter.
+   */
   describe('backButtonLabel getter', () => {
     it('should return back to list label', () => {
       setup();
@@ -521,6 +584,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para generateRatingArray.
+   */
   describe('generateRatingArray()', () => {
     it('should return star array based on rating', () => {
       setup();
@@ -534,6 +600,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para getCategories.
+   */
   describe('getCategories()', () => {
     it('should delegate to bookSearchService', () => {
       setup();
@@ -546,6 +615,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para getEditionCount.
+   */
   describe('getEditionCount()', () => {
     it('should return editionCount as string', () => {
       setup();
@@ -566,6 +638,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para isSaga.
+   */
   describe('isSaga()', () => {
     it('should delegate to getSagaName', () => {
       setup();
@@ -584,6 +659,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para onAvatarError.
+   */
   describe('onAvatarError()', () => {
     it('should call auth.setLocalAvatar(null)', () => {
       setup();
@@ -595,6 +673,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para selectBook.
+   */
   describe('selectBook()', () => {
     it('should call bookSearchService.setSelectedBook with the book', () => {
       setup();
@@ -607,6 +688,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para addToList.
+   */
   describe('addToList()', () => {
     it('should set error when no list or status selected', () => {
       vi.useFakeTimers();
@@ -634,6 +718,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para submitReview.
+   */
   describe('submitReview()', () => {
     it('should set error when no book selected', () => {
       setup();
@@ -678,6 +765,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para deleteReview.
+   */
   describe('deleteReview()', () => {
     it('should do nothing when no current review', async () => {
       setup();
@@ -712,6 +802,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para deleteReviewById.
+   */
   describe('deleteReviewById()', () => {
     it('should do nothing when id is undefined', async () => {
       setup();
@@ -734,6 +827,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para getSagaName.
+   */
   describe('getSagaName()', () => {
     it('should extract saga from series field', () => {
       setup();
@@ -766,6 +862,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para onReviewEditorInput.
+   */
   describe('onReviewEditorInput()', () => {
     it('should set userReview from element innerText', () => {
       setup();
@@ -788,6 +887,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para openSagaBook.
+   */
   describe('openSagaBook()', () => {
     it('should do nothing when sagaBook has no title', () => {
       setup();
@@ -836,6 +938,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para serviceQuery getter.
+   */
   describe('serviceQuery getter', () => {
     it('should return the current search query', () => {
       setup();
@@ -846,6 +951,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para skeletonArray getter.
+   */
   describe('skeletonArray getter', () => {
     it('should have length equal to limit', () => {
       setup();
@@ -856,6 +964,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para customLists getter.
+   */
   describe('customLists getter', () => {
     it('should filter out profile lists', () => {
       setup();
@@ -876,6 +987,9 @@ describe('HeaderComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para addBookFromCard.
+   */
   describe('addBookFromCard()', () => {
     it('should set error when no listId', () => {
       vi.useFakeTimers();

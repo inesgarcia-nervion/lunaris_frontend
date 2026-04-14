@@ -2,6 +2,11 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { BubblePostComponent, BubblePost } from '../../../app/presentation/components/bubble-post/bubble-post.component';
 import { ConfirmService } from '../../../app/presentation/shared/confirm.service';
 
+/**
+ * Helper para crear objetos de prueba de BubblePost con valores predeterminados, permitiendo anular solo los campos necesarios para cada prueba.
+ * @param overrides Un objeto parcial de BubblePost para anular los valores predeterminados.
+ * @returns Un objeto completo de BubblePost con los valores predeterminados y las anulaciones aplicadas.
+ */
 const makePost = (overrides: Partial<BubblePost> = {}): BubblePost => ({
   id: 1,
   user: { name: 'Alice' },
@@ -12,11 +17,17 @@ const makePost = (overrides: Partial<BubblePost> = {}): BubblePost => ({
   ...overrides
 });
 
+/**
+ * Pruebas para BubblePostComponent.
+ */
 describe('BubblePostComponent', () => {
   let component: BubblePostComponent;
   let fixture: ComponentFixture<BubblePostComponent>;
   let confirmServiceMock: { confirm: ReturnType<typeof vi.fn> };
 
+  /**
+   * Configuración antes de cada prueba.
+   */
   beforeEach(() => {
     confirmServiceMock = { confirm: vi.fn().mockResolvedValue(true) };
 
@@ -29,11 +40,17 @@ describe('BubblePostComponent', () => {
     component = fixture.componentInstance;
   });
 
+  /**
+   * Limpieza después de cada prueba.
+   */
   afterEach(() => {
     TestBed.resetTestingModule();
     vi.clearAllMocks();
   });
 
+  /**
+   * Pruebas para el getter de imágenes.
+   */
   describe('images getter', () => {
     it('should return imageUrls when present and non-empty', () => {
       component.post = makePost({ imageUrls: ['a.jpg', 'b.jpg'] });
@@ -56,6 +73,9 @@ describe('BubblePostComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para showNextImage.
+   */
   describe('showNextImage()', () => {
     it('should advance currentImageIndex', () => {
       component.post = makePost({ imageUrls: ['a.jpg', 'b.jpg', 'c.jpg'] });
@@ -86,6 +106,9 @@ describe('BubblePostComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para showPrevImage.
+   */
   describe('showPrevImage()', () => {
     it('should go to previous image', () => {
       component.post = makePost({ imageUrls: ['a.jpg', 'b.jpg', 'c.jpg'] });
@@ -116,6 +139,9 @@ describe('BubblePostComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para currentImageSrc.
+   */
   describe('currentImageSrc()', () => {
     it('should return the current image url', () => {
       component.post = makePost({ imageUrls: ['a.jpg', 'b.jpg'] });
@@ -129,6 +155,9 @@ describe('BubblePostComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para firstImageSrc.
+   */
   describe('firstImageSrc()', () => {
     it('should return the first image url', () => {
       component.post = makePost({ imageUrls: ['first.jpg', 'second.jpg'] });
@@ -141,6 +170,9 @@ describe('BubblePostComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para onDeleteConfirm.
+   */
   describe('onDeleteConfirm()', () => {
     it('should emit delete event when user confirms', async () => {
       component.post = makePost({ id: 42 });
@@ -165,6 +197,9 @@ describe('BubblePostComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para onToggleLike.
+   */
   describe('onToggleLike()', () => {
     it('should emit like event with post id', () => {
       component.post = makePost({ id: 7 });
@@ -177,6 +212,9 @@ describe('BubblePostComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para onEdit.
+   */
   describe('onEdit()', () => {
     it('should emit edit event with post id', () => {
       component.post = makePost({ id: 5 });
@@ -189,6 +227,9 @@ describe('BubblePostComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para onDelete.
+   */
   describe('onDelete()', () => {
     it('should emit delete event with post id', () => {
       component.post = makePost({ id: 9 });
@@ -201,6 +242,9 @@ describe('BubblePostComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para onOpen.
+   */
   describe('onOpen()', () => {
     it('should emit open event with post object', () => {
       const post = makePost({ id: 3 });
@@ -214,6 +258,9 @@ describe('BubblePostComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para onMaybeOpen.
+   */
   describe('onMaybeOpen()', () => {
     it('should call onOpen when clicking on non-interactive element', () => {
       component.post = makePost({ id: 1 });

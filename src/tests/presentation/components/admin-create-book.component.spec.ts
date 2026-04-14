@@ -5,6 +5,9 @@ import { AuthService } from '../../../app/domain/services/auth.service';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
+/**
+ * Pruebas unitarias para el componente AdminCreateBookComponent.
+ */
 describe('AdminCreateBookComponent', () => {
   let component: AdminCreateBookComponent;
   let fixture: ComponentFixture<AdminCreateBookComponent>;
@@ -12,6 +15,10 @@ describe('AdminCreateBookComponent', () => {
   let authMock: any;
   let routerSpy: any;
 
+  /**
+   * Configuración común para las pruebas, con opción de simular un usuario admin o no admin.
+   * @param isAdmin Indica si el usuario simulado es admin (true) o no (false).
+   */
   function setup(isAdmin = true) {
     localStorage.clear();
     if (isAdmin) {
@@ -39,18 +46,30 @@ describe('AdminCreateBookComponent', () => {
     component = fixture.componentInstance;
   }
 
+  /**
+   * Limpieza después de cada prueba.
+   */
   afterEach(() => {
     TestBed.resetTestingModule();
     localStorage.clear();
     vi.clearAllMocks();
   });
 
+  /**
+   * Pruebas para el constructor del componente.
+   */
   describe('constructor', () => {
+    /**
+     * Verifica que isAdmin se establece correctamente cuando el usuario es admin.
+     */
     it('should set isAdmin=true when user is admin', () => {
       setup(true);
       expect(component.isAdmin).toBe(true);
     });
 
+    /**
+     * Verifica que se redirige a /menu después de un retraso cuando el usuario no es admin.
+     */
     it('should redirect to /menu after delay when not admin', () => {
       vi.useFakeTimers();
       setup(false);
@@ -59,19 +78,31 @@ describe('AdminCreateBookComponent', () => {
       vi.useRealTimers();
     });
 
+    /**
+     * Verifica que currentUserId se establece correctamente desde localStorage.
+     */
     it('should set currentUserId from localStorage', () => {
       setup(true);
       expect(component.currentUserId).toBe(42);
     });
   });
 
+  /**
+   * Pruebas para el método ngOnInit del componente.
+   */
   describe('ngOnInit', () => {
+    /**
+     * Verifica que los géneros se cargan correctamente al inicializar el componente.
+     */
     it('should load genres on init', () => {
       setup();
       fixture.detectChanges();
       expect(component.allGenres).toHaveLength(2);
     });
 
+    /**
+     * Verifica que no se lanza una excepción si getGenres falla.
+     */
     it('should not throw if getGenres fails', () => {
       setup();
       bookServiceMock.getGenres.mockReturnValue(throwError(() => new Error('Network error')));
@@ -79,13 +110,22 @@ describe('AdminCreateBookComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método hasCreateBookChanges del componente.
+   */
   describe('hasCreateBookChanges()', () => {
+    /**
+     * Verifica que devuelve false cuando todos los campos están vacíos.
+     */
     it('should return false when all fields empty', () => {
       setup();
       fixture.detectChanges();
       expect(component.hasCreateBookChanges()).toBe(false);
     });
 
+    /**
+     * Verifica que devuelve true cuando el título está establecido.
+     */
     it('should return true when title is set', () => {
       setup();
       fixture.detectChanges();
@@ -93,6 +133,9 @@ describe('AdminCreateBookComponent', () => {
       expect(component.hasCreateBookChanges()).toBe(true);
     });
 
+    /**
+     * Verifica que devuelve true cuando selectedGenreIds no está vacío.
+     */
     it('should return true when selectedGenreIds is non-empty', () => {
       setup();
       fixture.detectChanges();
@@ -100,6 +143,9 @@ describe('AdminCreateBookComponent', () => {
       expect(component.hasCreateBookChanges()).toBe(true);
     });
 
+    /**
+     * Verifica que devuelve true cuando releaseYear está establecido.
+     */
     it('should return true when releaseYear is set', () => {
       setup();
       fixture.detectChanges();
@@ -108,7 +154,13 @@ describe('AdminCreateBookComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método toggleGenreDropdown del componente.
+   */
   describe('toggleGenreDropdown()', () => {
+    /**
+     * Verifica que se abre el dropdown cuando está cerrado.
+     */
     it('should open dropdown', () => {
       setup();
       fixture.detectChanges();
@@ -119,6 +171,9 @@ describe('AdminCreateBookComponent', () => {
       expect(component.genreDropdownOpen).toBe(true);
     });
 
+    /**
+     * Verifica que se cierra el dropdown cuando está abierto.
+     */
     it('should close dropdown', () => {
       setup();
       fixture.detectChanges();
@@ -130,7 +185,13 @@ describe('AdminCreateBookComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método isGenreSelected del componente.
+   */
   describe('isGenreSelected()', () => {
+    /**
+     * Verifica que devuelve true para un género seleccionado.
+     */
     it('should return true for selected genre', () => {
       setup();
       fixture.detectChanges();
@@ -138,6 +199,9 @@ describe('AdminCreateBookComponent', () => {
       expect(component.isGenreSelected(1)).toBe(true);
     });
 
+    /**
+     * Verifica que devuelve false para un género no seleccionado.
+     */
     it('should return false for unselected genre', () => {
       setup();
       fixture.detectChanges();
@@ -146,7 +210,13 @@ describe('AdminCreateBookComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método toggleGenre del componente.
+   */
   describe('toggleGenre()', () => {
+    /**
+     * Verifica que se agrega un género cuando no está seleccionado.
+     */
     it('should add genre when not selected', () => {
       setup();
       fixture.detectChanges();
@@ -157,6 +227,9 @@ describe('AdminCreateBookComponent', () => {
       expect(component.selectedGenreIds).toContain(1);
     });
 
+    /**
+     * Verifica que se elimina un género cuando ya está seleccionado.
+     */
     it('should remove genre when already selected', () => {
       setup();
       fixture.detectChanges();
@@ -168,7 +241,13 @@ describe('AdminCreateBookComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método removeGenre del componente.
+   */
   describe('removeGenre()', () => {
+    /**
+     * Verifica que se elimina un género de selectedGenreIds.
+     */
     it('should remove genre from selectedGenreIds', () => {
       setup();
       fixture.detectChanges();
@@ -180,13 +259,22 @@ describe('AdminCreateBookComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método getGenreName del componente.
+   */
   describe('getGenreName()', () => {
+    /**
+     * Verifica que devuelve el nombre del género por su id.
+     */
     it('should return genre name by id', () => {
       setup();
       fixture.detectChanges();
       expect(component.getGenreName(1)).toBe('Fantasy');
     });
 
+    /**
+     * Verifica que devuelve una cadena vacía para un id desconocido.
+     */
     it('should return empty string for unknown id', () => {
       setup();
       fixture.detectChanges();
@@ -194,7 +282,13 @@ describe('AdminCreateBookComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método getDropdownLabel del componente.
+   */
   describe('getDropdownLabel()', () => {
+    /**
+     * Verifica que devuelve el placeholder cuando no hay géneros seleccionados.
+     */
     it('should return placeholder when no genres selected', () => {
       setup();
       fixture.detectChanges();
@@ -202,6 +296,9 @@ describe('AdminCreateBookComponent', () => {
       expect(component.getDropdownLabel()).toBe('Selecciona géneros...');
     });
 
+    /**
+     * Verifica que devuelve los nombres de los géneros seleccionados unidos por comas.
+     */
     it('should return joined genre names when genres selected', () => {
       setup();
       fixture.detectChanges();
@@ -210,7 +307,13 @@ describe('AdminCreateBookComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método setImageFromUrl del componente.
+   */
   describe('setImageFromUrl()', () => {
+    /**
+     * Verifica que se establece filePreview a partir de coverImage.
+     */
     it('should set filePreview from coverImage', () => {
       setup();
       fixture.detectChanges();
@@ -221,6 +324,9 @@ describe('AdminCreateBookComponent', () => {
       expect(component.filePreview).toBe('http://example.com/cover.jpg');
     });
 
+    /**
+     * Verifica que no hace nada cuando coverImage está vacío.
+     */
     it('should do nothing when coverImage is empty', () => {
       setup();
       fixture.detectChanges();
@@ -232,7 +338,13 @@ describe('AdminCreateBookComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método clearForm del componente.
+   */
   describe('clearForm()', () => {
+    /**
+     * Verifica que se reinician todos los campos del formulario.
+     */
     it('should reset all form fields', () => {
       setup();
       fixture.detectChanges();
@@ -258,7 +370,13 @@ describe('AdminCreateBookComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método submit del componente.
+   */
   describe('submit()', () => {
+    /**
+     * Verifica que se establece un error cuando el título está vacío.
+     */
     it('should set error when title is empty', () => {
       setup();
       fixture.detectChanges();
@@ -271,6 +389,9 @@ describe('AdminCreateBookComponent', () => {
       expect(bookServiceMock.createBook).not.toHaveBeenCalled();
     });
 
+    /**
+     * Verifica que se establece un error cuando el autor está vacío.
+     */
     it('should set error when author is empty', () => {
       setup();
       fixture.detectChanges();
@@ -283,6 +404,9 @@ describe('AdminCreateBookComponent', () => {
       expect(bookServiceMock.createBook).not.toHaveBeenCalled();
     });
 
+    /**
+     * Verifica que se establece un error cuando la puntuación está fuera del rango permitido.
+     */
     it('should set error when score is out of range', () => {
       setup();
       fixture.detectChanges();
@@ -295,6 +419,9 @@ describe('AdminCreateBookComponent', () => {
       expect(component.error).toBeTruthy();
     });
 
+    /**
+     * Verifica que se establece un error cuando el año de lanzamiento es inválido.
+     */
     it('should set error when releaseYear is invalid', () => {
       setup();
       fixture.detectChanges();
@@ -307,6 +434,9 @@ describe('AdminCreateBookComponent', () => {
       expect(component.error).toBeTruthy();
     });
 
+    /**
+     * Verifica que se llama a createBook con los datos correctos y se muestra el éxito.
+     */
     it('should call createBook with correct data and show success', () => {
       vi.useFakeTimers();
       setup();
@@ -323,6 +453,9 @@ describe('AdminCreateBookComponent', () => {
       vi.useRealTimers();
     });
 
+    /**
+     * Verifica que se establece un error cuando se recibe una respuesta 400.
+     */
     it('should set error on 400 response', () => {
       setup();
       fixture.detectChanges();
@@ -336,6 +469,9 @@ describe('AdminCreateBookComponent', () => {
       expect(component.loading).toBe(false);
     });
 
+    /**
+     * Verifica que se establece un error cuando no hay conexión (status 0).
+     */
     it('should set error on status 0 (no connection)', () => {
       setup();
       fixture.detectChanges();
@@ -348,6 +484,9 @@ describe('AdminCreateBookComponent', () => {
       expect(component.error).toContain('servidor');
     });
 
+    /**
+     * Verifica que se establece un error genérico en otros fallos.
+     */
     it('should set generic error on other failures', () => {
       setup();
       fixture.detectChanges();

@@ -5,6 +5,9 @@ import { NewsService } from '../../../app/domain/services/news.service';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 
+/**
+ * Pruebas para el componente NoticiasDetailComponent.
+ */
 describe('NoticiasDetailComponent', () => {
   let component: NoticiasDetailComponent;
   let fixture: ComponentFixture<NoticiasDetailComponent>;
@@ -13,6 +16,11 @@ describe('NoticiasDetailComponent', () => {
   let locationMock: { back: ReturnType<typeof vi.fn> };
   let paramMapGet: ReturnType<typeof vi.fn>;
 
+  /**
+   * Configura el entorno de pruebas para el componente, permitiendo simular diferentes escenarios de ID y noticias.
+   * @param id El ID de la noticia a buscar, o null para simular ausencia de ID.
+   * @param newsItems Un array de noticias para simular la respuesta del servicio, por defecto vacío.
+   */
   function setup(id: string | null, newsItems: any[] = []) {
     paramMapGet = vi.fn().mockReturnValue(id);
     newsServiceMock = { getAll: vi.fn().mockReturnValue(newsItems) };
@@ -33,11 +41,17 @@ describe('NoticiasDetailComponent', () => {
     component = fixture.componentInstance;
   }
 
+  /**
+   * Limpia el entorno de pruebas después de cada test, reseteando el módulo de pruebas y limpiando los mocks.
+   */
   afterEach(() => {
     TestBed.resetTestingModule();
     vi.clearAllMocks();
   });
 
+  /**
+   * Pruebas para el método ngOnInit del componente.
+   */
   describe('ngOnInit', () => {
     it('should set noticia when id matches a news item', () => {
       const news = [{ id: '1', title: 'Test', text: '', body: '' }];
@@ -66,6 +80,9 @@ describe('NoticiasDetailComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método back del componente.
+   */
   describe('back()', () => {
     it('should call location.back()', () => {
       setup('1', [{ id: '1', title: 'Test', text: '', body: '' }]);

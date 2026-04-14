@@ -5,12 +5,18 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { RecuperarContrasenaComponent } from '../../../app/presentation/components/recuperar-contrasena/recuperar-contrasena.component';
 
+/**
+ * Pruebas para el componente RecuperarContrasenaComponent.
+ */
 describe('RecuperarContrasenaComponent', () => {
   let fixture: ComponentFixture<RecuperarContrasenaComponent>;
   let component: RecuperarContrasenaComponent;
   let httpMock: HttpTestingController;
   let routerSpy: { navigate: ReturnType<typeof vi.fn> };
 
+  /**
+   * Configuración antes de cada prueba.
+   */
   beforeEach(async () => {
     routerSpy = { navigate: vi.fn() };
 
@@ -30,12 +36,21 @@ describe('RecuperarContrasenaComponent', () => {
     fixture.detectChanges();
   });
 
+  /**
+   * Verificación después de cada prueba.
+   */
   afterEach(() => httpMock.verify());
 
+  /**
+   * Prueba de creación del componente.
+   */
   it('should be created', () => {
     expect(component).toBeTruthy();
   });
 
+  /**
+   * Prueba de envío con correo vacío.
+   */
   it('submit with empty email sets error', () => {
     component.email = '';
     component.submit();
@@ -43,6 +58,9 @@ describe('RecuperarContrasenaComponent', () => {
     expect(component.loading).toBe(false);
   });
 
+  /**
+   * Prueba de envío con correo válido.
+   */
   it('submit with valid email sends POST request', () => {
     component.email = 'test@test.com';
     component.submit();
@@ -54,6 +72,9 @@ describe('RecuperarContrasenaComponent', () => {
     expect(component.loading).toBe(false);
   });
 
+  /**
+   * Prueba de envío cuando la respuesta no tiene el campo message.
+   */
   it('submit uses default message when response has no message field', () => {
     component.email = 'a@b.com';
     component.submit();
@@ -63,6 +84,9 @@ describe('RecuperarContrasenaComponent', () => {
     expect(component.loading).toBe(false);
   });
 
+  /**
+   * Prueba de manejo de error de conexión (estado 0).
+   */
   it('submit handles connection error (status 0)', () => {
     component.email = 'a@b.com';
     component.submit();
@@ -72,6 +96,9 @@ describe('RecuperarContrasenaComponent', () => {
     expect(component.loading).toBe(false);
   });
 
+  /**
+   * Prueba de manejo de error 404.
+   */
   it('submit handles 404 error', () => {
     component.email = 'a@b.com';
     component.submit();
@@ -81,6 +108,9 @@ describe('RecuperarContrasenaComponent', () => {
     expect(component.loading).toBe(false);
   });
 
+  /**
+   * Prueba de manejo de error 404 sin cuerpo de error.
+   */
   it('submit handles 404 without error body', () => {
     component.email = 'a@b.com';
     component.submit();
@@ -89,6 +119,9 @@ describe('RecuperarContrasenaComponent', () => {
     expect(component.error).toBeTruthy();
   });
 
+  /**
+   * Prueba de manejo de error genérico del servidor.
+   */
   it('submit handles generic server error', () => {
     component.email = 'a@b.com';
     component.submit();
@@ -98,6 +131,9 @@ describe('RecuperarContrasenaComponent', () => {
     expect(component.loading).toBe(false);
   });
 
+  /**
+   * Prueba de manejo de error genérico sin cuerpo de respuesta.
+   */
   it('submit handles generic error without body', () => {
     component.email = 'a@b.com';
     component.submit();
@@ -106,6 +142,9 @@ describe('RecuperarContrasenaComponent', () => {
     expect(component.error).toBeTruthy();
   });
 
+  /**
+   * Prueba de limpieza de errores previos al reenvío.
+   */
   it('submit clears previous error on re-submit', () => {
     component.error = 'old error';
     component.email = 'a@b.com';
