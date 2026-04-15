@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, BehaviorSubject, forkJoin, of } from 'rxjs';
+import { Observable, BehaviorSubject, forkJoin, of, Subscription } from 'rxjs';
 import { map, catchError as rxCatchError } from 'rxjs/operators';
+import { Router, NavigationStart } from '@angular/router';
 
 /**
  * Interfaz para un libro obtenido de Open Library, adaptada al formato que usamos en la app
@@ -111,8 +112,38 @@ export class BookSearchService {
 
   private cachedGenreNames: Set<string> = new Set();
 
-  constructor(private http: HttpClient) {
+  private currentSearchSub: Subscription | null = null;
+  private prefetchSubs: Subscription[] = [];
+
+  constructor(private http: HttpClient, private router: Router) {
     this.loadGenreCache();
+
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        this.cancelPendingSearches();
+      }
+    });
+  }
+
+  cancelPendingSearches(): void {
+    if (this.currentSearchSub) {
+      try { 
+        this.currentSearchSub.unsubscribe(); 
+      } catch (e) { /* ignore */ }
+      this.currentSearchSub = null;
+    }
+    if (this.prefetchSubs && this.prefetchSubs.length > 0) {
+      for (const s of this.prefetchSubs) {
+        try { 
+          s.unsubscribe(); 
+        } catch (e) { 
+          /* ignore */ 
+        }
+      }
+      this.prefetchSubs = [];
+    }
+    this.setLoading(false);
+    this.setError(null);
   }
 
   /**
@@ -346,7 +377,7 @@ export class BookSearchService {
     this.setError(null);
     this.setSuccess(null);
 
-    this.searchBooks(this.currentQuery, limit, offset).subscribe({
+    this.currentSearchSub = this.searchBooks(this.currentQuery, limit, offset).subscribe({
       next: (response) => {
         try { this.pageCache.set(cacheKey, response); } catch (e) { /* */ }
         this.publishResults(response);
@@ -355,6 +386,7 @@ export class BookSearchService {
           this.setError('No se encontraron libros. Intenta con otra búsqueda.');
         }
         this.prefetchPage(this.currentQuery, limit, offset + limit);
+        this.currentSearchSub = null;
       },
       error: (err) => {
         console.error('Error buscando libros (service):', err);
@@ -366,6 +398,7 @@ export class BookSearchService {
           this.setError(`Error al buscar libros. ${status ? 'Código: ' + status + '. ' : ''}${statusText}`);
         }
         this.setLoading(false);
+        this.currentSearchSub = null;
       }
     });
   }
@@ -382,12 +415,13 @@ export class BookSearchService {
     const cacheKey = `${query}::${limit}::${offset}`;
     if (this.pageCache.has(cacheKey)) return;
     // don't block UI; subscribe and store in cache
-    this.searchBooks(query, limit, offset).subscribe({
+    const sub = this.searchBooks(query, limit, offset).subscribe({
       next: (response) => {
         try { this.pageCache.set(cacheKey, response); } catch (e) { /* ignore */ }
       },
       error: () => { /*  */ }
     });
+    this.prefetchSubs.push(sub);
   }
 
   /**
