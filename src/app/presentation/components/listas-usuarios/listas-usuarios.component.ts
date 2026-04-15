@@ -96,7 +96,7 @@ export class ListasUsuariosComponent implements OnInit {
   async deleteList(listId: string): Promise<void> {
     const lista = this.listasService.getById(listId);
     if (!lista) return;
-    if (!lista.owner || lista.owner !== this.currentUser) return;
+    if (!lista.owner || (lista.owner !== this.currentUser && !this.auth.isAdmin())) return;
     if (this.listasService.isProfileListName(lista.nombre)) {
       alert('Las listas del perfil no se pueden eliminar.');
       return;
@@ -299,6 +299,8 @@ export class ListasUsuariosComponent implements OnInit {
    */
   toggleFavorite(listId: string, event?: Event): void {
     if (event) event.stopPropagation();
+    const lista = this.listasService.getById(listId);
+    if (lista && lista.isPrivate) return;
     this.listasService.toggleFavorite(listId);
     this.cdr.markForCheck();
   }
