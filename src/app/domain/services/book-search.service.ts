@@ -239,8 +239,9 @@ export class BookSearchService {
         const localKeys = new Set(localBooks.map(b => b.key));
         const filteredOl = olResponse.docs.filter(b => !localKeys.has(b.key));
         const merged = [...localBooks, ...filteredOl];
-        const total = (olResponse.numFound || 0) + (offset === 0 ? localBooks.length : 0);
-        return { numFound: total || merged.length, start: offset, docs: merged };
+        const totalFromOl = olResponse.numFound || 0;
+        const total = totalFromOl > 0 ? totalFromOl : merged.length;
+        return { numFound: total, start: offset, docs: merged };
       })
     );
   }

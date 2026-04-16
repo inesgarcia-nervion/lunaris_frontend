@@ -86,13 +86,40 @@ export class LoginComponent implements OnInit, OnDestroy {
         }
         try {
           if (this.rememberMe) {
-            try { localStorage.setItem('lunaris_remember', 'true'); } catch {}
-            try { localStorage.setItem('lunaris_current_user', this.username); } catch {}
+            try { 
+              localStorage.setItem('lunaris_remember', 'true'); 
+            } catch {
+              //
+            }
+            try { 
+              localStorage.setItem('lunaris_current_user', this.username); 
+            } catch {
+              //
+            }
           } else {
-            try { sessionStorage.setItem('lunaris_current_user', this.username); } catch {}
+            try { 
+              sessionStorage.setItem('lunaris_current_user', this.username); 
+            } catch {
+              //
+            }
+            try { 
+              localStorage.removeItem('lunaris_current_user'); 
+            } catch {
+              //
+            }
+            try { 
+              localStorage.removeItem('lunaris_remember'); 
+            } catch {
+              //
+            }
+            try { 
+              localStorage.removeItem('lunaris_remember_pass'); 
+            } catch {
+              //
+            }
           }
         } catch (e) {
-          console.warn('Unable to persist remember-me settings', e);
+          console.warn('Unable to persist/clear remember-me settings', e);
         }
         this.loading = false;
         this.cdr.detectChanges();
