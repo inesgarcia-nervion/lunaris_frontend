@@ -30,6 +30,51 @@ export class App implements OnInit, OnDestroy {
   constructor(private router: Router, private listasService: ListasService, public auth: AuthService) {}
 
   /**
+   * Manejador de cambio de visibilidad de la página. Este método se ejecuta 
+   * cada vez que el estado de visibilidad del documento cambia (por ejemplo, 
+   * cuando el usuario cambia de pestaña o minimiza el navegador).
+   * @returns void
+   */
+  private visibilityHandler = () => {
+    try {
+      if (document.visibilityState === 'visible') {
+        const token = this.auth.getToken();
+        if (!token) {
+          try { window.location.replace('/login'); } catch {}
+          return;
+        }
+        try {
+          const parts = token.split('.');
+          if (parts.length >= 2) {
+            const payload = JSON.parse(decodeURIComponent(escape(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')))));
+            const exp = payload?.exp;
+            if (exp) {
+              const expMs = (typeof exp === 'number' && exp < 1e12) ? exp * 1000 : exp;
+              if (Date.now() >= expMs) {
+                try { this.auth.logout(); } catch (e) {}
+                try { window.location.replace('/login'); } catch (e) {}
+              }
+            }
+          }
+        } catch (e) {
+          try { 
+            this.auth.logout(); 
+          } catch (e) {
+            // ignore
+          }
+          try { 
+            window.location.replace('/login'); 
+          } catch (e) {
+            // ignore
+          }
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  /**
    * Navega a la página de peticiones, que muestra las solicitudes de los usuarios para agregar 
    * nuevos libros a la plataforma.
    */
@@ -69,6 +114,7 @@ export class App implements OnInit, OnDestroy {
         this.applyThemeForRoute(e.urlAfterRedirects);
       }
     }));
+    try { document.addEventListener('visibilitychange', this.visibilityHandler); } catch (e) {}
   }
 
   private computeShowHeader(url: string): boolean {
@@ -99,5 +145,6 @@ export class App implements OnInit, OnDestroy {
    */
   ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe());
+    try { document.removeEventListener('visibilitychange', this.visibilityHandler); } catch (e) {}
   }
 }
