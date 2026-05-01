@@ -70,6 +70,35 @@ export class ListasService {
   }
 
   /**
+   * Fuerza la recarga de listas desde el backend (si hay usuario conectado),
+   * o desde localStorage como fallback.
+   */
+  refreshFromServer(): void {
+    const current = this.getCurrentUser();
+    if (current) {
+      this.http.get<any[]>(`${this.backendBase}/user_list/owner/${encodeURIComponent(current)}`).pipe(
+        catchError(_ => of([]))
+      ).subscribe(serverLists => {
+        const converted = (serverLists || []).map(l => ({
+          id: l.id?.toString() || Date.now().toString(),
+          nombre: l.name || '',
+          libros: l.booksJson ? JSON.parse(l.booksJson) : [],
+          owner: l.owner || current,
+          isPrivate: !!l.isPrivate
+        } as ListaItem));
+        if (converted.length) {
+          this.listasSubject.next(converted);
+          try { localStorage.setItem(this.storageKey, JSON.stringify(converted)); } catch {}
+          return;
+        }
+        this.listasSubject.next(this.loadFromStorage());
+      });
+    } else {
+      this.listasSubject.next(this.loadFromStorage());
+    }
+  }
+
+  /**
    * Carga las listas desde localStorage, parseando el JSON almacenado. Si no hay datos o 
    * ocurre un error, devuelve un array vacío.
    * @returns Array de listas cargadas desde localStorage

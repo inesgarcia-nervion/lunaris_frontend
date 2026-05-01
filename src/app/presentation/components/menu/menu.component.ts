@@ -66,6 +66,8 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.subs.push(this.auth.isAdmin$.subscribe(isAdmin => {
       this.isAdmin = isAdmin;
     }));
+    // refresh listas when entering menu so lists appear without page reload
+    try { this.listasService.refreshFromServer(); } catch (e) {}
     if (this.isAdmin) this.loadAdminRequests();
     this.subs.push(this.auth.isAdmin$.subscribe(isAdmin => { if (isAdmin) this.loadAdminRequests(); }));
     this.subs.push(this.bookSearchService.response$.subscribe((r: OpenLibrarySearchResponse | null) => {

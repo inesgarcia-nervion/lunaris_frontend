@@ -88,6 +88,8 @@ export class PerfilComponent implements OnInit {
     } catch (e) {
       console.warn('Unable to read avatar', e);
     }
+    // refresh listas from server when entering profile
+    try { this.listasService.refreshFromServer(); } catch (e) {}
     this.listasService.ensureProfileSections(this.username);
     this.loadLists();
     this.listasService.listas$.subscribe(() => this.loadLists());
