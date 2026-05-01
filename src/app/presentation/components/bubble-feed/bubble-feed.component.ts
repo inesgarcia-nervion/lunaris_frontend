@@ -7,6 +7,7 @@ import { BubblePostComponent, BubblePost } from '../bubble-post/bubble-post.comp
 import { ConfirmService } from '../../shared/confirm.service';
 import { AuthService } from '../../../domain/services/auth.service';
 import { BookSearchService } from '../../../domain/services/book-search.service';
+import { PostService } from '../../../domain/services/post.service';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
 
 /**
@@ -52,10 +53,10 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
   imageLoading = false;
   private imageObjectUrl: string | null = null;
 
-  constructor(public auth: AuthService, private zone: NgZone, private cdr: ChangeDetectorRef, private route: ActivatedRoute, private router: Router, private location: Location, private confirm: ConfirmService, private bookSearchService: BookSearchService) {}
+  constructor(public auth: AuthService, private zone: NgZone, private cdr: ChangeDetectorRef, private route: ActivatedRoute, private router: Router, private location: Location, private confirm: ConfirmService, private bookSearchService: BookSearchService, private postService: PostService) {}
 
   /**
-   * Al iniciar el componente, se cargan las publicaciones persistidas desde localStorage.
+   * Al iniciar el componente, se cargan las publicaciones desde el servidor.
    */
   ngOnInit(): void {
     this.loadPosts();
@@ -100,11 +101,15 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
    * @returns void
    */
   toggleLike(postId: number) {
-    const p = this.posts.find(x => x.id === postId);
-    if (!p) return;
-    p.liked = !p.liked;
-    p.likes += p.liked ? 1 : -1;
-    this.savePosts();
+    this.postService.toggleLike(postId).subscribe({
+      next: (updated) => {
+        const idx = this.posts.findIndex(x => x.id === postId);
+        if (idx !== -1) this.posts[idx] = updated;
+        if (this.selected && this.selected.id === postId) this.selected = updated;
+        this.updatePagination();
+        try { this.cdr.detectChanges(); } catch (_) {}
+      }
+    });
   }
 
   /**
@@ -197,15 +202,18 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     if (!this.selected) return;
     const text = this.newCommentText?.trim();
     if (!text) return;
-    const user = { name: this.auth.getCurrentUsername() || 'Tú' };
-    const comment = { id: Date.now(), user, text };
-    this.selected.comments = this.selected.comments || [];
-    this.selected.comments.push(comment);
-    const p = this.posts.find(x => x.id === this.selected!.id);
-    if (p) p.comments = this.selected.comments;
-    this.newCommentText = '';
-    try { if (this.commentEditorRef?.nativeElement) this.commentEditorRef.nativeElement.innerHTML = ''; } catch (_) {}
-    this.savePosts();
+    const avatarUrl = this.auth.getLocalAvatar() || undefined;
+    this.postService.addComment(this.selected.id, { text, userAvatarUrl: avatarUrl }).subscribe({
+      next: (updated) => {
+        const idx = this.posts.findIndex(x => x.id === updated.id);
+        if (idx !== -1) this.posts[idx] = updated;
+        this.selected = updated;
+        this.newCommentText = '';
+        try { if (this.commentEditorRef?.nativeElement) this.commentEditorRef.nativeElement.innerHTML = ''; } catch (_) {}
+        this.updatePagination();
+        try { this.cdr.detectChanges(); } catch (_) {}
+      }
+    });
   }
 
   /**
@@ -217,21 +225,17 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
    */
   async deleteComment(commentId: number) {
     if (!this.selected || !this.selected.comments) return;
-    const currentUser = this.auth.getCurrentUsername();
-    const isAdmin = this.auth.isAdmin();
-    const comment = this.selected.comments.find(c => c.id === commentId);
-    if (!comment) return;
-    if (!isAdmin && comment.user.name !== currentUser) return;
-
     const ok = await this.confirm.confirm('¿Estás seguro de eliminar este comentario?');
     if (!ok) return;
-
-    this.selected.comments = this.selected.comments.filter(c => c.id !== commentId);
-
-    const p = this.posts.find(x => x.id === this.selected!.id);
-    if (p) p.comments = this.selected.comments;
-    try { this.cdr.detectChanges(); } catch (_) {}
-    this.savePosts();
+    this.postService.deleteComment(this.selected.id, commentId).subscribe({
+      next: (updated) => {
+        const idx = this.posts.findIndex(x => x.id === updated.id);
+        if (idx !== -1) this.posts[idx] = updated;
+        this.selected = updated;
+        this.updatePagination();
+        try { this.cdr.detectChanges(); } catch (_) {}
+      }
+    });
   }
 
   /**
@@ -264,17 +268,17 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
    * @returns void
    */
   removeConfirmedPost(id: number) {
-    const isAdmin = this.auth.isAdmin();
-    const currentUser = this.auth.getCurrentUsername();
-    const p = this.posts.find(x => x.id === id);
-    if (!p) return;
-    if (!isAdmin && p.user.name !== currentUser) return;
-    this.posts = this.posts.filter(x => x.id !== id);
-    if (this.selected && this.selected.id === id) this.selected = undefined;
-    if (this.pendingDeleteId === id) this.pendingDeleteId = null;
-    this.savePosts();
-    this.postSuccess = 'Publicación eliminada';
-    this.clearPostAlertAfterDelay();
+    this.postService.delete(id).subscribe({
+      next: () => {
+        this.posts = this.posts.filter(x => x.id !== id);
+        if (this.selected && this.selected.id === id) this.selected = undefined;
+        if (this.pendingDeleteId === id) this.pendingDeleteId = null;
+        this.updatePagination();
+        this.postSuccess = 'Publicación eliminada';
+        this.clearPostAlertAfterDelay();
+        try { this.cdr.detectChanges(); } catch (_) {}
+      }
+    });
   }
 
   /**
@@ -555,79 +559,62 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
    * @returns void
    */
   publish() {
-    const username = this.auth.getCurrentUsername() || 'Tú';
-    const avatar = this.auth.getLocalAvatar() || null;
+    const avatar = this.auth.getLocalAvatar() || undefined;
+    const imageUrls = this.newImagePreviews.slice(0, 3);
     if (this.editingId != null) {
-      const p = this.posts.find(x => x.id === this.editingId);
-      if (!p) return;
-      p.text = this.newText || '';
-      if (this.newImagePreviews && this.newImagePreviews.length) {
-        p.imageUrls = this.newImagePreviews.slice(0, 3);
-        p.imageUrl = this.newImagePreviews[0] || undefined;
-      } else {
-        p.imageUrls = undefined;
-        p.imageUrl = undefined;
-      }
-      this.editingId = null;
-      this.clearForm();
-      this.creating = false;
-      this.savePosts();
+      const editId = this.editingId;
+      this.postService.update(editId, { text: this.newText || '', imageUrls, userAvatarUrl: avatar }).subscribe({
+        next: (updated) => {
+          const idx = this.posts.findIndex(x => x.id === editId);
+          if (idx !== -1) this.posts[idx] = updated;
+          if (this.selected && this.selected.id === editId) this.selected = updated;
+          this.editingId = null;
+          this.clearForm();
+          this.creating = false;
+          this.updatePagination();
+          try { this.cdr.detectChanges(); } catch (_) {}
+        }
+      });
       return;
     }
 
-    const id = Date.now();
-    const post: BubblePost = {
-      id,
-      user: { name: username, avatarUrl: avatar || undefined },
-      imageUrl: this.newImagePreviews.length ? this.newImagePreviews[0] : undefined,
-      imageUrls: this.newImagePreviews.length ? this.newImagePreviews.slice(0, 3) : undefined,
-      text: this.newText || '',
-      likes: 0,
-      liked: false,
-      comments: []
-    };
-    this.posts.unshift(post);
-    this.clearForm();
-    this.creating = false;
-    this.currentPage = 1;
-    this.savePosts();
-  }
-
-  private readonly STORAGE_KEY = 'lunaris.bubble.posts.v1';
-
-  /**
-   * Guarda la lista de publicaciones actual en localStorage para persistir los datos entre sesiones.
-   * @returns void
-   */
-  private savePosts() {
-    try {
-      const serialized = JSON.stringify(this.posts || []);
-      localStorage.setItem(this.STORAGE_KEY, serialized);
-    } catch (e) {
-      // ignore 
-    }
-    this.updatePagination();
+    this.postService.create({ text: this.newText || '', imageUrls, userAvatarUrl: avatar }).subscribe({
+      next: (created) => {
+        this.posts.unshift(created);
+        this.clearForm();
+        this.creating = false;
+        this.currentPage = 1;
+        this.updatePagination();
+        try { this.cdr.detectChanges(); } catch (_) {}
+      }
+    });
   }
 
   /**
-   * Carga la lista de publicaciones desde localStorage al iniciar el componente. Si no hay datos almacenados,
-   * o si ocurre un error al parsear los datos, se inicializa la lista de publicaciones como vacía.
-   * Después de cargar las publicaciones, se actualiza la paginación para mostrar las publicaciones correspondientes 
-   * a la página actual.
-   * @returns void
+   * Carga la lista de publicaciones desde el servidor.
    */
   private loadPosts() {
-    try {
-      const raw = localStorage.getItem(this.STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as BubblePost[];
-      if (Array.isArray(parsed)) {
-        this.posts = parsed;
+    this.postService.getAll().subscribe({
+      next: (posts) => {
+        this.posts = posts;
+        this.updatePagination();
+        // Resolve selected post from route after loading
+        try {
+          const params = this.route.snapshot.params;
+          const id = params['id'];
+          if (id) {
+            const pid = Number(id);
+            const p = this.posts.find(x => x.id === pid);
+            if (p) this.selected = p;
+          }
+        } catch (_) {}
+        try { this.cdr.detectChanges(); } catch (_) {}
+      },
+      error: () => {
+        this.posts = [];
+        this.updatePagination();
       }
-    } catch (e) {
-      // ignore 
-    }
-    this.updatePagination();
+    });
   }
 
   /**
