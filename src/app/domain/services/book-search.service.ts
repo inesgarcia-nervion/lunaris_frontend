@@ -469,8 +469,6 @@ export class BookSearchService {
     coverImage?: string;
     releaseYear?: number;
     score?: number;
-    source?: string;
-    userId?: number;
     genreIds?: number[];
   }): Observable<any> {
     return this.http.post(`${this.apiUrl}/books`, bookData);

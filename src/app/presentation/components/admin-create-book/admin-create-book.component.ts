@@ -256,8 +256,6 @@ export class AdminCreateBookComponent implements OnInit {
       coverImage: this.coverImage.trim() || undefined,
       releaseYear: this.releaseYear || undefined,
       score: this.score || undefined,
-      source: 'custom', // Marcamos como libro creado manualmente
-      userId: this.currentUserId || undefined,
       genreIds: this.selectedGenreIds.length > 0 ? this.selectedGenreIds : undefined
     };
 
