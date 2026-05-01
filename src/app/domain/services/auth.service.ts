@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { tap, map } from 'rxjs/operators';
 import { Observable, BehaviorSubject, of } from 'rxjs';
@@ -38,7 +38,7 @@ export class AuthService {
    * Constructor del servicio de autenticación.
    * @param http Cliente HTTP para realizar solicitudes al backend.
    */
-  constructor(private http: HttpClient) {
+  constructor(private injector: Injector) {
     try {
       const stored = localStorage.getItem('lunaris_is_admin');
       if (stored) {
@@ -60,10 +60,32 @@ export class AuthService {
       // 
     }
     try {
-      this.avatarSubject.next(localStorage.getItem(this.getAvatarKey()) || null);
+      try { this.avatarSubject.next(localStorage.getItem(this.getAvatarKey()) || null); } catch {}
+      const username = this.getCurrentUsername();
+      const token = this.getToken();
+      if (username && token) {
+        setTimeout(() => {
+          try {
+            const headers = new HttpHeaders({ Authorization: `Bearer ${this.getToken()}` });
+            this.http.get<any>(`${this.backendBase}/users/username/${encodeURIComponent(username)}`, { headers }).subscribe({
+              next: u => {
+                try { localStorage.setItem(this.getAvatarKey(username), u?.avatarUrl ?? ''); } catch {}
+                this.avatarSubject.next(u?.avatarUrl || null);
+              },
+              error: () => {}
+            });
+          } catch (e) {
+            // ignore
+          }
+        }, 0);
+      }
     } catch (e) {
-      // 
+      //
     }
+  }
+
+  private get http(): HttpClient {
+    return this.injector.get(HttpClient);
   }
 
   private readonly backendBase = 'http://localhost:8080';
@@ -137,8 +159,18 @@ export class AuthService {
           console.warn('Unable to determine admin role', e);
         }
         try {
-          const savedAvatar = localStorage.getItem(this.getAvatarKey(username)) || null;
-          this.avatarSubject.next(savedAvatar);
+              const savedAvatar = localStorage.getItem(this.getAvatarKey(username)) || null;
+              // try to fetch avatar from server if available; fall back to savedAvatar
+              const tokenPresent = !!this.getToken();
+              if (tokenPresent) {
+                const headers = tokenPresent ? new HttpHeaders({ Authorization: `Bearer ${this.getToken()}` }) : undefined;
+                this.http.get<any>(`${this.backendBase}/users/username/${encodeURIComponent(username)}`, { headers }).subscribe({
+                  next: u => this.avatarSubject.next(u?.avatarUrl ?? savedAvatar),
+                  error: () => this.avatarSubject.next(savedAvatar)
+                });
+              } else {
+                this.avatarSubject.next(savedAvatar);
+              }
         } catch (e) {
           console.warn('Unable to load user avatar on login', e);
         }
@@ -307,7 +339,18 @@ export class AuthService {
    * @returns El avatar del usuario como cadena, o null si no se encuentra.
    */
   getLocalAvatar(username?: string | null): string | null {
-    try { return localStorage.getItem(this.getAvatarKey(username)); } catch { return null; }
+    try {
+      const fromSubject = this.avatarSubject.value;
+      if (fromSubject) return fromSubject;
+      return localStorage.getItem(this.getAvatarKey(username));
+    } catch { return null; }
+  }
+
+  /**
+   * Synchronous snapshot of current avatar value (from in-memory subject).
+   */
+  getAvatar(): string | null {
+    return this.avatarSubject.value;
   }
 
   /**
@@ -319,7 +362,30 @@ export class AuthService {
    * Si no se proporciona, se intentará establecer el avatar del usuario actual.
    */
   setLocalAvatar(avatar: string | null, username?: string | null) {
+    const current = username ?? this.getCurrentUsername();
+    const token = this.getToken();
     const key = this.getAvatarKey(username);
+    // If user is authenticated, persist avatar to backend and update subject.
+    if (current && token) {
+      // If it's a data URL (file), send as plain text to the dedicated avatar endpoint
+      const isDataUrl = typeof avatar === 'string' && avatar.startsWith('data:');
+      if (isDataUrl) {
+        const headers = new HttpHeaders({ 'Content-Type': 'text/plain' }).set('Authorization', `Bearer ${token}`);
+        this.http.post<any>(`${this.backendBase}/users/username/${encodeURIComponent(current)}/avatar`, avatar || '', { headers }).subscribe({
+          next: (res) => {
+            try { localStorage.setItem(this.getAvatarKey(current), res?.avatarUrl ?? avatar ?? ''); } catch {}
+            this.avatarSubject.next(res?.avatarUrl ?? avatar);
+          },
+          error: () => this.avatarSubject.next(avatar)
+        });
+        return;
+      }
+      this.updateUser(current, { avatarUrl: avatar }).subscribe({
+        next: (res: any) => this.avatarSubject.next(res?.avatarUrl ?? avatar),
+        error: () => this.avatarSubject.next(avatar)
+      });
+      return;
+    }
     try {
       if (avatar) localStorage.setItem(key, avatar);
       else localStorage.removeItem(key);
