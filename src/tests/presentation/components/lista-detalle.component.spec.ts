@@ -8,6 +8,9 @@ import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 
+/**
+ * Pruebas para ListaDetalleComponent.
+ */
 describe('ListaDetalleComponent', () => {
   let component: ListaDetalleComponent;
   let fixture: ComponentFixture<ListaDetalleComponent>;
@@ -19,6 +22,11 @@ describe('ListaDetalleComponent', () => {
   let listasSubject: BehaviorSubject<any[]>;
   let routeStub: any;
 
+  /**
+   * Configuración común para las pruebas de ListaDetalleComponent.
+   * @param listId El ID de la lista a cargar (por defecto 'list1').
+   * @param currentLista El objeto de lista actual a usar en las pruebas (por defecto una lista simple con id 'list1').
+   */
   function setup(listId = 'list1', currentLista: any = { id: 'list1', nombre: 'Mi Lista', libros: [], owner: 'testuser', isPrivate: false }) {
     listasSubject = new BehaviorSubject<any[]>([currentLista]);
 
@@ -77,11 +85,17 @@ describe('ListaDetalleComponent', () => {
     fixture.detectChanges();
   }
 
+  /**
+   * Limpieza después de cada prueba.
+   */
   afterEach(() => {
     TestBed.resetTestingModule();
     vi.clearAllMocks();
   });
 
+  /**
+   * Pruebas para ngOnInit.
+   */
   describe('ngOnInit', () => {
     it('should load lista by id from route', () => {
       setup('list1', { id: 'list1', nombre: 'Mi Lista', libros: [], owner: 'testuser' });
@@ -101,7 +115,6 @@ describe('ListaDetalleComponent', () => {
 
       listasSubject.next([{ id: 'list1', nombre: 'Mi Lista', libros: [{ title: 'C' }], owner: 'testuser' }]);
 
-      // BehaviorSubject emits immediately on subscribe (1 call) + explicit next (1 call) + initial direct call = 3
       expect(listasMock.getById).toHaveBeenCalledTimes(3);
     });
 
@@ -112,6 +125,9 @@ describe('ListaDetalleComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para ngOnDestroy.
+   */
   describe('ngOnDestroy', () => {
     it('should not throw when destroyed', () => {
       setup();
@@ -120,6 +136,9 @@ describe('ListaDetalleComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para updatePagination.
+   */
   describe('updatePagination()', () => {
     it('should slice libros according to pageSize', () => {
       const books = Array.from({ length: 20 }, (_, i) => ({ title: `Book ${i}` }));
@@ -138,6 +157,9 @@ describe('ListaDetalleComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para onPageChange.
+   */
   describe('onPageChange()', () => {
     it('should update currentPage and refresh pagination', () => {
       const books = Array.from({ length: 20 }, (_, i) => ({ title: `Book ${i}` }));
@@ -149,6 +171,9 @@ describe('ListaDetalleComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para openFromDetail.
+   */
   describe('openFromDetail()', () => {
     it('should set navigation origin and selected book then navigate to /menu', () => {
       setup();
@@ -180,6 +205,9 @@ describe('ListaDetalleComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para back().
+   */
   describe('back()', () => {
     it('should navigate to /listas-usuarios when origin is null', () => {
       setup();
@@ -227,6 +255,9 @@ describe('ListaDetalleComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para backButtonLabel getter.
+   */
   describe('backButtonLabel getter', () => {
     it('should return "← Volver" when no origin', () => {
       setup();
@@ -257,6 +288,9 @@ describe('ListaDetalleComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para isProfileList().
+   */
   describe('isProfileList()', () => {
     it('should delegate to listasService', () => {
       setup();
@@ -273,6 +307,9 @@ describe('ListaDetalleComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para getCover().
+   */
   describe('getCover()', () => {
     it('should return cover from bookSearch service', () => {
       setup();
@@ -304,6 +341,9 @@ describe('ListaDetalleComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para getAuthor().
+   */
   describe('getAuthor()', () => {
     it('should return author from bookSearch service', () => {
       setup();
@@ -345,6 +385,9 @@ describe('ListaDetalleComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para removeFromList().
+   */
   describe('removeFromList()', () => {
     it('should remove book from list when confirmed', async () => {
       setup();
@@ -375,6 +418,9 @@ describe('ListaDetalleComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para confirmAndDeleteList().
+   */
   describe('confirmAndDeleteList()', () => {
     it('should delete list and navigate when confirmed', async () => {
       setup();
@@ -416,6 +462,9 @@ describe('ListaDetalleComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para editListName().
+   */
   describe('editListName()', () => {
     it('should update list name when user enters a new name', () => {
       setup('list1', { id: 'list1', nombre: 'Old Name', libros: [], owner: 'testuser' });
@@ -454,6 +503,9 @@ describe('ListaDetalleComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para openEditModal().
+   */
   describe('openEditModal()', () => {
     it('should open edit modal with current list values', () => {
       setup('list1', { id: 'list1', nombre: 'Test List', libros: [], owner: 'testuser', isPrivate: false });
@@ -483,6 +535,9 @@ describe('ListaDetalleComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para saveEdit().
+   */
   describe('saveEdit()', () => {
     it('should save the edited list name and privacy', () => {
       setup();
@@ -507,6 +562,9 @@ describe('ListaDetalleComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para cancelEdit().
+   */
   describe('cancelEdit()', () => {
     it('should set editingList to false', () => {
       setup();
@@ -518,6 +576,9 @@ describe('ListaDetalleComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para hasChanges().
+   */
   describe('hasChanges()', () => {
     it('should return true when name changed', () => {
       setup();
@@ -548,6 +609,9 @@ describe('ListaDetalleComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para isFavorited().
+   */
   describe('isFavorited()', () => {
     it('should delegate to listasService', () => {
       setup();
@@ -564,6 +628,9 @@ describe('ListaDetalleComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para confirmAndRemoveFavorite().
+   */
   describe('confirmAndRemoveFavorite()', () => {
     it('should toggle favorite when confirmed', async () => {
       setup();

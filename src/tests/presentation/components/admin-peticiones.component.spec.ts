@@ -4,18 +4,28 @@ import { PeticionesService } from '../../../app/domain/services/peticiones.servi
 import { ConfirmService } from '../../../app/presentation/shared/confirm.service';
 import { of, throwError } from 'rxjs';
 
+/**
+ * Tests para AdminPeticionesComponent, enfocándose en la lógica de carga, paginación y eliminación de peticiones.
+ */
 const sampleRequests = [
   { id: 1, title: 'Harry Potter', author: 'Rowling' },
   { id: 2, title: 'Harry Potter', author: 'Rowling' },
   { id: 3, title: 'Dune', author: 'Herbert' }
 ];
 
+/**
+ * Tests para AdminPeticionesComponent, enfocándose en la lógica de carga, paginación y eliminación de peticiones.
+ */
 describe('AdminPeticionesComponent', () => {
   let component: AdminPeticionesComponent;
   let fixture: ComponentFixture<AdminPeticionesComponent>;
   let peticionesMock: any;
   let confirmMock: any;
 
+  /**
+   * Configura el entorno de pruebas para AdminPeticionesComponent, permitiendo inyectar peticiones personalizadas.
+   * @param requests Lista de peticiones a usar en las pruebas, por defecto se usa sampleRequests.
+   */
   function setup(requests = sampleRequests) {
     peticionesMock = {
       getAll: vi.fn().mockReturnValue(of(requests)),
@@ -35,21 +45,32 @@ describe('AdminPeticionesComponent', () => {
     component = fixture.componentInstance;
   }
 
+  /**
+   * Limpia el entorno de pruebas después de cada test.
+   */
   afterEach(() => {
     TestBed.resetTestingModule();
     vi.clearAllMocks();
   });
 
+  /**
+   * Pruebas para ngOnInit y load.
+   */
   describe('ngOnInit / load()', () => {
+    /**
+     * Verifica que se cargan las peticiones y se construyen los grupos al inicializar.
+     */
     it('should load requests and build groups on init', () => {
       setup();
       fixture.detectChanges();
 
       expect(component.requests).toHaveLength(3);
-      // 'Harry Potter' + 'Rowling' form one group, 'Dune' + 'Herbert' another
       expect(component.groupedRequests).toHaveLength(2);
     });
 
+    /**
+     * Verifica que loading se establece en false después de cargar las peticiones.
+     */
     it('should set loading=false after load', () => {
       setup();
       fixture.detectChanges();
@@ -57,6 +78,9 @@ describe('AdminPeticionesComponent', () => {
       expect(component.loading).toBe(false);
     });
 
+    /**
+     * Verifica que se establece un error cuando la carga falla.
+     */
     it('should set error on load failure', () => {
       setup();
       peticionesMock.getAll.mockReturnValue(throwError(() => new Error('fail')));
@@ -67,7 +91,13 @@ describe('AdminPeticionesComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para updatePagination.
+   */
   describe('updatePagination()', () => {
+    /**
+     * Verifica que se establecen correctamente las peticiones paginadas.
+     */
     it('should set pagedRequests correctly', () => {
       setup();
       fixture.detectChanges();
@@ -75,6 +105,9 @@ describe('AdminPeticionesComponent', () => {
       expect(component.pagedRequests).toHaveLength(2);
     });
 
+    /**
+     * Verifica que currentPage se ajusta cuando excede el total de páginas.
+     */
     it('should clamp currentPage when exceeding total pages', () => {
       setup();
       fixture.detectChanges();
@@ -85,7 +118,13 @@ describe('AdminPeticionesComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para onPageChange.
+   */
   describe('onPageChange()', () => {
+    /**
+     * Verifica que se actualiza currentPage y se llama a updatePagination.
+     */
     it('should update currentPage and pagination', () => {
       setup();
       fixture.detectChanges();
@@ -96,7 +135,13 @@ describe('AdminPeticionesComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para remove.
+   */
   describe('remove()', () => {
+    /**
+     * Verifica que se establece un error cuando se proporciona un ID inválido.
+     */
     it('should set error for invalid id (always)', async () => {
       setup();
       fixture.detectChanges();
@@ -106,6 +151,9 @@ describe('AdminPeticionesComponent', () => {
       expect(component.error).toBeTruthy();
     });
 
+    /**
+     * Verifica que se establece un error cuando no se proporciona un ID.
+     */
     it('should set error when no id provided', async () => {
       setup();
       fixture.detectChanges();
@@ -116,11 +164,17 @@ describe('AdminPeticionesComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para removeGroup.
+   */
   describe('removeGroup()', () => {
+    /**
+     * Verifica que se eliminan todas las solicitudes en un grupo cuando se confirma.
+     */
     it('should delete all requests in a group when confirmed', async () => {
       setup();
       fixture.detectChanges();
-      const group = component.groupedRequests[0]; // Harry Potter group
+      const group = component.groupedRequests[0];
       confirmMock.confirm.mockResolvedValue(true);
 
       await component.removeGroup(group);
@@ -128,6 +182,9 @@ describe('AdminPeticionesComponent', () => {
       expect(peticionesMock.delete).toHaveBeenCalledTimes(group.ids.length);
     });
 
+    /**
+     * Verifica que no se eliminan las solicitudes cuando el usuario cancela.
+     */
     it('should not delete when user cancels', async () => {
       setup();
       fixture.detectChanges();
@@ -139,6 +196,9 @@ describe('AdminPeticionesComponent', () => {
       expect(peticionesMock.delete).not.toHaveBeenCalled();
     });
 
+    /**
+     * Verifica que se establece un error cuando no se proporciona un grupo.
+     */
     it('should set error when group is undefined', async () => {
       setup();
       fixture.detectChanges();
@@ -148,6 +208,9 @@ describe('AdminPeticionesComponent', () => {
       expect(component.error).toBeTruthy();
     });
 
+    /**
+     * Verifica que se reconstruyen los grupos y se actualiza la paginación después de la eliminación.
+     */
     it('should rebuild groups and update pagination after deletion', async () => {
       setup();
       fixture.detectChanges();
@@ -160,6 +223,9 @@ describe('AdminPeticionesComponent', () => {
       expect(component.groupedRequests.length).toBeLessThan(initialGroupCount);
     });
 
+    /**
+     * Verifica que se borra deletingGroupKey después de la operación.
+     */
     it('should clear deletingGroupKey after operation', async () => {
       setup();
       fixture.detectChanges();
@@ -171,15 +237,17 @@ describe('AdminPeticionesComponent', () => {
       expect(component.deletingGroupKey).toBeNull();
     });
 
+    /**
+     * Verifica que se continúa eliminando otros IDs si uno falla.
+     */
     it('should continue deleting other ids if one delete fails', async () => {
       setup();
       fixture.detectChanges();
-      // Make first delete fail, second succeed
       peticionesMock.delete
         .mockReturnValueOnce(throwError(() => new Error('fail')))
         .mockReturnValue(of({}));
       const group = component.groupedRequests.find(g => g.ids.length >= 2);
-      if (!group) return; // skip if no such group
+      if (!group) return; 
       confirmMock.confirm.mockResolvedValue(true);
 
       await expect(component.removeGroup(group)).resolves.not.toThrow();

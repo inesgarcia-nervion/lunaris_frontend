@@ -11,11 +11,11 @@
         <span class="privacy-badge" [ngClass]="lista.isPrivate ? 'privacy-private' : 'privacy-public'">{{ lista.isPrivate ? 'Privada' : 'Pública' }}</span>
       </div>
       <div style="display:flex; align-items:center; gap:8px;">
-        <div *ngIf="lista.owner && lista.owner === currentUser && !isProfileList(lista.nombre)" class="lista-actions">
-        <button class="btn-edit-list" (click)="openEditModal()">Editar</button>
+        <div *ngIf="lista.owner && (lista.owner === currentUser || auth.isAdmin()) && !isProfileList(lista.nombre)" class="lista-actions">
+        <button class="btn-edit-list" (click)="openEditModal()" *ngIf="lista.owner === currentUser">Editar</button>
         <button class="btn-delete" (click)="confirmAndDeleteList()">Eliminar lista</button>
       </div>
-        <button *ngIf="lista.owner && lista.owner !== currentUser && isFavorited()" class="btn-delete-like-news" (click)="$event.stopPropagation(); confirmAndRemoveFavorite()">Eliminar favorito</button>
+        <button *ngIf="lista.owner && lista.owner !== currentUser && isFavorited() && !lista.isPrivate" class="btn-delete-like-news" (click)="$event.stopPropagation(); confirmAndRemoveFavorite()">Eliminar favorito</button>
       </div>
     </div>
 

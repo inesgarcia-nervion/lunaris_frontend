@@ -53,11 +53,15 @@
       <div class="form-group">
         <label for="releaseYear">Año de Lanzamiento</label>
         <input
-          type="number"
+          type="text"
           id="releaseYear"
-          [(ngModel)]="releaseYear"
+          [value]="releaseYear !== null ? releaseYear : ''"
+          (input)="onYearInput($event)"
           name="releaseYear"
           placeholder="Ej: 2023"
+          maxlength="4"
+          pattern="^[0-9]{4}$"
+          inputmode="numeric"
           [disabled]="loading"
         />
       </div>
@@ -108,6 +112,19 @@
             <button type="button" class="genre-tag-remove" (click)="removeGenre(id)">×</button>
           </span>
         </div>
+      </div>
+      
+      <!-- Saga (opcional) -->
+      <div class="form-group">
+        <label for="sagaName">Saga (opcional — nombre exacto)</label>
+        <input
+          type="text"
+          id="sagaName"
+          [(ngModel)]="sagaName"
+          name="sagaName"
+          placeholder="Nombre exacto de la saga (ej: La Saga Prueba)"
+          [disabled]="loading"
+        />
       </div>
 
       <!-- Portada -->

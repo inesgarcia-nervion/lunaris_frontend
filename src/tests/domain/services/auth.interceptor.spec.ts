@@ -6,10 +6,16 @@ import { AuthService } from '../../../app/domain/services/auth.service';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
+/**
+ * Test para {@link AuthInterceptor}.
+ */
 describe('AuthInterceptor', () => {
   let interceptor: AuthInterceptor;
   let authService: { getToken: ReturnType<typeof vi.fn> };
 
+  /**
+   * Configura el entorno de prueba antes de cada test.
+   */
   beforeEach(() => {
     authService = { getToken: vi.fn() };
     TestBed.configureTestingModule({
@@ -23,6 +29,9 @@ describe('AuthInterceptor', () => {
     interceptor = TestBed.inject(AuthInterceptor);
   });
 
+  /**
+   * Verifica que se agrega el encabezado Authorization cuando existe un token.
+   */
   it('should add Authorization header when token exists', () => {
     authService.getToken.mockReturnValue('a.b.c');
     const req = new HttpRequest('GET', '/api/data');
@@ -36,6 +45,9 @@ describe('AuthInterceptor', () => {
     expect(calledWith.headers.get('Authorization')).toBe('Bearer a.b.c');
   });
 
+  /**
+   * Verifica que no se agrega el encabezado Authorization cuando no existe un token.
+   */
   it('should NOT add Authorization header when no token', () => {
     authService.getToken.mockReturnValue(null);
     const req = new HttpRequest('GET', '/api/data');
@@ -50,6 +62,9 @@ describe('AuthInterceptor', () => {
     expect(calledWith).toBe(req);
   });
 
+  /**
+   * Verifica que se pasa la solicitud original sin cambios cuando no hay token.
+   */
   it('should pass the original request unchanged when no token', () => {
     authService.getToken.mockReturnValue(null);
     const req = new HttpRequest('POST', '/api/data', { data: 1 });
@@ -65,6 +80,9 @@ describe('AuthInterceptor', () => {
     expect(handledReq).toBe(req);
   });
 
+  /**
+   * Verifica que se retorna el observable de next.handle.
+   */
   it('should return observable from next.handle', () => {
     authService.getToken.mockReturnValue('x.y.z');
     const expectedResponse = new HttpResponse({ status: 201 });

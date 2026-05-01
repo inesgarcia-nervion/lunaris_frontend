@@ -225,6 +225,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.bookSearchService.setCurrentPage(1);
       this.bookSearchService.setError(null);
       this.bookSearchService.setSuccess(null);
+      try { 
+        this.bookSearchService.cancelPendingSearches(); 
+      } catch (e) { /* ignore */ }
     }
     this.router.navigate([path]);
   }
@@ -254,7 +257,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
    * avatar local a null.
    */
   onAvatarError(): void {
-    try { this.auth.setLocalAvatar(null); } catch (e) { /* ignore */ }
+    try { 
+      this.auth.setLocalAvatar(null); 
+    } catch (e) { 
+      /* ignore */ 
+    }
   }
 
   /**

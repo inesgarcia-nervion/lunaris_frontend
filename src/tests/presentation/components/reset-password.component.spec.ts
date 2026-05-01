@@ -5,12 +5,19 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { ResetPasswordComponent } from '../../../app/presentation/components/reset-password/reset-password.component';
 
+/**
+ * Pruebas para el componente ResetPasswordComponent.
+ */
 describe('ResetPasswordComponent', () => {
   let fixture: ComponentFixture<ResetPasswordComponent>;
   let component: ResetPasswordComponent;
   let httpMock: HttpTestingController;
   let routerSpy: { navigate: ReturnType<typeof vi.fn> };
 
+  /**
+   * Función auxiliar para crear el componente con un token específico.
+   * @param token El token a usar en la prueba, o null para simular ausencia de token.
+   */
   function createComponent(token: string | null = 'valid-token'): void {
     routerSpy = { navigate: vi.fn() };
 
@@ -37,11 +44,17 @@ describe('ResetPasswordComponent', () => {
     httpMock = TestBed.inject(HttpTestingController);
   }
 
+  /**
+   * Limpia los recursos después de cada prueba.
+   */
   afterEach(() => {
     try { httpMock?.verify(); } catch {}
     TestBed.resetTestingModule();
   });
 
+  /**
+   * Prueba para verificar la creación del componente.
+   */
   it('should be created', () => {
     createComponent('my-token');
     fixture.detectChanges();
@@ -50,6 +63,9 @@ describe('ResetPasswordComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  /**
+   * Prueba para verificar el comportamiento de ngOnInit cuando no hay token.
+   */
   it('ngOnInit with no token sets error and does not send request', () => {
     createComponent(null);
     fixture.detectChanges();
@@ -58,6 +74,9 @@ describe('ResetPasswordComponent', () => {
     expect(component.validating).toBe(false);
   });
 
+  /**
+   * Prueba para verificar el comportamiento de ngOnInit cuando el token es válido.
+   */
   it('ngOnInit validates token as valid', () => {
     createComponent('good-token');
     fixture.detectChanges();
@@ -67,6 +86,9 @@ describe('ResetPasswordComponent', () => {
     expect(component.validating).toBe(false);
   });
 
+  /**
+   * Prueba para verificar el comportamiento de ngOnInit cuando el token es inválido.
+   */
   it('ngOnInit validates token as invalid', () => {
     createComponent('bad-token');
     fixture.detectChanges();
@@ -76,6 +98,9 @@ describe('ResetPasswordComponent', () => {
     expect(component.validating).toBe(false);
   });
 
+  /**
+   * Prueba para verificar el manejo de errores durante la validación del token.
+   */
   it('ngOnInit handles validation error', () => {
     createComponent('expired-token');
     fixture.detectChanges();
@@ -85,6 +110,9 @@ describe('ResetPasswordComponent', () => {
     expect(component.error).toContain('Token expired');
   });
 
+  /**
+   * Prueba para verificar el manejo de errores durante la validación del token sin cuerpo de respuesta.
+   */
   it('ngOnInit handles validation error without body', () => {
     createComponent('expired-token2');
     fixture.detectChanges();
@@ -93,6 +121,9 @@ describe('ResetPasswordComponent', () => {
     expect(component.error).toBeTruthy();
   });
 
+  /**
+   * Prueba para verificar el comportamiento del método togglePassword.
+   */
   it('togglePassword toggles showPassword', () => {
     createComponent(null);
     fixture.detectChanges();
@@ -103,6 +134,9 @@ describe('ResetPasswordComponent', () => {
     expect(component.showPassword).toBe(false);
   });
 
+  /**
+   * Prueba para verificar el comportamiento del método toggleConfirmPassword.
+   */
   it('toggleConfirmPassword toggles showConfirmPassword', () => {
     createComponent(null);
     fixture.detectChanges();
@@ -111,6 +145,9 @@ describe('ResetPasswordComponent', () => {
     expect(component.showConfirmPassword).toBe(true);
   });
 
+  /**
+   * Prueba para verificar el comportamiento del método submit cuando la contraseña está vacía.
+   */
   it('submit with empty password sets error', () => {
     createComponent(null);
     fixture.detectChanges();
@@ -118,6 +155,9 @@ describe('ResetPasswordComponent', () => {
     expect(component.error).toContain('contraseña');
   });
 
+  /**
+   * Prueba para verificar el comportamiento del método submit cuando la contraseña es corta.
+   */
   it('submit with short password sets error', () => {
     createComponent(null);
     fixture.detectChanges();
@@ -126,6 +166,9 @@ describe('ResetPasswordComponent', () => {
     expect(component.error).toContain('6 caracteres');
   });
 
+  /**
+   * Prueba para verificar el comportamiento del método submit cuando las contraseñas no coinciden.
+   */
   it('submit with mismatched passwords sets error', () => {
     createComponent(null);
     fixture.detectChanges();
@@ -135,6 +178,9 @@ describe('ResetPasswordComponent', () => {
     expect(component.error).toContain('coinciden');
   });
 
+  /**
+   * Prueba para verificar el comportamiento del método submit cuando las contraseñas coinciden y son válidas.
+   */
   it('submit sends POST request with valid inputs', () => {
     createComponent('tok');
     fixture.detectChanges();
@@ -153,6 +199,9 @@ describe('ResetPasswordComponent', () => {
     expect(component.loading).toBe(false);
   });
 
+  /**
+   * Prueba para verificar el comportamiento del método submit cuando la respuesta no tiene mensaje.
+   */
   it('submit uses default message when response has none', () => {
     createComponent('tok2');
     fixture.detectChanges();
@@ -166,6 +215,9 @@ describe('ResetPasswordComponent', () => {
     expect(component.message).toContain('Contraseña');
   });
 
+  /**
+   * Prueba para verificar el comportamiento del método submit cuando la operación es exitosa y se navega a /login.
+   */
   it('submit navigates to /login after success', () => {
     vi.useFakeTimers();
     createComponent('tok3');
@@ -183,6 +235,9 @@ describe('ResetPasswordComponent', () => {
     vi.useRealTimers();
   });
 
+  /**
+   * Prueba para verificar el manejo de errores HTTP durante la operación de restablecimiento de contraseña.
+   */
   it('submit handles HTTP error', () => {
     createComponent('tok4');
     fixture.detectChanges();
@@ -200,6 +255,9 @@ describe('ResetPasswordComponent', () => {
     expect(component.loading).toBe(false);
   });
 
+  /**
+   * Prueba para verificar el manejo de errores HTTP durante la operación de restablecimiento de contraseña sin cuerpo de respuesta.
+   */
   it('submit handles HTTP error without body', () => {
     createComponent('tok5');
     fixture.detectChanges();

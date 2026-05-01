@@ -7,8 +7,11 @@ import { ListasService } from '../../../app/domain/services/listas.service';
 import { ReviewService } from '../../../app/domain/services/review.service';
 import { NewsService } from '../../../app/domain/services/news.service';
 import { Router } from '@angular/router';
-import { BehaviorSubject, of, throwError } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 
+/**
+ * Pruebas unitarias para el componente MenuComponent.
+ */
 describe('MenuComponent', () => {
   let component: MenuComponent;
   let fixture: ComponentFixture<MenuComponent>;
@@ -30,6 +33,9 @@ describe('MenuComponent', () => {
   let newsSubject: BehaviorSubject<any[]>;
   let reviewsSubject: BehaviorSubject<any[]>;
 
+  /**
+   * Función de configuración común para las pruebas, que inicializa los mocks y el componente.
+   */
   function setup() {
     isAdminSubject = new BehaviorSubject(false);
     responseSubject = new BehaviorSubject<any>(null);
@@ -113,20 +119,29 @@ describe('MenuComponent', () => {
     fixture.detectChanges();
   }
 
+  /**
+   * Función de limpieza después de cada prueba, que resetea el módulo de pruebas y limpia los mocks.
+   */
   afterEach(() => {
     TestBed.resetTestingModule();
     vi.clearAllMocks();
   });
 
+  /**
+   * Pruebas para el constructor del componente.
+   */
   describe('constructor', () => {
     it('should set isAdmin from auth service', () => {
       setup();
       authMock.isAdmin.mockReturnValue(true);
 
-      expect(component.isAdmin).toBe(false); // already initialized before mock update
+      expect(component.isAdmin).toBe(false);
     });
   });
 
+  /**
+   * Pruebas para el método ngOnInit del componente.
+   */
   describe('ngOnInit', () => {
     it('should subscribe to isAdmin$ and update isAdmin', () => {
       setup();
@@ -225,6 +240,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método ngOnDestroy del componente.
+   */
   describe('ngOnDestroy', () => {
     it('should unsubscribe all subscriptions', () => {
       setup();
@@ -233,6 +251,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método previousPage del componente.
+   */
   describe('previousPage()', () => {
     it('should decrement page when above 1', () => {
       setup();
@@ -255,6 +276,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método nextPage del componente.
+   */
   describe('nextPage()', () => {
     it('should increment page when not on last page', () => {
       setup();
@@ -277,6 +301,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método getTotalPages del componente.
+   */
   describe('getTotalPages()', () => {
     it('should calculate correct total pages', () => {
       setup();
@@ -293,6 +320,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para los métodos hasNextPage y hasPreviousPage del componente.
+   */
   describe('hasNextPage() / hasPreviousPage()', () => {
     it('should return true for hasNextPage when not on last page', () => {
       setup();
@@ -325,6 +355,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método selectBook del componente.
+   */
   describe('selectBook()', () => {
     it('should set navigation origin and selected book', () => {
       setup();
@@ -337,6 +370,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método backToSearch del componente.
+   */
   describe('backToSearch()', () => {
     it('should clear selected book when no origin', () => {
       setup();
@@ -357,6 +393,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método submitReview del componente.
+   */
   describe('submitReview()', () => {
     it('should set success message when review is not empty', () => {
       setup();
@@ -377,6 +416,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método addToList del componente.
+   */
   describe('addToList()', () => {
     it('should set success message with selectedList name', () => {
       setup();
@@ -388,6 +430,10 @@ describe('MenuComponent', () => {
     });
   });
 
+
+  /**
+   * Pruebas para el método getCoverUrl del componente.
+   */
   describe('getCoverUrl()', () => {
     it('should delegate to bookSearchService', () => {
       setup();
@@ -399,6 +445,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método getFirstAuthor del componente.
+   */
   describe('getFirstAuthor()', () => {
     it('should delegate to bookSearchService', () => {
       setup();
@@ -410,6 +459,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método getSagaName del componente.
+   */
   describe('getSagaName()', () => {
     it('should delegate to bookSearchService', () => {
       setup();
@@ -420,6 +472,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método isSaga del componente.
+   */
   describe('isSaga()', () => {
     it('should delegate to bookSearchService', () => {
       setup();
@@ -431,6 +486,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método getEditionCount del componente.
+   */
   describe('getEditionCount()', () => {
     it('should delegate to bookSearchService', () => {
       setup();
@@ -442,6 +500,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método getCategories del componente.
+   */
   describe('getCategories()', () => {
     it('should delegate to bookSearchService', () => {
       setup();
@@ -452,6 +513,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método generateRatingArray del componente.
+   */
   describe('generateRatingArray()', () => {
     it('should delegate to bookSearchService', () => {
       setup();
@@ -462,6 +526,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el getter searchQuery del componente.
+   */
   describe('searchQuery getter', () => {
     it('should return value from bookSearchService.getSearchQuery', () => {
       setup();
@@ -471,6 +538,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método showHero del componente.
+   */
   describe('showHero()', () => {
     it('should return true when no query and no results', () => {
       setup();
@@ -498,6 +568,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método navigate del componente.
+   */
   describe('navigate()', () => {
     it('should call router.navigateByUrl with path', () => {
       setup();
@@ -508,6 +581,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método openListFromMenu del componente.
+   */
   describe('openListFromMenu()', () => {
     it('should set navigation origin and navigate to list', () => {
       setup();
@@ -519,6 +595,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para la paginación de listas del componente.
+   */
   describe('List pagination', () => {
     it('pagedLists should return correct slice', () => {
       setup();
@@ -572,6 +651,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para la paginación de reseñas del componente.
+   */
   describe('Review pagination', () => {
     it('pagedReviews should return correct slice', () => {
       setup();
@@ -625,6 +707,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método getListCover del componente.
+   */
   describe('getListCover()', () => {
     it('should return empty string when no book at index', () => {
       setup();
@@ -644,6 +729,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método getReviewCoverUrl del componente.
+   */
   describe('getReviewCoverUrl()', () => {
     it('should return coverUrl if present on review', () => {
       setup();
@@ -670,6 +758,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método getReviewAvatarUrl del componente.
+   */
   describe('getReviewAvatarUrl()', () => {
     it('should return local avatar for user', () => {
       setup();
@@ -689,6 +780,9 @@ describe('MenuComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método getReviewStars del componente.
+   */
   describe('getReviewStars()', () => {
     it('should delegate to bookSearchService.generateRatingArray', () => {
       setup();

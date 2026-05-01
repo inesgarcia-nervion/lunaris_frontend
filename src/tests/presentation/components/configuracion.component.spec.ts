@@ -5,6 +5,9 @@ import { Router } from '@angular/router';
 import { ConfirmService } from '../../../app/presentation/shared/confirm.service';
 import { of, throwError } from 'rxjs';
 
+/**
+ * Pruebas para ConfiguracionComponent.
+ */
 describe('ConfiguracionComponent', () => {
   let component: ConfiguracionComponent;
   let fixture: ComponentFixture<ConfiguracionComponent>;
@@ -44,6 +47,9 @@ describe('ConfiguracionComponent', () => {
     vi.clearAllMocks();
   });
 
+  /**
+   * Pruebas para ngOnInit.
+   */
   describe('ngOnInit', () => {
     it('should load username, theme from auth service', () => {
       setup();
@@ -65,6 +71,9 @@ describe('ConfiguracionComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para onUrlChange.
+   */
   describe('onUrlChange()', () => {
     it('should clear file-related state when avatarUrl is set', () => {
       setup();
@@ -91,6 +100,9 @@ describe('ConfiguracionComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para setAvatarFromUrl.
+   */
   describe('setAvatarFromUrl()', () => {
     it('should do nothing when avatarUrl is empty', () => {
       setup();
@@ -124,6 +136,9 @@ describe('ConfiguracionComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para toggleFilePreview.
+   */
   describe('toggleFilePreview()', () => {
     it('should do nothing when no file selected', () => {
       setup();
@@ -159,6 +174,9 @@ describe('ConfiguracionComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para toggleTheme.
+   */
   describe('toggleTheme()', () => {
     it('should toggle from light to dark', () => {
       setup();
@@ -183,6 +201,9 @@ describe('ConfiguracionComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para applyAvatar.
+   */
   describe('applyAvatar()', () => {
     it('should call setLocalAvatar with avatarPreview', () => {
       setup();
@@ -207,6 +228,9 @@ describe('ConfiguracionComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para applyUrlAvatar.
+   */
   describe('applyUrlAvatar()', () => {
     it('should save avatar and clear avatar url', () => {
       setup();
@@ -230,6 +254,9 @@ describe('ConfiguracionComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para applyFileAvatar.
+   */
   describe('applyFileAvatar()', () => {
     it('should save file preview data url as avatar', () => {
       setup();
@@ -254,6 +281,9 @@ describe('ConfiguracionComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para applyAvatarUnified.
+   */
   describe('applyAvatarUnified()', () => {
     it('should call applyUrlAvatar when avatarUrl is set', () => {
       setup();
@@ -279,6 +309,9 @@ describe('ConfiguracionComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para previewAvatar.
+   */
   describe('previewAvatar()', () => {
     it('should call setAvatarFromUrl when avatarUrl is set', () => {
       setup();
@@ -304,6 +337,9 @@ describe('ConfiguracionComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para hasChanges getter.
+   */
   describe('hasChanges getter', () => {
     it('should return false when nothing changed', () => {
       setup();
@@ -332,6 +368,9 @@ describe('ConfiguracionComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para isNameChanged getter.
+   */
   describe('isNameChanged getter', () => {
     it('should return true when username changed (case insensitive)', () => {
       setup();
@@ -352,6 +391,9 @@ describe('ConfiguracionComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para submitChanges.
+   */
   describe('submitChanges()', () => {
     it('should set error when newUsername is blank', async () => {
       setup();

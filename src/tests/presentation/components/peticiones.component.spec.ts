@@ -1,5 +1,4 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
@@ -7,11 +6,17 @@ import { PeticionesComponent } from '../../../app/presentation/components/petici
 import { PeticionesService } from '../../../app/domain/services/peticiones.service';
 import { of, throwError } from 'rxjs';
 
+/**
+ * Pruebas para el componente PeticionesComponent.
+ */
 describe('PeticionesComponent', () => {
   let fixture: ComponentFixture<PeticionesComponent>;
   let component: PeticionesComponent;
   let peticionesSpy: { create: ReturnType<typeof vi.fn> };
 
+  /**
+   * Configuración antes de cada prueba.
+   */
   beforeEach(async () => {
     peticionesSpy = { create: vi.fn().mockReturnValue(of({ id: 1, title: 'Test', author: 'Auth' })) };
 
@@ -30,10 +35,16 @@ describe('PeticionesComponent', () => {
     fixture.detectChanges();
   });
 
+  /**
+   * Pruebas para la creación del componente.
+   */
   it('should be created', () => {
     expect(component).toBeTruthy();
   });
 
+  /**
+   * Pruebas para el estado inicial del componente.
+   */
   it('initial state should have empty fields', () => {
     expect(component.title).toBe('');
     expect(component.author).toBe('');
@@ -42,6 +53,9 @@ describe('PeticionesComponent', () => {
     expect(component.success).toBeNull();
   });
 
+  /**
+   * Pruebas para el método submit del componente.
+   */
   it('submit with empty title sets error', () => {
     component.title = '';
     component.author = 'AuthorName';
@@ -50,6 +64,9 @@ describe('PeticionesComponent', () => {
     expect(peticionesSpy.create).not.toHaveBeenCalled();
   });
 
+  /**
+   * Pruebas para el método submit del componente con título en blanco.
+   */
   it('submit with whitespace-only title sets error', () => {
     component.title = '   ';
     component.author = 'Author';
@@ -57,6 +74,9 @@ describe('PeticionesComponent', () => {
     expect(component.error).toBe('El título es obligatorio');
   });
 
+  /**
+   * Pruebas para el método submit del componente con autor en blanco.
+   */
   it('submit with empty author sets error', () => {
     component.title = 'A Book';
     component.author = '';
@@ -65,6 +85,9 @@ describe('PeticionesComponent', () => {
     expect(peticionesSpy.create).not.toHaveBeenCalled();
   });
 
+  /**
+   * Pruebas para el método submit del componente con entradas válidas.
+   */
   it('submit with valid inputs calls peticiones.create', () => {
     component.title = 'Dune';
     component.author = 'Herbert';
@@ -72,6 +95,9 @@ describe('PeticionesComponent', () => {
     expect(peticionesSpy.create).toHaveBeenCalledWith({ title: 'Dune', author: 'Herbert' });
   });
 
+  /**
+   * Pruebas para el método submit del componente con entradas con espacios en blanco.
+   */
   it('submit trims whitespace from inputs', () => {
     component.title = '  Dune  ';
     component.author = '  Herbert  ';
@@ -79,6 +105,9 @@ describe('PeticionesComponent', () => {
     expect(peticionesSpy.create).toHaveBeenCalledWith({ title: 'Dune', author: 'Herbert' });
   });
 
+  /**
+   * Pruebas para el método submit del componente en caso de éxito.
+   */
   it('submit on success shows success message and clears fields', () => {
     component.title = 'Dune';
     component.author = 'Herbert';
@@ -89,6 +118,9 @@ describe('PeticionesComponent', () => {
     expect(component.loading).toBe(false);
   });
 
+  /**
+   * Pruebas para el método submit del componente en caso de error.
+   */
   it('submit on error shows error message', () => {
     peticionesSpy.create.mockReturnValue(throwError(() => ({ error: { message: 'Server Error' } })));
     component.title = 'Dune';
@@ -98,6 +130,9 @@ describe('PeticionesComponent', () => {
     expect(component.loading).toBe(false);
   });
 
+  /**
+   * Pruebas para el método submit del componente en caso de error sin mensaje.
+   */
   it('submit on error without message shows default error', () => {
     peticionesSpy.create.mockReturnValue(throwError(() => ({})));
     component.title = 'Dune';
@@ -106,14 +141,15 @@ describe('PeticionesComponent', () => {
     expect(component.error).toBe('Error enviando la petición');
   });
 
+  /**
+   * Pruebas para el método submit del componente al limpiar errores y éxitos previos.
+   */
   it('submit clears previous error and success', () => {
     component.error = 'old error';
     component.success = 'old success';
     component.title = 'Book';
     component.author = 'Author';
     component.submit();
-    // these get cleared before validating
     expect(component.error).toBeNull();
-    // Only temporarily null during submit; success is set after
   });
 });

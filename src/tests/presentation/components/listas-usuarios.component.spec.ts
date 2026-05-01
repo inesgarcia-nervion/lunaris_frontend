@@ -7,6 +7,9 @@ import { ConfirmService } from '../../../app/presentation/shared/confirm.service
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 
+/**
+ * Pruebas para ListasUsuariosComponent.
+ */
 describe('ListasUsuariosComponent', () => {
   let component: ListasUsuariosComponent;
   let fixture: ComponentFixture<ListasUsuariosComponent>;
@@ -18,12 +21,19 @@ describe('ListasUsuariosComponent', () => {
   let listasSubject: BehaviorSubject<any[]>;
   let favoritesSubject: BehaviorSubject<string[]>;
 
+  /**
+   * Datos de prueba para listas, incluyendo una lista de perfil "Leyendo" que no debería mostrarse en la vista de listas de usuario.
+   */
   const mockListas = [
     { id: '1', nombre: 'Primera', owner: 'testuser', libros: [], isPrivate: false },
     { id: '2', nombre: 'Segunda', owner: 'testuser', libros: [], isPrivate: false },
     { id: '3', nombre: 'Leyendo', owner: 'testuser', libros: [], isPrivate: false }
   ];
 
+  /**
+   * Configuración común para las pruebas, con la posibilidad de inyectar diferentes listas para casos específicos.
+   * @param listas Listas a usar para la prueba, por defecto se usan las mockListas definidas arriba.
+   */
   function setup(listas = mockListas) {
     listasSubject = new BehaviorSubject<any[]>(listas);
     favoritesSubject = new BehaviorSubject<string[]>([]);
@@ -80,11 +90,17 @@ describe('ListasUsuariosComponent', () => {
     fixture.detectChanges();
   }
 
+  /**
+   * Limpieza después de cada prueba.
+   */
   afterEach(() => {
     TestBed.resetTestingModule();
     vi.clearAllMocks();
   });
 
+  /**
+   * Pruebas para ngOnInit().
+   */
   describe('ngOnInit', () => {
     it('should load and filter listas from service', () => {
       setup();
@@ -131,6 +147,9 @@ describe('ListasUsuariosComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para editList().
+   */
   describe('editList()', () => {
     it('should prompt for new name and call updateListName', () => {
       setup();
@@ -180,6 +199,9 @@ describe('ListasUsuariosComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para deleteList().
+   */
   describe('deleteList()', () => {
     it('should delete list when confirmed', async () => {
       setup();
@@ -225,6 +247,9 @@ describe('ListasUsuariosComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para onSearch().
+   */
   describe('onSearch()', () => {
     it('should filter listas by search term', () => {
       setup();
@@ -254,6 +279,9 @@ describe('ListasUsuariosComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para updatePagination().
+   */
   describe('updatePagination()', () => {
     it('should slice filteredListas for paged display', () => {
       const manyListas = Array.from({ length: 20 }, (_, i) => ({
@@ -269,6 +297,9 @@ describe('ListasUsuariosComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para onPageChange().
+   */
   describe('onPageChange()', () => {
     it('should update currentPage and call updatePagination', () => {
       setup();
@@ -279,6 +310,9 @@ describe('ListasUsuariosComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para crearLista().
+   */
   describe('crearLista()', () => {
     it('should show create input', () => {
       setup();
@@ -289,6 +323,9 @@ describe('ListasUsuariosComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para confirmCreate().
+   */
   describe('confirmCreate()', () => {
     it('should create list and navigate to it', () => {
       setup();
@@ -325,6 +362,9 @@ describe('ListasUsuariosComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para cancelCreate().
+   */
   describe('cancelCreate()', () => {
     it('should hide create input and clear state', () => {
       setup();
@@ -338,6 +378,9 @@ describe('ListasUsuariosComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para getCoverForTemplate().
+   */
   describe('getCoverForTemplate()', () => {
     it('should delegate to bookSearchService', () => {
       setup();
@@ -350,6 +393,9 @@ describe('ListasUsuariosComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para getOwnerAvatar().
+   */
   describe('getOwnerAvatar()', () => {
     it('should return avatar from auth service', () => {
       setup();
@@ -369,6 +415,9 @@ describe('ListasUsuariosComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para getTitleForTemplate().
+   */
   describe('getTitleForTemplate()', () => {
     it('should return title from book object', () => {
       setup();
@@ -387,6 +436,9 @@ describe('ListasUsuariosComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para openBookDetailFromList().
+   */
   describe('openBookDetailFromList()', () => {
     it('should set selected book and navigate to /menu', () => {
       setup();
@@ -407,6 +459,9 @@ describe('ListasUsuariosComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para openListFromListas().
+   */
   describe('openListFromListas()', () => {
     it('should set navigation origin and navigate to list', () => {
       setup();
@@ -418,6 +473,9 @@ describe('ListasUsuariosComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para isFavorited().
+   */
   describe('isFavorited()', () => {
     it('should delegate to listasService', () => {
       setup();
@@ -434,6 +492,9 @@ describe('ListasUsuariosComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para toggleFavorite().
+   */
   describe('toggleFavorite()', () => {
     it('should call listasService.toggleFavorite', () => {
       setup();

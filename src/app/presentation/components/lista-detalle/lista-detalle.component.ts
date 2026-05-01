@@ -4,6 +4,7 @@ import { Location } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ListasService, ListaItem } from '../../../domain/services/listas.service';
+import { AuthService } from '../../../domain/services/auth.service';
 import { ConfirmService } from '../../shared/confirm.service';
 import { Subscription } from 'rxjs';
 import { BookSearchService, OpenLibraryBook } from '../../../domain/services/book-search.service';
@@ -36,7 +37,7 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
   editOriginalNombre = '';
   editOriginalIsPrivate = false;
 
-  constructor(private route: ActivatedRoute, private listas: ListasService, private router: Router, private bookSearch: BookSearchService, private location: Location, private confirm: ConfirmService) {}
+  constructor(private route: ActivatedRoute, private listas: ListasService, private router: Router, private bookSearch: BookSearchService, private location: Location, private confirm: ConfirmService, public auth: AuthService) {}
 
   /**
    * Inicializa el componente, obteniendo la lista a mostrar según el ID de la ruta,

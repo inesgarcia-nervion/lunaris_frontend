@@ -6,6 +6,9 @@ import { AuthService } from '../../../app/domain/services/auth.service';
 import { ListasService } from '../../../app/domain/services/listas.service';
 import { of, throwError } from 'rxjs';
 
+/**
+ * Pruebas para LoginComponent.
+ */
 describe('LoginComponent', () => {
   let fixture: ComponentFixture<LoginComponent>;
   let component: LoginComponent;
@@ -35,20 +38,32 @@ describe('LoginComponent', () => {
     fixture.detectChanges();
   });
 
+  /**
+   * Limpieza después de cada prueba.
+   */
   afterEach(() => {
     fixture.destroy();
     localStorage.clear();
     sessionStorage.clear();
   });
 
+  /**
+   * Prueba de creación del componente.
+   */
   it('should be created', () => {
     expect(component).toBeTruthy();
   });
 
+  /**
+   * Prueba de ngOnInit para ocultar el scroll del body.
+   */
   it('ngOnInit hides body scroll', () => {
     expect(document.body.style.overflow).toBe('hidden');
   });
 
+  /**
+   * Prueba de ngOnInit para restaurar credenciales recordadas desde localStorage.
+   */
   it('ngOnInit restores remembered credentials from localStorage', async () => {
     fixture.destroy();
     localStorage.setItem('lunaris_remember', 'true');
@@ -75,6 +90,9 @@ describe('LoginComponent', () => {
     expect(component.password).toBe('mypassword');
   });
 
+  /**
+   * Prueba de ngOnInit para cargar el nombre de usuario desde sessionStorage cuando no se recuerda.
+   */
   it('ngOnInit loads username from sessionStorage when not remembered', async () => {
     fixture.destroy();
     sessionStorage.setItem('lunaris_current_user', 'bob');
@@ -97,11 +115,17 @@ describe('LoginComponent', () => {
     expect(component.username).toBe('bob');
   });
 
+  /**
+   * Prueba de ngOnDestroy para restaurar el scroll del body.
+   */
   it('ngOnDestroy restores body scroll', () => {
     fixture.destroy();
     expect(document.body.style.overflow).toBe('');
   });
 
+  /**
+   * Prueba de submit con nombre de usuario vacío.
+   */
   it('submit with empty username sets error', () => {
     component.username = '';
     component.password = 'pass';
@@ -110,6 +134,9 @@ describe('LoginComponent', () => {
     expect(authSpy.login).not.toHaveBeenCalled();
   });
 
+  /**
+   * Prueba de submit con contraseña vacía.
+   */
   it('submit with empty password sets error', () => {
     component.username = 'user';
     component.password = '';
@@ -117,6 +144,9 @@ describe('LoginComponent', () => {
     expect(component.error).toContain('usuario y contraseña');
   });
 
+  /**
+   * Prueba de submit con entradas válidas.
+   */
   it('submit with valid inputs calls auth.login', () => {
     component.username = 'user';
     component.password = 'pass';
@@ -124,6 +154,9 @@ describe('LoginComponent', () => {
     expect(authSpy.login).toHaveBeenCalledWith('user', 'pass', false);
   });
 
+  /**
+   * Prueba de submit con rememberMe activado.
+   */
   it('submit with rememberMe calls auth.login with rememberMe=true', () => {
     component.username = 'user';
     component.password = 'pass';
@@ -132,6 +165,9 @@ describe('LoginComponent', () => {
     expect(authSpy.login).toHaveBeenCalledWith('user', 'pass', true);
   });
 
+  /**
+   * Prueba de submit con éxito, asignando propiedad de listas, guardando remember-me y navegando.
+   */
   it('submit on success assigns list ownership, saves remember-me and navigates', () => {
     component.username = 'user';
     component.password = 'pass';
@@ -144,6 +180,9 @@ describe('LoginComponent', () => {
     expect(component.loading).toBe(false);
   });
 
+  /**
+   * Prueba de submit con éxito sin rememberMe, guardando en sessionStorage.
+   */
   it('submit on success without rememberMe saves to session', () => {
     component.username = 'ann';
     component.password = 'pass1';
@@ -152,6 +191,9 @@ describe('LoginComponent', () => {
     expect(sessionStorage.getItem('lunaris_current_user')).toBe('ann');
   });
 
+  /**
+   * Prueba de submit manejando error 401.
+   */
   it('submit handles login error 401', () => {
     authSpy.login.mockReturnValue(throwError(() => ({ status: 401 })));
     component.username = 'user';
@@ -161,6 +203,9 @@ describe('LoginComponent', () => {
     expect(component.loading).toBe(false);
   });
 
+  /**
+   * Prueba de submit manejando error de conexión (status 0).
+   */
   it('submit handles connection error (status 0)', () => {
     authSpy.login.mockReturnValue(throwError(() => ({ status: 0 })));
     component.username = 'user';
@@ -169,6 +214,9 @@ describe('LoginComponent', () => {
     expect(component.error).toContain('conectar');
   });
 
+  /**
+   * Prueba de submit manejando error genérico.
+   */
   it('submit handles generic error', () => {
     authSpy.login.mockReturnValue(throwError(() => ({ status: 500 })));
     component.username = 'user';
@@ -177,15 +225,20 @@ describe('LoginComponent', () => {
     expect(component.error).toContain('Error');
   });
 
+  /**
+   * Prueba de submit manejando error de listasService.
+   */
   it('submit handles listasService error gracefully', () => {
     listasSpySvc.assignUnownedListsToCurrentUser.mockImplementation(() => { throw new Error('fail'); });
     component.username = 'user';
     component.password = 'pass';
     component.submit();
-    // Should still navigate
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/menu']);
   });
 
+  /**
+   * Prueba de togglePassword.
+   */
   it('togglePassword toggles showPassword', () => {
     expect(component.showPassword).toBe(false);
     component.togglePassword();
@@ -194,6 +247,9 @@ describe('LoginComponent', () => {
     expect(component.showPassword).toBe(false);
   });
 
+  /**
+   * Prueba de ngOnInit manejando codificación btoa inválida.
+   */
   it('ngOnInit handles invalid btoa encoding gracefully', async () => {
     fixture.destroy();
     localStorage.setItem('lunaris_remember', 'true');
@@ -214,7 +270,6 @@ describe('LoginComponent', () => {
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    // Should not throw; password just remains empty or unchanged
     expect(component.username).toBe('grace');
   });
 });

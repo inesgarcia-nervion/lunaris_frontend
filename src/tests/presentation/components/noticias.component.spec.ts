@@ -3,10 +3,12 @@ import { NoticiasComponent } from '../../../app/presentation/components/noticias
 import { NewsService } from '../../../app/domain/services/news.service';
 import { AuthService } from '../../../app/domain/services/auth.service';
 import { Router } from '@angular/router';
-import { ChangeDetectorRef } from '@angular/core';
 import { ConfirmService } from '../../../app/presentation/shared/confirm.service';
 import { Subject } from 'rxjs';
 
+/**
+ * Pruebas para el componente NoticiasComponent.
+ */
 describe('NoticiasComponent', () => {
   let component: NoticiasComponent;
   let fixture: ComponentFixture<NoticiasComponent>;
@@ -22,6 +24,9 @@ describe('NoticiasComponent', () => {
     { id: '2', title: 'News 2', text: 'text 2', body: 'body 2', date: '2024-01-02' }
   ];
 
+  /**
+   * Configura el entorno de pruebas para el componente, creando mocks para los servicios y estableciendo valores iniciales.
+   */
   function setup() {
     newsSubject = new Subject<any[]>();
     isAdminSubject = new Subject<boolean>();
@@ -52,11 +57,17 @@ describe('NoticiasComponent', () => {
     component = fixture.componentInstance;
   }
 
+  /**
+   * Limpia el entorno de pruebas después de cada test, reseteando el módulo de pruebas y limpiando los mocks.
+   */
   afterEach(() => {
     TestBed.resetTestingModule();
     vi.clearAllMocks();
   });
 
+  /**
+   * Pruebas para el método ngOnInit del componente.
+   */
   describe('ngOnInit', () => {
     it('should load news and set isAdmin on init', () => {
       setup();
@@ -86,6 +97,9 @@ describe('NoticiasComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método updatePagination del componente.
+   */
   describe('updatePagination()', () => {
     it('should set pagedNews correctly for first page', () => {
       setup();
@@ -104,6 +118,9 @@ describe('NoticiasComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método onPageChange del componente.
+   */
   describe('onPageChange()', () => {
     it('should set currentPage and update pagination', () => {
       const news6 = [...sampleNews, ...sampleNews, ...sampleNews];
@@ -119,6 +136,9 @@ describe('NoticiasComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método onFileChange del componente.
+   */
   describe('openDetail()', () => {
     it('should navigate to noticias/:id', () => {
       setup();
@@ -128,6 +148,9 @@ describe('NoticiasComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método hasCreateChanges del componente.
+   */
   describe('hasCreateChanges()', () => {
     it('should return false when all fields are empty', () => {
       setup();
@@ -157,6 +180,9 @@ describe('NoticiasComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método addNews del componente.
+   */
   describe('addNews()', () => {
     it('should not add news if user is not admin', () => {
       setup();
@@ -223,6 +249,9 @@ describe('NoticiasComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método clearImage del componente.
+   */
   describe('clearImage()', () => {
     it('should clear imageData', () => {
       setup();
@@ -235,6 +264,9 @@ describe('NoticiasComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método onBodyInput del componente.
+   */
   describe('onBodyInput()', () => {
     it('should extract text from element and set body', () => {
       setup();
@@ -248,6 +280,9 @@ describe('NoticiasComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método onBodyKeydown del componente.
+   */
   describe('onBodyKeydown()', () => {
     it('should not throw when called', () => {
       setup();
@@ -259,6 +294,9 @@ describe('NoticiasComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método openCreateModal del componente.
+   */
   describe('openCreateModal()', () => {
     it('should set showCreateModal to true', () => {
       vi.useFakeTimers();
@@ -274,6 +312,9 @@ describe('NoticiasComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método closeCreateModal del componente.
+   */
   describe('closeCreateModal()', () => {
     it('should reset all fields and close modal', () => {
       setup();
@@ -295,6 +336,9 @@ describe('NoticiasComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método requestInlineDelete del componente.
+   */
   describe('requestInlineDelete()', () => {
     it('should set pendingDeleteId when admin', () => {
       setup();
@@ -317,6 +361,9 @@ describe('NoticiasComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método removeConfirmed del componente.
+   */
   describe('removeConfirmed()', () => {
     it('should call removeNews and clear pendingDeleteId when admin', async () => {
       setup();
@@ -341,6 +388,9 @@ describe('NoticiasComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método cancelRemove del componente.
+   */
   describe('cancelRemove()', () => {
     it('should clear pendingDeleteId', () => {
       setup();
@@ -353,6 +403,9 @@ describe('NoticiasComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método confirmRemove del componente.
+   */
   describe('confirmRemove()', () => {
     it('should remove news when admin and confirm returns true', async () => {
       setup();

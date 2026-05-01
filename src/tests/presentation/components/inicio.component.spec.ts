@@ -3,11 +3,17 @@ import { Router } from '@angular/router';
 import { InicioComponent } from '../../../app/presentation/components/inicio/inicio.component';
 import { provideRouter } from '@angular/router';
 
+/**
+ * Pruebas para InicioComponent.
+ */
 describe('InicioComponent', () => {
   let fixture: ComponentFixture<InicioComponent>;
   let component: InicioComponent;
   let routerSpy: { navigate: ReturnType<typeof vi.fn> };
 
+  /**
+   * Configuración antes de cada prueba.
+   */
   beforeEach(async () => {
     routerSpy = { navigate: vi.fn() };
 

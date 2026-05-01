@@ -6,6 +6,9 @@ import { BookSearchService } from '../../../app/domain/services/book-search.serv
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 
+/**
+ * Pruebas para el componente PerfilComponent.
+ */
 describe('PerfilComponent', () => {
   let component: PerfilComponent;
   let fixture: ComponentFixture<PerfilComponent>;
@@ -17,6 +20,10 @@ describe('PerfilComponent', () => {
   let favoritesSubject: BehaviorSubject<string[]>;
   let avatarSubject: BehaviorSubject<string | null>;
 
+  /**
+   * Configura el entorno de pruebas para el componente, permitiendo simular diferentes escenarios de listas, usuario y avatar.
+   * @param listas Un array de listas para simular la respuesta del servicio, por defecto se usan listas de ejemplo.
+   */
   const mockListas = [
     { id: 'ley1', nombre: 'Leyendo', libros: [{ title: 'A' }, { title: 'B' }], owner: 'testuser' },
     { id: 'lei1', nombre: 'Leído', libros: [{ title: 'C' }], owner: 'testuser' },
@@ -24,6 +31,10 @@ describe('PerfilComponent', () => {
     { id: 'custom1', nombre: 'Ciencia Ficción', libros: [], owner: 'testuser' }
   ];
 
+  /**
+   * Configura el entorno de pruebas para el componente, permitiendo simular diferentes escenarios de listas, usuario y avatar.
+   * @param listas Un array de listas para simular la respuesta del servicio, por defecto se usan listas de ejemplo.
+   */
   function setup(listas = mockListas) {
     listasSubject = new BehaviorSubject<any[]>(listas);
     favoritesSubject = new BehaviorSubject<string[]>([]);
@@ -72,11 +83,17 @@ describe('PerfilComponent', () => {
     fixture.detectChanges();
   }
 
+  /**
+   * Limpia el entorno de pruebas después de cada prueba, restableciendo el módulo de pruebas y limpiando los mocks.
+   */
   afterEach(() => {
     TestBed.resetTestingModule();
     vi.clearAllMocks();
   });
 
+  /**
+   * Pruebas para el método ngOnInit del componente.
+   */
   describe('ngOnInit', () => {
     it('should load username from auth service', () => {
       setup();
@@ -123,6 +140,9 @@ describe('PerfilComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método loadLists del componente.
+   */
   describe('loadLists()', () => {
     it('should separate Leyendo section correctly', () => {
       setup();
@@ -195,6 +215,9 @@ describe('PerfilComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para la paginación de las secciones Leyendo, Leído, Plan para leer y listas de usuario del componente.
+   */
   describe('Leyendo pagination', () => {
     it('updatePaginationLeyendo should slice by pageSize', () => {
       setup();
@@ -215,6 +238,9 @@ describe('PerfilComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para la paginación de la sección Leído del componente.
+   */
   describe('Leído pagination', () => {
     it('updatePaginationLeido should slice by pageSize', () => {
       setup();
@@ -235,6 +261,9 @@ describe('PerfilComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para la paginación de la sección Plan para leer del componente.
+   */
   describe('Plan para leer pagination', () => {
     it('updatePaginationPlan should slice by pageSize', () => {
       setup();
@@ -255,6 +284,9 @@ describe('PerfilComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para la paginación de las listas de usuario del componente.
+   */
   describe('User lists pagination', () => {
     it('updatePagedUserLists should slice by userListsPageSize', () => {
       setup();
@@ -275,6 +307,9 @@ describe('PerfilComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método getCoverUrl del componente.
+   */
   describe('getCoverUrl()', () => {
     it('should delegate to bookSearchService', () => {
       setup();
@@ -287,6 +322,9 @@ describe('PerfilComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método navigate del componente.
+   */
   describe('navigate()', () => {
     it('should call router.navigateByUrl', () => {
       setup();
@@ -297,6 +335,9 @@ describe('PerfilComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método navigateToList del componente.
+   */
   describe('navigateToList()', () => {
     it('should set navigation origin and navigate to list', () => {
       setup();
@@ -316,6 +357,9 @@ describe('PerfilComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método toggleFavorite del componente.
+   */
   describe('toggleFavorite()', () => {
     it('should call listasService.toggleFavorite', () => {
       setup();
@@ -335,6 +379,9 @@ describe('PerfilComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método onAvatarError del componente.
+   */
   describe('onAvatarError()', () => {
     it('should call auth.setLocalAvatar(null)', () => {
       setup();

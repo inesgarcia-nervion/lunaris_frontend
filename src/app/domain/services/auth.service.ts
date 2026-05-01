@@ -76,14 +76,45 @@ export class AuthService {
         this.saveToken(token, rememberMe);
         try {
           if (rememberMe) {
-            localStorage.setItem('lunaris_current_user', username);
-            localStorage.setItem(this.REMEMBER_PASS_KEY, btoa(password));
+            try { 
+              localStorage.setItem('lunaris_current_user', username); 
+            } catch {
+              //
+            }
+            try { 
+              localStorage.setItem(this.REMEMBER_PASS_KEY, btoa(password)); 
+            } catch {
+              //
+            }
+            try { 
+              sessionStorage.removeItem('lunaris_current_user'); 
+            } catch {
+              //
+            }
           } else {
-            sessionStorage.setItem('lunaris_current_user', username);
-            localStorage.removeItem(this.REMEMBER_PASS_KEY);
+            try { 
+              sessionStorage.setItem('lunaris_current_user', username); 
+            } catch {
+              //
+            }
+            try { 
+              localStorage.removeItem(this.REMEMBER_PASS_KEY); 
+            } catch {
+              //
+            }
+            try { 
+              localStorage.removeItem('lunaris_current_user'); 
+            } catch {
+              //
+            }
+            try { 
+              localStorage.removeItem(this.REMEMBER_KEY); 
+            } catch {
+              //
+            }
           }
         } catch (e) {
-          console.error('Unable to save current user', e);
+          console.error('Unable to save/clear current user', e);
         }
         try {
           let admin = false;

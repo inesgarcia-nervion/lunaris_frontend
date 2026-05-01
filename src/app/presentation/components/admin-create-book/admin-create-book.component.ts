@@ -27,6 +27,7 @@ export class AdminCreateBookComponent implements OnInit {
   coverImage: string = '';
   releaseYear: number | null = null;
   score: number | null = null;
+  sagaName: string = '';
 
   allGenres: { id: number; name: string }[] = [];
   selectedGenreIds: number[] = [];
@@ -190,6 +191,22 @@ export class AdminCreateBookComponent implements OnInit {
   }
 
   /**
+   * Maneja la entrada del campo 'Año de Lanzamiento', permitiendo solo dígitos
+   * y limitando a 4 caracteres. Convierte el valor a number o null.
+   */
+  onYearInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const digits = (input.value || '').replace(/\D/g, '').slice(0, 4);
+    input.value = digits;
+    if (!digits) {
+      this.releaseYear = null;
+      return;
+    }
+    const num = parseInt(digits, 10);
+    this.releaseYear = Number.isNaN(num) ? null : num;
+  }
+
+  /**
    * Establece la imagen de portada a partir de la URL ingresada en el campo correspondiente.
    * @returns void
    */
@@ -242,9 +259,11 @@ export class AdminCreateBookComponent implements OnInit {
       return;
     }
 
-    if (this.releaseYear !== null && this.releaseYear < 1000) {
-      this.error = 'El año de lanzamiento debe ser válido';
-      return;
+    if (this.releaseYear !== null) {
+      if (!Number.isInteger(this.releaseYear) || this.releaseYear < 1000 || this.releaseYear > 9999) {
+        this.error = 'El año de lanzamiento debe tener 4 dígitos (ej: 2026)';
+        return;
+      }
     }
 
     this.loading = true;
@@ -257,6 +276,8 @@ export class AdminCreateBookComponent implements OnInit {
       releaseYear: this.releaseYear || undefined,
       score: this.score || undefined,
       genreIds: this.selectedGenreIds.length > 0 ? this.selectedGenreIds : undefined
+      ,
+      sagaName: this.sagaName && this.sagaName.trim().length > 0 ? this.sagaName.trim() : undefined
     };
 
     this.bookService.createBook(bookData).subscribe({
@@ -272,7 +293,9 @@ export class AdminCreateBookComponent implements OnInit {
       error: (err) => {
         this.loading = false;
         console.error('Error creando libro:', err);
-        if (err.status === 400) {
+        if (err.status === 409) {
+          this.error = err.error || 'Ya existe un libro con el mismo título y autor';
+        } else if (err.status === 400) {
           this.error = 'Error en los datos enviados';
         } else if (err.status === 0) {
           this.error = 'No se puede conectar con el servidor';

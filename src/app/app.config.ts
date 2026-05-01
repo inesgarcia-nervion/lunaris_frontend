@@ -9,6 +9,7 @@ registerLocaleData(localeEs);
 
 import { routes } from './app.routes';
 import { AuthInterceptor } from './domain/services/auth.interceptor';
+import { ErrorInterceptor } from './domain/services/error.interceptor';
 
 /**
  * Configuración global de la aplicación Angular, que incluye la provisión de servicios y 
@@ -19,6 +20,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'enabled' })),
     provideHttpClient(withInterceptorsFromDi()),
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
     , { provide: LOCALE_ID, useValue: 'es' }
   ]

@@ -2,9 +2,11 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { RuletaComponent } from '../../../app/presentation/components/ruleta/ruleta.component';
 import { ListasService } from '../../../app/domain/services/listas.service';
 import { BookSearchService } from '../../../app/domain/services/book-search.service';
-import { NgZone } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
+/**
+ * Pruebas para el componente RuletaComponent.
+ */
 describe('RuletaComponent', () => {
   let component: RuletaComponent;
   let fixture: ComponentFixture<RuletaComponent>;
@@ -24,6 +26,10 @@ describe('RuletaComponent', () => {
     { id: 'plan1', nombre: 'Plan para leer', libros: [], owner: 'testuser' }
   ];
 
+  /**
+   * Configura el entorno de pruebas para el componente RuletaComponent.
+   * @param listas Listas de prueba a utilizar.
+   */
   function setup(listas = mockListas) {
     listasSubject = new BehaviorSubject<any[]>(listas);
 
@@ -56,11 +62,17 @@ describe('RuletaComponent', () => {
     fixture.detectChanges();
   }
 
+  /**
+   * Limpia el entorno de pruebas después de cada prueba.
+   */
   afterEach(() => {
     TestBed.resetTestingModule();
     vi.clearAllMocks();
   });
 
+  /**
+   * Pruebas para el método ngOnInit del componente RuletaComponent.
+   */
   describe('ngOnInit', () => {
     it('should get current user from listasService', () => {
       setup();
@@ -109,6 +121,9 @@ describe('RuletaComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método ngOnDestroy del componente RuletaComponent.
+   */
   describe('ngOnDestroy', () => {
     it('should clear reveal timeout on destroy', () => {
       vi.useFakeTimers();
@@ -131,6 +146,9 @@ describe('RuletaComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método onWindowResize del componente RuletaComponent.
+   */
   describe('onWindowResize()', () => {
     it('should call recalcWheelSize', () => {
       setup();
@@ -142,6 +160,9 @@ describe('RuletaComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método onSelectList del componente RuletaComponent.
+   */
   describe('onSelectList()', () => {
     it('should reset state and show default titles when no list selected', () => {
       setup();
@@ -202,6 +223,9 @@ describe('RuletaComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el getter canStart del componente RuletaComponent.
+   */
   describe('canStart getter', () => {
     it('should return false when no list selected', () => {
       setup();
@@ -244,6 +268,9 @@ describe('RuletaComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método comenzarRuleta del componente RuletaComponent.
+   */
   describe('comenzarRuleta()', () => {
     beforeEach(() => {
       vi.spyOn(window, "alert").mockImplementation(() => {});
@@ -308,6 +335,9 @@ describe('RuletaComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método onWheelTransitionEnd del componente RuletaComponent.
+   */
   describe('onWheelTransitionEnd()', () => {
     it('should do nothing for non-transform transitions', () => {
       setup();
@@ -315,7 +345,6 @@ describe('RuletaComponent', () => {
 
       component.onWheelTransitionEnd({ propertyName: 'opacity' } as TransitionEvent);
 
-      // non-transform transition causes early return, getById is never called
       expect(listasMock.getById).not.toHaveBeenCalled();
     });
 
@@ -325,7 +354,6 @@ describe('RuletaComponent', () => {
 
       component.onWheelTransitionEnd({ propertyName: 'transform' } as TransitionEvent);
 
-      // null pendingSpinIdx causes early return, getById is never called
       expect(listasMock.getById).not.toHaveBeenCalled();
     });
 
@@ -343,6 +371,9 @@ describe('RuletaComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método quitarLibro del componente RuletaComponent.
+   */
   describe('quitarLibro()', () => {
     it('should do nothing when no selectedListId', () => {
       setup();
@@ -396,6 +427,9 @@ describe('RuletaComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método getCover del componente RuletaComponent.
+   */
   describe('getCover()', () => {
     it('should return empty string for null book', () => {
       setup();
@@ -414,6 +448,9 @@ describe('RuletaComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método truncateTitle del componente RuletaComponent.
+   */
   describe('truncateTitle()', () => {
     it('should return empty string for falsy input', () => {
       setup();
@@ -438,6 +475,9 @@ describe('RuletaComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el método labelTransform del componente RuletaComponent.
+   */
   describe('labelTransform()', () => {
     it('should return rotate(90deg) for top segment', () => {
       setup();
@@ -458,6 +498,9 @@ describe('RuletaComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el getter halfRadius del componente RuletaComponent.
+   */
   describe('halfRadius getter', () => {
     it('should return half of the radius', () => {
       setup();
@@ -467,6 +510,9 @@ describe('RuletaComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el getter sliceLines del componente RuletaComponent.
+   */
   describe('sliceLines getter', () => {
     it('should return empty array when only 1 title', () => {
       setup();
@@ -485,6 +531,9 @@ describe('RuletaComponent', () => {
     });
   });
 
+  /**
+   * Pruebas para el getter labelFontSize del componente RuletaComponent.
+   */
   describe('labelFontSize getter', () => {
     it('should be within min/max bounds', () => {
       setup();
