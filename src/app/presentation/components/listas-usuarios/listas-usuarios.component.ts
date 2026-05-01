@@ -181,7 +181,7 @@ export class ListasUsuariosComponent implements OnInit {
    * usuario actual como propietario.
    * @returns void
    */
-  confirmCreate(): void {
+  async confirmCreate(): Promise<void> {
     const name = (this.newListName || '').trim();
     if (!name) {
       return;
@@ -197,7 +197,7 @@ export class ListasUsuariosComponent implements OnInit {
       return;
     }
     this.createError = '';
-    const nueva = this.listasService.addList(name, !!this.newListPrivate);
+    const nueva = await this.listasService.addList(name, !!this.newListPrivate);
     this.bookSearchService.setNavigationOrigin({ type: 'listas' });
     this.router.navigate(['/listas', nueva.id]);
     this.cdr.detectChanges();

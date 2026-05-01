@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of, firstValueFrom } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { AuthService } from './auth.service';
+import { catchError } from 'rxjs/operators';
 import { OpenLibraryBook } from './book-search.service';
 
 /**
@@ -32,12 +35,39 @@ export interface ListaItem {
 export class ListasService {
   private storageKey = 'lunaris_lists';
   private favoritesKey = 'lunaris_favorites';
-  private listasSubject = new BehaviorSubject<ListaItem[]>(this.loadFromStorage());
+  private listasSubject = new BehaviorSubject<ListaItem[]>([]);
   listas$ = this.listasSubject.asObservable();
   private favoritesSubject = new BehaviorSubject<Record<string, string[]>>(this.loadFavoritesMap());
   favorites$ = this.favoritesSubject.asObservable();
 
-  constructor() {}
+  private backendBase = 'http://localhost:8080';
+
+  constructor(private http: HttpClient, private auth: AuthService) {
+    // Initialize lists: prefer server-backed lists for authenticated users
+    const current = this.getCurrentUser();
+    if (current) {
+      this.http.get<any[]>(`${this.backendBase}/user_list/owner/${encodeURIComponent(current)}`).pipe(
+        catchError(_ => of([]))
+      ).subscribe(serverLists => {
+        const converted = (serverLists || []).map(l => ({
+          id: l.id?.toString() || Date.now().toString(),
+          nombre: l.name || '',
+          libros: l.booksJson ? JSON.parse(l.booksJson) : [],
+          owner: l.owner || current,
+          isPrivate: !!l.isPrivate
+        } as ListaItem));
+        if (converted.length) {
+          this.listasSubject.next(converted);
+          try { localStorage.setItem(this.storageKey, JSON.stringify(converted)); } catch {}
+          return;
+        }
+        // fallback to local storage if no server lists
+        this.listasSubject.next(this.loadFromStorage());
+      });
+    } else {
+      this.listasSubject.next(this.loadFromStorage());
+    }
+  }
 
   /**
    * Carga las listas desde localStorage, parseando el JSON almacenado. Si no hay datos o 
@@ -85,12 +115,30 @@ export class ListasService {
    * @param isPrivate Flag opcional que indica si la lista es privada
    * @returns La nueva lista creada
    */
-  addList(nombre: string, isPrivate: boolean = false): ListaItem {
-    const nueva: ListaItem = { id: Date.now().toString(), nombre, libros: [], owner: this.getCurrentUser(), isPrivate };
-    const listas = [nueva, ...this.getAll()];
+  async addList(nombre: string, isPrivate: boolean = false): Promise<ListaItem> {
+    const owner = this.getCurrentUser();
+    const payload: any = { name: nombre, owner, isPrivate, booksJson: JSON.stringify([]) };
+    if (owner) {
+      try {
+        const res = await firstValueFrom(this.http.post<any>(`${this.backendBase}/user_list`, payload).pipe(catchError(_ => of(null))));
+        const nueva: ListaItem = { id: res?.id?.toString() || Date.now().toString(), nombre, libros: [], owner, isPrivate };
+        const listas = [nueva, ...this.getAll()];
+        try { localStorage.setItem(this.storageKey, JSON.stringify(listas)); } catch {}
+        this.listasSubject.next(listas);
+        return nueva;
+      } catch (e) {
+        const fallback: ListaItem = { id: Date.now().toString(), nombre, libros: [], owner, isPrivate };
+        const listas = [fallback, ...this.getAll()];
+        try { localStorage.setItem(this.storageKey, JSON.stringify(listas)); } catch {}
+        this.listasSubject.next(listas);
+        return fallback;
+      }
+    }
+    const nuevaOffline: ListaItem = { id: Date.now().toString(), nombre, libros: [], owner, isPrivate };
+    const listas = [nuevaOffline, ...this.getAll()];
     this.saveToStorage(listas);
     this.listasSubject.next(listas);
-    return nueva;
+    return nuevaOffline;
   }
 
   /**
@@ -98,6 +146,16 @@ export class ListasService {
    * @param id ID de la lista a eliminar
    */
   deleteList(id: string) {
+    const owner = this.getCurrentUser();
+    const numericId = Number(id);
+    if (owner && !isNaN(numericId)) {
+      this.http.delete(`${this.backendBase}/user_list/${numericId}`).pipe(catchError(_ => of(null))).subscribe(() => {
+        const listas = this.getAll().filter(l => l.id !== id);
+        try { localStorage.setItem(this.storageKey, JSON.stringify(listas)); } catch {}
+        this.listasSubject.next(listas);
+      });
+      return;
+    }
     const listas = this.getAll().filter(l => l.id !== id);
     this.saveToStorage(listas);
     this.listasSubject.next(listas);
@@ -109,23 +167,35 @@ export class ListasService {
    * @param newName Nuevo nombre para la lista
    */
   updateListName(id: string, newName: string) {
-    const listas = this.getAll().map(l => {
-      if (l.id === id) {
-        return { ...l, nombre: newName };
-      }
-      return l;
-    });
+    const owner = this.getCurrentUser();
+    const numericId = Number(id);
+    const listas = this.getAll().map(l => l.id === id ? { ...l, nombre: newName } : l);
+    if (owner && !isNaN(numericId)) {
+      const toSave = listas.find(l => l.id === id);
+      const payload = { name: newName, owner, isPrivate: toSave?.isPrivate || false, booksJson: JSON.stringify(toSave?.libros || []) };
+      this.http.put<any>(`${this.backendBase}/user_list/${numericId}`, payload).pipe(catchError(_ => of(null))).subscribe(() => {
+        try { localStorage.setItem(this.storageKey, JSON.stringify(listas)); } catch {}
+        this.listasSubject.next(listas);
+      });
+      return;
+    }
     this.saveToStorage(listas);
     this.listasSubject.next(listas);
   }
 
   updateListPrivacy(id: string, isPrivate: boolean) {
-    const listas = this.getAll().map(l => {
-      if (l.id === id) {
-        return { ...l, isPrivate };
-      }
-      return l;
-    });
+    const owner = this.getCurrentUser();
+    const numericId = Number(id);
+    const listas = this.getAll().map(l => l.id === id ? { ...l, isPrivate } : l);
+    if (owner && !isNaN(numericId)) {
+      const toSave = listas.find(l => l.id === id);
+      const payload = { name: toSave?.nombre || '', owner, isPrivate, booksJson: JSON.stringify(toSave?.libros || []) };
+      this.http.put<any>(`${this.backendBase}/user_list/${numericId}`, payload).pipe(catchError(_ => of(null))).subscribe(() => {
+        try { localStorage.setItem(this.storageKey, JSON.stringify(listas)); } catch {}
+        this.listasSubject.next(listas);
+      });
+      return;
+    }
     this.saveToStorage(listas);
     this.listasSubject.next(listas);
   }
@@ -139,11 +209,14 @@ export class ListasService {
    */
   assignUnownedListsToCurrentUser(username: string) {
     if (!username) return;
-    const listas = this.getAll().map(l => {
-      if (!l.owner) {
-        return { ...l, owner: username };
+    const listas = this.getAll().map(l => l.owner ? l : { ...l, owner: username });
+    // persist changed lists to server if logged in
+    listas.forEach(l => {
+      const numericId = Number(l.id);
+      if (numericId && l.owner) {
+        const payload = { name: l.nombre, owner: l.owner, isPrivate: l.isPrivate, booksJson: JSON.stringify(l.libros || []) };
+        this.http.put<any>(`${this.backendBase}/user_list/${numericId}`, payload).pipe(catchError(_ => of(null))).subscribe();
       }
-      return l;
     });
     this.saveToStorage(listas);
     this.listasSubject.next(listas);
@@ -337,6 +410,17 @@ export class ListasService {
       }
       return l;
     });
+    const owner = this.getCurrentUser();
+    const numericId = Number(listId);
+    if (owner && !isNaN(numericId)) {
+      const toSave = listas.find(l => l.id === listId);
+      const payload = { name: toSave?.nombre || '', owner, isPrivate: toSave?.isPrivate || false, booksJson: JSON.stringify(toSave?.libros || []) };
+      this.http.put<any>(`${this.backendBase}/user_list/${numericId}`, payload).pipe(catchError(_ => of(null))).subscribe(() => {
+        try { localStorage.setItem(this.storageKey, JSON.stringify(listas)); } catch {}
+        this.listasSubject.next(listas);
+      });
+      return;
+    }
     this.saveToStorage(listas);
     this.listasSubject.next(listas);
   }
@@ -366,6 +450,17 @@ export class ListasService {
       }
       return l;
     });
+    const owner = this.getCurrentUser();
+    const numericId = Number(listId);
+    if (owner && !isNaN(numericId)) {
+      const toSave = listas.find(l => l.id === listId);
+      const payload = { name: toSave?.nombre || '', owner, isPrivate: toSave?.isPrivate || false, booksJson: JSON.stringify(toSave?.libros || []) };
+      this.http.put<any>(`${this.backendBase}/user_list/${numericId}`, payload).pipe(catchError(_ => of(null))).subscribe(() => {
+        try { localStorage.setItem(this.storageKey, JSON.stringify(listas)); } catch {}
+        this.listasSubject.next(listas);
+      });
+      return;
+    }
     this.saveToStorage(listas);
     this.listasSubject.next(listas);
   }
