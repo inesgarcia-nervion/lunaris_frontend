@@ -49,20 +49,23 @@ export class ListasService {
       this.http.get<any[]>(`${this.backendBase}/user_list/owner/${encodeURIComponent(current)}`).pipe(
         catchError(_ => of([]))
       ).subscribe(serverLists => {
-        const converted = (serverLists || []).map(l => ({
-          id: l.id?.toString() || Date.now().toString(),
-          nombre: l.name || '',
-          libros: l.booksJson ? JSON.parse(l.booksJson) : [],
-          owner: l.owner || current,
-          isPrivate: !!l.isPrivate
-        } as ListaItem));
-        if (converted.length) {
-          this.listasSubject.next(converted);
-          try { localStorage.setItem(this.storageKey, JSON.stringify(converted)); } catch {}
-          return;
-        }
-        // fallback to local storage if no server lists
-        this.listasSubject.next(this.loadFromStorage());
+        const customLists = (serverLists || [])
+          .filter((l: any) => !this.isProfileListName(l.name))
+          .map((l: any) => ({
+            id: l.id?.toString() || Date.now().toString(),
+            nombre: l.name || '',
+            libros: l.booksJson ? JSON.parse(l.booksJson) : [],
+            owner: l.owner || current,
+            isPrivate: !!l.isPrivate
+          } as ListaItem));
+        this.http.get<any>(`${this.backendBase}/users/username/${encodeURIComponent(current)}/book-status`).pipe(
+          catchError(_ => of(null))
+        ).subscribe(statusData => {
+          const profileLists = this.buildProfileListsFromStatus(current, statusData);
+          const all = [...profileLists, ...customLists];
+          this.listasSubject.next(all);
+          try { localStorage.setItem(this.storageKey, JSON.stringify(all)); } catch {}
+        });
       });
     } else {
       this.listasSubject.next(this.loadFromStorage());
@@ -79,23 +82,58 @@ export class ListasService {
       this.http.get<any[]>(`${this.backendBase}/user_list/owner/${encodeURIComponent(current)}`).pipe(
         catchError(_ => of([]))
       ).subscribe(serverLists => {
-        const converted = (serverLists || []).map(l => ({
-          id: l.id?.toString() || Date.now().toString(),
-          nombre: l.name || '',
-          libros: l.booksJson ? JSON.parse(l.booksJson) : [],
-          owner: l.owner || current,
-          isPrivate: !!l.isPrivate
-        } as ListaItem));
-        if (converted.length) {
-          this.listasSubject.next(converted);
-          try { localStorage.setItem(this.storageKey, JSON.stringify(converted)); } catch {}
-          return;
-        }
-        this.listasSubject.next(this.loadFromStorage());
+        const customLists = (serverLists || [])
+          .filter((l: any) => !this.isProfileListName(l.name))
+          .map((l: any) => ({
+            id: l.id?.toString() || Date.now().toString(),
+            nombre: l.name || '',
+            libros: l.booksJson ? JSON.parse(l.booksJson) : [],
+            owner: l.owner || current,
+            isPrivate: !!l.isPrivate
+          } as ListaItem));
+        this.http.get<any>(`${this.backendBase}/users/username/${encodeURIComponent(current)}/book-status`).pipe(
+          catchError(_ => of(null))
+        ).subscribe(statusData => {
+          const profileLists = this.buildProfileListsFromStatus(current, statusData);
+          const all = [...profileLists, ...customLists];
+          this.listasSubject.next(all);
+          try { localStorage.setItem(this.storageKey, JSON.stringify(all)); } catch {}
+        });
       });
     } else {
       this.listasSubject.next(this.loadFromStorage());
     }
+  }
+
+  /**
+   * Construye las 3 listas de estado de lectura (Leyendo, Leído, Plan para leer) 
+   * a partir de los datos devueltos por el endpoint de estado del usuario.
+   * Usa IDs deterministas para evitar duplicados.
+   */
+  private buildProfileListsFromStatus(username: string, statusData: any): ListaItem[] {
+    return [
+      {
+        id: `profile-leyendo-${username}`,
+        nombre: 'Leyendo',
+        libros: statusData?.leyendo || [],
+        owner: username,
+        isPrivate: false
+      },
+      {
+        id: `profile-leido-${username}`,
+        nombre: 'Leído',
+        libros: statusData?.leido || [],
+        owner: username,
+        isPrivate: false
+      },
+      {
+        id: `profile-plan-${username}`,
+        nombre: 'Plan para leer',
+        libros: statusData?.planParaLeer || [],
+        owner: username,
+        isPrivate: false
+      }
+    ];
   }
 
   /**
@@ -403,14 +441,18 @@ export class ListasService {
    */
   ensureProfileSections(username: string | null) {
     if (!username) return;
-    const required = ['Leyendo', 'Leído', 'Plan para leer'];
+    const required = [
+      { nombre: 'Leyendo', id: `profile-leyendo-${username}` },
+      { nombre: 'Leído', id: `profile-leido-${username}` },
+      { nombre: 'Plan para leer', id: `profile-plan-${username}` },
+    ];
     const listas = this.getAll();
     let changed = false;
 
-    required.forEach(name => {
-      const exists = listas.some(l => l.owner === username && l.nombre === name);
+    required.forEach(({ nombre, id }) => {
+      const exists = listas.some(l => l.owner === username && l.nombre === nombre);
       if (!exists) {
-        listas.unshift({ id: Date.now().toString() + Math.random().toString(36).slice(2,8), nombre: name, libros: [], owner: username, isPrivate: false });
+        listas.unshift({ id, nombre, libros: [], owner: username, isPrivate: false });
         changed = true;
       }
     });
@@ -422,16 +464,65 @@ export class ListasService {
   }
 
   /**
+   * Establece el estado de lectura de un libro en la base de datos del usuario.
+   * El libro se elimina de cualquier otro estado antes de añadirse al nuevo.
+   * Actualiza el estado local de forma síncrona y persiste en el backend de forma asíncrona.
+   * @param book Libro al que se desea asignar un estado de lectura.
+   * @param status Estado de lectura: "Plan para leer", "Leyendo", "Leído" o null para eliminar.
+   */
+  setBookReadingStatus(book: OpenLibraryBook, status: string | null): void {
+    const username = this.getCurrentUser();
+    if (!username) return;
+
+    const bookId = (book as any).key || '';
+    const profileNames = ['Leyendo', 'Leído', 'Plan para leer'];
+
+    // Update all 3 profile lists locally in one atomic operation
+    const listas = this.getAll().map(l => {
+      if (!this.isProfileListName(l.nombre) || l.owner !== username) return l;
+      if (l.nombre === status) {
+        // Add to target list (avoid duplicates)
+        const exists = l.libros.some(b => (bookId ? (b as any).key === bookId : false) || b.title === book.title);
+        if (!exists) return { ...l, libros: [...l.libros, book] };
+      } else {
+        // Remove from all other profile lists
+        const filtered = l.libros.filter(b => {
+          if (bookId) return (b as any).key !== bookId;
+          return b.title !== book.title;
+        });
+        return { ...l, libros: filtered };
+      }
+      return l;
+    });
+
+    try { localStorage.setItem(this.storageKey, JSON.stringify(listas)); } catch {}
+    this.listasSubject.next(listas);
+
+    // Persist to backend
+    const payload = { bookId, status: status || null, bookData: book };
+    this.http.put<any>(`${this.backendBase}/users/username/${encodeURIComponent(username)}/book-status`, payload)
+      .pipe(catchError(_ => of(null)))
+      .subscribe();
+  }
+
+  /**
    * Agrega un libro a una lista específica, evitando duplicados por clave o título. 
-   * Si la lista existe y el libro no es un duplicado, se agrega al array de libros 
-   * de la lista. Luego, se guarda el nuevo array de listas en localStorage y se emite 
-   * el nuevo estado a través del BehaviorSubject.
+   * Para listas de perfil (Leyendo, Leído, Plan para leer) usa el endpoint de estado
+   * del usuario, que garantiza la persistencia y la exclusividad del estado.
    * @param listId ID de la lista a la cual agregar el libro
    * @param book Libro a agregar a la lista, representado como un objeto OpenLibraryBook. 
-   * El libro se agrega solo si no es un duplicado por clave o título en la lista especificada.
    * @returns void
    */
   addBookToList(listId: string, book: OpenLibraryBook) {
+    const lista = this.getAll().find(l => l.id === listId);
+
+    // For profile lists, use the dedicated book-status endpoint
+    if (lista && this.isProfileListName(lista.nombre)) {
+      this.setBookReadingStatus(book, lista.nombre);
+      return;
+    }
+
+    // Custom list: use user_list endpoint
     const listas = this.getAll().map(l => {
       if (l.id === listId) {
         const exists = l.libros.some(b => (b as any).key === (book as any).key || b.title === book.title);
@@ -456,11 +547,34 @@ export class ListasService {
 
   /**
    * Elimina un libro de una lista específica, identificando el libro por su clave o título.
+   * Para listas de perfil, solo actualiza el estado local (el backend ya fue actualizado
+   * por setBookReadingStatus al añadir al nuevo estado).
    * @param listId ID de la lista de la cual eliminar el libro
-   * @param book Libro a eliminar de la lista, representado como un objeto OpenLibraryBook o 
-   * un objeto con clave o título.
+   * @param book Libro a eliminar de la lista.
    */
   removeBookFromList(listId: string, book: OpenLibraryBook | { key?: string; title?: string }) {
+    const lista = this.getAll().find(l => l.id === listId);
+
+    // For profile lists, only update local state — the backend is handled by setBookReadingStatus
+    if (lista && this.isProfileListName(lista.nombre)) {
+      const listas = this.getAll().map(l => {
+        if (l.id !== listId) return l;
+        return {
+          ...l, libros: (l.libros || []).filter(b => {
+            try {
+              if ((book as any).key) return (b as any).key !== (book as any).key;
+              if ((book as any).title) return b.title !== (book as any).title;
+              return true;
+            } catch { return true; }
+          })
+        };
+      });
+      try { localStorage.setItem(this.storageKey, JSON.stringify(listas)); } catch {}
+      this.listasSubject.next(listas);
+      return;
+    }
+
+    // Custom list: use user_list endpoint
     const listas = this.getAll().map(l => {
       if (l.id === listId) {
         l.libros = (l.libros || []).filter(b => {
@@ -494,3 +608,4 @@ export class ListasService {
     this.listasSubject.next(listas);
   }
 }
+

@@ -633,13 +633,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
       const list = this.listasService.getById(this.selectedList || '');
       const name = list?.nombre || '';
       this.successMessage = name ? `Libro añadido a la lista "${name}" correctamente` : 'Libro añadido a la lista correctamente';
-    } else if (addedToStatus) {
-      this.successMessage = 'Estado añadido';
+    }
+    if (addedToStatus) {
+      this.successMessage = 'Estado guardado';
     }
 
     console.debug('[Header] addToList result:', { addedToCustom, addedToStatus, selectedList: this.selectedList, selectedStatus: this.selectedStatus, currentUser });
     console.debug('[Header] listas after add:', this.listasService.getAll());
     this.updateSelectedListFromBook(this.selectedBook);
+    try { this.listasService.refreshFromServer(); } catch (e) { /* ignore */ }
     this.updatingStatusOrList = false;
     this.clearAlertAfterDelay();
   }
@@ -736,7 +738,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     if (addedToStatus) {
-      this.successMessage = 'Estado añadido';
+      this.successMessage = 'Estado guardado';
     } else if (addedToCustom) {
       const list = this.listasService.getById(listId);
       const name = list?.nombre || '';
@@ -744,6 +746,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
 
     this.updateSelectedListFromBook(book);
+    try { this.listasService.refreshFromServer(); } catch (e) { /* ignore */ }
     this.updatingStatusOrList = false;
     this.clearAlertAfterDelay();
   }
