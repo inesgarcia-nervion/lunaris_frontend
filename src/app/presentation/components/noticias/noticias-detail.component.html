@@ -1,14 +1,14 @@
 <!-- Componente: noticias-detail -->
 <!-- Contenedor detalle noticia: muestra título, fecha, imagen y cuerpo -->
-<div class="noticia-detail" *ngIf="noticia">
+<div class="noticia-detail" *ngIf="!loading && noticia">
   <button class="back" (click)="back()">← Volver</button>
   <h1>{{ noticia.title }}</h1>
   <div class="meta">{{ noticia.date | date:"d 'de' MMMM 'de' y, HH:mm" }}</div>
   <div *ngIf="noticia.image" class="image"><img [src]="noticia.image" alt="imagen noticia" /></div>
   <div class="text">
-    <p *ngIf="noticia.body && noticia.body.length > 0">{{ noticia.body }}</p>
+    <p *ngIf="noticia.body && noticia.body.length > 0" style="white-space: pre-wrap">{{ noticia.body }}</p>
     <p *ngIf="!noticia.body">{{ noticia.text }}</p>
   </div>
 </div>
 <!-- Mensaje cuando no existe la noticia -->
-<div *ngIf="!noticia" class="not-found">Noticia no encontrada.</div>
+<div *ngIf="!loading && !noticia" class="not-found">Noticia no encontrada.</div>

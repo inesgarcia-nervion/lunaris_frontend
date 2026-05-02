@@ -57,12 +57,11 @@ export class NoticiasComponent implements OnInit {
    * de creación y eliminación de noticias.
    */
   ngOnInit(): void {
-    this.news = this.newsService.getAll();
-    this.updatePagination();
     this.newsService.news$.subscribe(n => {
       this.news = n || [];
       this.updatePagination();
     });
+    this.newsService.refresh();
     this.isAdmin = this.auth.isAdmin();
     this.auth.isAdmin$.subscribe(v => this.isAdmin = v);
   }
@@ -131,14 +130,18 @@ export class NoticiasComponent implements OnInit {
       setTimeout(() => { try { this.error = null; this.cdr.detectChanges(); } catch(_){} }, 3000);
       return;
     }
-    this.newsService.addNews({ title, text, body, image: this.imageData || undefined });
-    this.title = '';
-    this.text = '';
-    this.body = '';
-    this.imageData = null;
-    try { if (this.fileInputRef?.nativeElement) this.fileInputRef.nativeElement.value = ''; } catch (_) {}
-    try { if (this.bodyEditorRef?.nativeElement) this.bodyEditorRef.nativeElement.innerHTML = ''; } catch (_) {}
-    this.closeCreateModal();
+    this.newsService.addNews({ title, text, body, image: this.imageData || undefined }).subscribe({
+      next: () => {
+        this.closeCreateModal();
+        this.newsSuccess = 'Noticia creada';
+        setTimeout(() => { this.newsSuccess = null; try { this.cdr.detectChanges(); } catch(_){} }, 5000);
+      },
+      error: (err) => {
+        this.error = err?.error?.message || 'Error al crear la noticia';
+        try { this.cdr.detectChanges(); } catch(_){}
+        setTimeout(() => { try { this.error = null; this.cdr.detectChanges(); } catch(_){} }, 5000);
+      }
+    });
   }
 
   /**
@@ -235,9 +238,17 @@ export class NoticiasComponent implements OnInit {
     if (!this.isAdmin) return;
     const ok = await this.confirm.confirm('¿Estás seguro de eliminar esta noticia?');
     if (!ok) return;
-    this.newsService.removeNews(id);
-    this.newsSuccess = 'Noticia eliminada';
-    setTimeout(() => { this.newsSuccess = null; try { this.cdr.detectChanges(); } catch(_){} }, 5000);
+    this.newsService.removeNews(id).subscribe({
+      next: () => {
+        this.newsService.refresh();
+        this.newsSuccess = 'Noticia eliminada';
+        setTimeout(() => { this.newsSuccess = null; try { this.cdr.detectChanges(); } catch(_){} }, 5000);
+      },
+      error: (err) => {
+        this.error = err?.error?.message || 'Error al eliminar la noticia';
+        setTimeout(() => { try { this.error = null; this.cdr.detectChanges(); } catch(_){} }, 5000);
+      }
+    });
   }
 
   /**
@@ -261,10 +272,19 @@ export class NoticiasComponent implements OnInit {
    */
   async removeConfirmed(id: string) {
     if (!this.isAdmin) return;
-    this.newsService.removeNews(id);
-    this.pendingDeleteId = null;
-    this.newsSuccess = 'Noticia eliminada';
-    setTimeout(() => { this.newsSuccess = null; try { this.cdr.detectChanges(); } catch(_){} }, 5000);
+    this.newsService.removeNews(id).subscribe({
+      next: () => {
+        this.newsService.refresh();
+        this.pendingDeleteId = null;
+        this.newsSuccess = 'Noticia eliminada';
+        setTimeout(() => { this.newsSuccess = null; try { this.cdr.detectChanges(); } catch(_){} }, 5000);
+      },
+      error: (err) => {
+        this.pendingDeleteId = null;
+        this.error = err?.error?.message || 'Error al eliminar la noticia';
+        setTimeout(() => { try { this.error = null; this.cdr.detectChanges(); } catch(_){} }, 5000);
+      }
+    });
   }
 
   /**

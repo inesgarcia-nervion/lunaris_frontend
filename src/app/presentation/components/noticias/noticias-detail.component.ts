@@ -21,15 +21,17 @@ import { NewsService, NewsItem } from '../../../domain/services/news.service';
 })
 export class NoticiasDetailComponent implements OnInit {
   noticia: NewsItem | null = null;
+  loading = true;
 
   constructor(private route: ActivatedRoute, private newsService: NewsService, private router: Router, private location: Location) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) { this.router.navigate(['/noticias']); return; }
-    const all = this.newsService.getAll();
-    this.noticia = all.find(n => n.id === id) || null;
-    if (!this.noticia) this.router.navigate(['/noticias']);
+    this.newsService.getById(id).subscribe({
+      next: n => { this.noticia = n; this.loading = false; },
+      error: () => this.router.navigate(['/noticias'])
+    });
   }
 
   back() { this.location.back(); }
