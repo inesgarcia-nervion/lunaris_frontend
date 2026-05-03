@@ -1,9 +1,3 @@
-/*
-  Archivo: src/app/presentation/components/header/header.component.css
-  Descripción: Estilos del header/navigation bar y secciones hero, cards
-  y respuestas a diferentes tamaños de pantalla. Contiene animaciones,
-  dropdowns, y estilos de elementos interactivos (botones, búsqueda).
-*/
 .navbar {
   background: var(--navbar-bg);
   padding: 0.6rem 2rem;

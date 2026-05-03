@@ -52,7 +52,6 @@ export class ListasUsuariosComponent implements OnInit {
    * para actualizar la vista cuando cambien las listas o favoritos.
    */
   ngOnInit(): void {
-    // ensure latest lists are loaded from server when entering this view
     try { this.listasService.refreshFromServer(); } catch (e) {}
     this.listas = this.filterOutProfileLists(this.listasService.getAll());
     this.filteredListas = this.listas;

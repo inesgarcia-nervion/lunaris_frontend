@@ -34,7 +34,6 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
   editingId: number | null = null;
   editInline = false;
   imageError: string | null = null;
-  // originales para detectar cambios cuando se edita
   editOriginalText = '';
   editOriginalImagePreviews: string[] = [];
 
@@ -598,7 +597,6 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
       next: (posts) => {
         this.posts = posts;
         this.updatePagination();
-        // Resolve selected post from route after loading
         try {
           const params = this.route.snapshot.params;
           const id = params['id'];
