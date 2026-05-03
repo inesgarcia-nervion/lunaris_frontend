@@ -130,8 +130,8 @@
   <button *ngIf="!creating" class="floating-create" (click)="openCreate()" aria-label="Crear publicación">+</button>
 
   <!-- Modal de detalle de publicación -->
-  <div class="detail-overlay" *ngIf="selected">
-    <div class="detail-card">
+  <div class="detail-overlay" *ngIf="selected" (click)="closeDetail()">
+    <div class="detail-card" (click)="$event.stopPropagation()">
       <button class="close" (click)="closeDetail()">✕</button>
 
       <!-- Detalle del post: imagenes, texto, acciones -->

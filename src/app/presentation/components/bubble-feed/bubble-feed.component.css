@@ -204,6 +204,9 @@
   margin-bottom: 6px;
   color: var(--text-primary);
   font-weight: 800;
+  white-space: nowrap;
+  word-break: normal;
+  overflow: visible;
 }
 
 .comments .comment-body { 
