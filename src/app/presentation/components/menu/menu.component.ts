@@ -138,6 +138,10 @@ export class MenuComponent implements OnInit, OnDestroy {
         this.listPageIndex = Math.max(0, this.listTotalPages - 1);
       }
       try { this.cdr.detectChanges(); } catch {}
+      const savedScrollY = history.state?.menuScrollY;
+      if (savedScrollY != null) {
+        setTimeout(() => window.scrollTo({ top: savedScrollY, behavior: 'instant' }), 0);
+      }
     });
   }
 
@@ -364,7 +368,7 @@ export class MenuComponent implements OnInit, OnDestroy {
    * @param listId El ID de la lista que se desea abrir.
    */
   openListFromMenu(listId: string): void {
-    this.bookSearchService.setNavigationOrigin({ type: 'menu' });
+    this.bookSearchService.setNavigationOrigin({ type: 'menu', scrollY: window.scrollY });
     this.router.navigate(['/listas', listId]);
   }
 

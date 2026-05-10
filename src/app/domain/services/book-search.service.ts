@@ -319,11 +319,11 @@ export class BookSearchService {
     this.selectedBookSubject.next(book);
   }
 
-  setNavigationOrigin(origin: { type: 'search' | 'list' | 'other' | 'profile' | 'menu' | 'listas'; listId?: string } | null): void {
+  setNavigationOrigin(origin: { type: 'search' | 'list' | 'other' | 'profile' | 'menu' | 'listas'; listId?: string; scrollY?: number } | null): void {
     this.originSubject.next(origin);
   }
 
-  getNavigationOrigin(): { type: 'search' | 'list' | 'other' | 'profile' | 'menu' | 'listas'; listId?: string } | null {
+  getNavigationOrigin(): { type: 'search' | 'list' | 'other' | 'profile' | 'menu' | 'listas'; listId?: string; scrollY?: number } | null {
     return this.originSubject.value;
   }
 

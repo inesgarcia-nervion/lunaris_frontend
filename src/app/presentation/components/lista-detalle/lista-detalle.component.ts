@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { CommonModule } from '@angular/common';
@@ -39,7 +39,7 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
   editOriginalIsPrivate = false;
   editError = '';
 
-  constructor(private route: ActivatedRoute, private listas: ListasService, private router: Router, private bookSearch: BookSearchService, private location: Location, private confirm: ConfirmService, public auth: AuthService) {}
+  constructor(private route: ActivatedRoute, private listas: ListasService, private router: Router, private bookSearch: BookSearchService, private location: Location, private confirm: ConfirmService, public auth: AuthService, private cdr: ChangeDetectorRef) {}
 
   /**
    * Inicializa el componente, obteniendo la lista a mostrar según el ID de la ruta,
@@ -58,6 +58,7 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
       this.listas.getByIdFromServer(this.currentId).subscribe(l => {
         this.loadingFromServer = false;
         if (l) { this.lista = l; this.updatePagination(); }
+        try { this.cdr.detectChanges(); } catch {}
       });
     }
     this.subs.push(this.listas.listas$.subscribe(() => {
@@ -115,8 +116,9 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
     const origin = this.bookSearch.getNavigationOrigin();
     if (origin) {
       if (origin.type === 'menu') {
+        const scrollY = origin.scrollY ?? 0;
         this.bookSearch.setNavigationOrigin(null);
-        this.location.back();
+        this.router.navigate(['/menu'], { state: { menuScrollY: scrollY } });
         return;
       }
       if (origin.type === 'listas') {

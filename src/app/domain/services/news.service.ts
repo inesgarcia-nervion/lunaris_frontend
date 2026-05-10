@@ -110,7 +110,11 @@ export class NewsService {
    * @returns Un Observable que se completa cuando la noticia ha sido eliminada.
    */
   removeNews(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.base}/${id}`);
+    return this.http.delete<void>(`${this.base}/${id}`).pipe(
+      tap(() => {
+        this.newsSubject.next(this.newsSubject.value.filter(n => n.id !== id));
+      })
+    );
   }
 }
 

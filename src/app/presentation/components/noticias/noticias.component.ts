@@ -60,6 +60,7 @@ export class NoticiasComponent implements OnInit {
     this.newsService.news$.subscribe(n => {
       this.news = n || [];
       this.updatePagination();
+      try { this.cdr.detectChanges(); } catch (_) {}
     });
     this.newsService.refresh();
     this.isAdmin = this.auth.isAdmin();
@@ -276,9 +277,11 @@ export class NoticiasComponent implements OnInit {
     if (!this.isAdmin) return;
     this.newsService.removeNews(id).subscribe({
       next: () => {
-        this.newsService.refresh();
+        this.news = this.news.filter(n => n.id !== id);
+        this.updatePagination();
         this.pendingDeleteId = null;
         this.newsSuccess = 'Noticia eliminada';
+        try { this.cdr.detectChanges(); } catch (_) {}
         setTimeout(() => { this.newsSuccess = null; try { this.cdr.detectChanges(); } catch(_){} }, 5000);
       },
       error: (err) => {
