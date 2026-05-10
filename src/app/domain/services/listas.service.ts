@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, of, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, Observable, of, firstValueFrom } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from './auth.service';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { OpenLibraryBook } from './book-search.service';
 
 /**
@@ -39,11 +39,14 @@ export class ListasService {
   listas$ = this.listasSubject.asObservable();
   private favoritesSubject = new BehaviorSubject<Record<string, string[]>>(this.loadFavoritesMap());
   favorites$ = this.favoritesSubject.asObservable();
+  private favoriteListDetailsSubject = new BehaviorSubject<ListaItem[]>([]);
+  favoriteListDetails$ = this.favoriteListDetailsSubject.asObservable();
+
+  private pendingStatusUpdates = 0;
 
   private backendBase = 'http://localhost:8080';
 
   constructor(private http: HttpClient, private auth: AuthService) {
-    // Initialize lists: prefer server-backed lists for authenticated users
     const current = this.getCurrentUser();
     if (current) {
       this.http.get<any[]>(`${this.backendBase}/user_list/owner/${encodeURIComponent(current)}`).pipe(
@@ -73,6 +76,30 @@ export class ListasService {
   }
 
   /**
+   * Recarga los detalles de las listas favoritas del usuario actual desde el backend,
+   * emitiendo el resultado a través de favoriteListDetails$.
+   */
+  refreshFavoriteListDetails(): void {
+    const current = this.getCurrentUser();
+    if (!current) { this.favoriteListDetailsSubject.next([]); return; }
+    const favoriteIds = this.getFavoritesForUser(current);
+    if (favoriteIds.length === 0) { this.favoriteListDetailsSubject.next([]); return; }
+    this.http.get<any[]>(`${this.backendBase}/user_list/all`).pipe(
+      catchError(() => of([]))
+    ).subscribe(all => {
+      const mapped = (all || []).map((l: any) => ({
+        id: l.id?.toString() || '',
+        nombre: l.name || '',
+        libros: l.booksJson ? JSON.parse(l.booksJson) : [],
+        owner: l.owner || '',
+        isPrivate: !!l.isPrivate
+      } as ListaItem));
+      const favorites = mapped.filter(l => favoriteIds.includes(l.id) && l.owner !== current);
+      this.favoriteListDetailsSubject.next(favorites);
+    });
+  }
+
+  /**
    * Fuerza la recarga de listas desde el backend (si hay usuario conectado),
    * o desde localStorage como fallback.
    */
@@ -94,7 +121,17 @@ export class ListasService {
         this.http.get<any>(`${this.backendBase}/users/username/${encodeURIComponent(current)}/book-status`).pipe(
           catchError(_ => of(null))
         ).subscribe(statusData => {
-          const profileLists = this.buildProfileListsFromStatus(current, statusData);
+          let profileLists: ListaItem[];
+          if (this.pendingStatusUpdates > 0) {
+            profileLists = this.listasSubject.value.filter(
+              l => this.isProfileListName(l.nombre) && l.owner === current
+            );
+            if (profileLists.length === 0) {
+              profileLists = this.buildProfileListsFromStatus(current, statusData);
+            }
+          } else {
+            profileLists = this.buildProfileListsFromStatus(current, statusData);
+          }
           const all = [...profileLists, ...customLists];
           this.listasSubject.next(all);
           try { localStorage.setItem(this.storageKey, JSON.stringify(all)); } catch {}
@@ -277,7 +314,6 @@ export class ListasService {
   assignUnownedListsToCurrentUser(username: string) {
     if (!username) return;
     const listas = this.getAll().map(l => l.owner ? l : { ...l, owner: username });
-    // persist changed lists to server if logged in
     listas.forEach(l => {
       const numericId = Number(l.id);
       if (numericId && l.owner) {
@@ -307,6 +343,30 @@ export class ListasService {
    */
   getById(id: string): ListaItem | undefined {
     return this.getAll().find(l => l.id === id);
+  }
+
+  /**
+   * Obtiene una lista por su ID desde el backend. Útil para listas de otros usuarios
+   * que no están en el listasSubject local.
+   * @param id ID numérico de la lista
+   * @returns Observable con la ListaItem encontrada o null si no existe
+   */
+  getByIdFromServer(id: string): Observable<ListaItem | null> {
+    const numericId = Number(id);
+    if (isNaN(numericId)) return of(null);
+    return this.http.get<any>(`${this.backendBase}/user_list/${numericId}`).pipe(
+      map((l: any) => {
+        if (!l) return null;
+        return {
+          id: l.id?.toString() || id,
+          nombre: l.name || '',
+          libros: l.booksJson ? JSON.parse(l.booksJson) : [],
+          owner: l.owner || '',
+          isPrivate: !!l.isPrivate
+        } as ListaItem;
+      }),
+      catchError(() => of(null))
+    );
   }
 
   /**
@@ -410,6 +470,16 @@ export class ListasService {
     }
     map[user] = arr;
     this.saveFavoritesMap(map);
+    this.http.post<string[]>(`${this.backendBase}/users/username/${encodeURIComponent(user)}/favorites`, { listId })
+      .pipe(catchError(_ => of(null)))
+      .subscribe(ids => {
+        if (ids && Array.isArray(ids)) {
+          const m = this.loadFavoritesMap();
+          m[user] = ids;
+          this.saveFavoritesMap(m);
+        }
+        this.refreshFavoriteListDetails();
+      });
     return true;
   }
 
@@ -477,15 +547,12 @@ export class ListasService {
     const bookId = (book as any).key || '';
     const profileNames = ['Leyendo', 'Leído', 'Plan para leer'];
 
-    // Update all 3 profile lists locally in one atomic operation
     const listas = this.getAll().map(l => {
       if (!this.isProfileListName(l.nombre) || l.owner !== username) return l;
       if (l.nombre === status) {
-        // Add to target list (avoid duplicates)
         const exists = l.libros.some(b => (bookId ? (b as any).key === bookId : false) || b.title === book.title);
         if (!exists) return { ...l, libros: [...l.libros, book] };
       } else {
-        // Remove from all other profile lists
         const filtered = l.libros.filter(b => {
           if (bookId) return (b as any).key !== bookId;
           return b.title !== book.title;
@@ -498,11 +565,13 @@ export class ListasService {
     try { localStorage.setItem(this.storageKey, JSON.stringify(listas)); } catch {}
     this.listasSubject.next(listas);
 
-    // Persist to backend
     const payload = { bookId, status: status || null, bookData: book };
+    this.pendingStatusUpdates++;
     this.http.put<any>(`${this.backendBase}/users/username/${encodeURIComponent(username)}/book-status`, payload)
       .pipe(catchError(_ => of(null)))
-      .subscribe();
+      .subscribe(() => {
+        this.pendingStatusUpdates = Math.max(0, this.pendingStatusUpdates - 1);
+      });
   }
 
   /**
@@ -516,13 +585,11 @@ export class ListasService {
   addBookToList(listId: string, book: OpenLibraryBook) {
     const lista = this.getAll().find(l => l.id === listId);
 
-    // For profile lists, use the dedicated book-status endpoint
     if (lista && this.isProfileListName(lista.nombre)) {
       this.setBookReadingStatus(book, lista.nombre);
       return;
     }
 
-    // Custom list: use user_list endpoint
     const listas = this.getAll().map(l => {
       if (l.id === listId) {
         const exists = l.libros.some(b => (b as any).key === (book as any).key || b.title === book.title);
@@ -555,26 +622,11 @@ export class ListasService {
   removeBookFromList(listId: string, book: OpenLibraryBook | { key?: string; title?: string }) {
     const lista = this.getAll().find(l => l.id === listId);
 
-    // For profile lists, only update local state — the backend is handled by setBookReadingStatus
     if (lista && this.isProfileListName(lista.nombre)) {
-      const listas = this.getAll().map(l => {
-        if (l.id !== listId) return l;
-        return {
-          ...l, libros: (l.libros || []).filter(b => {
-            try {
-              if ((book as any).key) return (b as any).key !== (book as any).key;
-              if ((book as any).title) return b.title !== (book as any).title;
-              return true;
-            } catch { return true; }
-          })
-        };
-      });
-      try { localStorage.setItem(this.storageKey, JSON.stringify(listas)); } catch {}
-      this.listasSubject.next(listas);
+      this.setBookReadingStatus(book as OpenLibraryBook, null);
       return;
     }
 
-    // Custom list: use user_list endpoint
     const listas = this.getAll().map(l => {
       if (l.id === listId) {
         l.libros = (l.libros || []).filter(b => {
@@ -595,17 +647,16 @@ export class ListasService {
     });
     const owner = this.getCurrentUser();
     const numericId = Number(listId);
+    this.listasSubject.next(listas);
     if (owner && !isNaN(numericId)) {
       const toSave = listas.find(l => l.id === listId);
       const payload = { name: toSave?.nombre || '', owner, isPrivate: toSave?.isPrivate || false, booksJson: JSON.stringify(toSave?.libros || []) };
       this.http.put<any>(`${this.backendBase}/user_list/${numericId}`, payload).pipe(catchError(_ => of(null))).subscribe(() => {
         try { localStorage.setItem(this.storageKey, JSON.stringify(listas)); } catch {}
-        this.listasSubject.next(listas);
       });
       return;
     }
     this.saveToStorage(listas);
-    this.listasSubject.next(listas);
   }
 }
 

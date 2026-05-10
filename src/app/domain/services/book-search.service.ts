@@ -120,9 +120,22 @@ export class BookSearchService {
 
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
-        this.cancelPendingSearches();
+        if (event.url.startsWith('/menu')) {
+          this.cancelPrefetchOnly();
+        } else {
+          this.cancelPendingSearches();
+        }
       }
     });
+  }
+
+  private cancelPrefetchOnly(): void {
+    if (this.prefetchSubs && this.prefetchSubs.length > 0) {
+      for (const s of this.prefetchSubs) {
+        try { s.unsubscribe(); } catch (e) { /* ignore */ }
+      }
+      this.prefetchSubs = [];
+    }
   }
 
   cancelPendingSearches(): void {

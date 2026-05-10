@@ -240,7 +240,9 @@ export class NoticiasComponent implements OnInit {
     if (!ok) return;
     this.newsService.removeNews(id).subscribe({
       next: () => {
-        this.newsService.refresh();
+        this.news = this.news.filter(n => n.id !== id);
+        this.updatePagination();
+        this.cdr.detectChanges();
         this.newsSuccess = 'Noticia eliminada';
         setTimeout(() => { this.newsSuccess = null; try { this.cdr.detectChanges(); } catch(_){} }, 5000);
       },

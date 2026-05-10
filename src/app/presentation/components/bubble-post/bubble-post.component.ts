@@ -46,6 +46,7 @@ export interface BubblePost {
 export class BubblePostComponent {
   @Input() post!: BubblePost;
   @Input() canDelete: boolean = false;
+  @Input() canEdit: boolean = false;
   @Output() like = new EventEmitter<number>();
   @Output() edit = new EventEmitter<number>();
   @Output() open = new EventEmitter<BubblePost>();

@@ -597,38 +597,49 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.listasService.ensureProfileSections(currentUser);
 
     let addedToCustom = false;
+    let removedFromCustom = false;
     let addedToStatus = false;
+    let removedFromStatus = false;
 
     if (this.selectedList) {
       this.listasService.addBookToList(this.selectedList, this.selectedBook);
       addedToCustom = true;
+    } else {
+      const bookKey = (this.selectedBook as any).key;
+      const bookTitle = this.selectedBook.title;
+      const customListsWithBook = this.listasService.getAll().filter(l =>
+        !this.listasService.isProfileListName(l.nombre) &&
+        l.owner === currentUser &&
+        Array.isArray(l.libros) &&
+        l.libros.some((b: any) => bookKey ? (b as any).key === bookKey : b.title === bookTitle)
+      );
+      for (const l of customListsWithBook) {
+        this.listasService.removeBookFromList(l.id, this.selectedBook);
+        removedFromCustom = true;
+      }
     }
 
     const status = (this.selectedStatus || '').toString().trim();
     const profileNames = ['Leyendo', 'Leído', 'Plan para leer'];
-    if (status && profileNames.includes(status)) {
-      const profileList = this.listasService.getAll().find(l => l.owner === currentUser && l.nombre === status);
-      if (profileList) {
-        this.listasService.addBookToList(profileList.id, this.selectedBook);
-        const otherProfileNames = profileNames.filter(n => n !== status);
-        for (const otherName of otherProfileNames) {
-          const otherList = this.listasService.getAll().find(l => l.owner === currentUser && l.nombre === otherName);
-          if (otherList) {
-            this.listasService.removeBookFromList(otherList.id, this.selectedBook);
-          }
-        }
-        addedToStatus = true;
-        this.selectedStatus = status;
-      }
+    if (!status && this.bookHasStatus()) {
+      this.listasService.setBookReadingStatus(this.selectedBook, null);
+      removedFromStatus = true;
+    } else if (status && profileNames.includes(status)) {
+      this.listasService.setBookReadingStatus(this.selectedBook, status);
+      addedToStatus = true;
+      this.selectedStatus = status;
     }
 
-    if (!addedToCustom && !addedToStatus) {
+    if (!addedToCustom && !addedToStatus && !removedFromCustom && !removedFromStatus) {
       this.error = 'Selecciona una lista o un estado para guardar el libro';
       this.updatingStatusOrList = false;
       this.clearAlertAfterDelay();
       return;
     }
 
+    if ((removedFromCustom && !addedToCustom) || removedFromStatus) {
+      this.successMessage = 'Libro eliminado de las listas';
+    }
     if (addedToCustom) {
       const list = this.listasService.getById(this.selectedList || '');
       const name = list?.nombre || '';
@@ -641,16 +652,88 @@ export class HeaderComponent implements OnInit, OnDestroy {
     console.debug('[Header] addToList result:', { addedToCustom, addedToStatus, selectedList: this.selectedList, selectedStatus: this.selectedStatus, currentUser });
     console.debug('[Header] listas after add:', this.listasService.getAll());
     this.updateSelectedListFromBook(this.selectedBook);
-    try { this.listasService.refreshFromServer(); } catch (e) { /* ignore */ }
     this.updatingStatusOrList = false;
     this.clearAlertAfterDelay();
   }
 
   /**
-   * Agrega el libro seleccionado a la lista personalizada o estado de perfil seleccionado. 
+   * Devuelve true si el libro seleccionado está actualmente en alguna lista de estado de perfil.
+   */
+  bookHasStatus(): boolean {
+    if (!this.selectedBook) return false;
+    const user = this.auth.getCurrentUsername() || this.listasService.getCurrentUser();
+    const bookKey = (this.selectedBook as any).key;
+    const bookTitle = this.selectedBook.title;
+    return this.listasService.getAll().some(l =>
+      this.listasService.isProfileListName(l.nombre) &&
+      l.owner === user &&
+      Array.isArray(l.libros) &&
+      l.libros.some((b: any) => bookKey ? (b as any).key === bookKey : b.title === bookTitle)
+    );
+  }
+
+  /**
+   * Devuelve true si el libro seleccionado ya está en la lista indicada.
+   */
+  isBookInList(listId: string): boolean {
+    if (!this.selectedBook) return false;
+    const lista = this.listasService.getById(listId);
+    if (!lista || !Array.isArray(lista.libros)) return false;
+    const bookKey = (this.selectedBook as any).key;
+    const bookTitle = this.selectedBook.title;
+    return lista.libros.some((b: any) =>
+      bookKey ? (b as any).key === bookKey : b.title === bookTitle
+    );
+  }
+
+  /**
+   * Alterna la presencia del libro seleccionado en la lista indicada.
+   */
+  toggleBookInList(listId: string): void {
+    if (!this.selectedBook) return;
+    const currentUser = this.auth.getCurrentUsername() || this.listasService.getCurrentUser();
+    this.listasService.ensureProfileSections(currentUser);
+    const list = this.listasService.getById(listId);
+    if (this.isBookInList(listId)) {
+      this.listasService.removeBookFromList(listId, this.selectedBook);
+      this.successMessage = list?.nombre ? `Libro eliminado de "${list.nombre}"` : 'Libro eliminado de la lista';
+    } else {
+      this.listasService.addBookToList(listId, this.selectedBook);
+      this.successMessage = list?.nombre ? `Libro añadido a "${list.nombre}"` : 'Libro añadido a la lista';
+    }
+    this.clearAlertAfterDelay();
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Guarda el estado de lectura del libro seleccionado (Leyendo, Leído, Plan para leer).
    */
   addStatus(): void {
-    this.addToList();
+    if (!this.selectedBook) return;
+    const currentUser = this.auth.getCurrentUsername() || this.listasService.getCurrentUser();
+    this.updatingStatusOrList = true;
+    this.listasService.ensureProfileSections(currentUser);
+
+    const status = (this.selectedStatus || '').toString().trim();
+    const profileNames = ['Leyendo', 'Leído', 'Plan para leer'];
+
+    if (!status && this.bookHasStatus()) {
+      this.listasService.setBookReadingStatus(this.selectedBook, null);
+      this.successMessage = 'Libro eliminado de las listas de estado';
+    } else if (status && profileNames.includes(status)) {
+      this.listasService.setBookReadingStatus(this.selectedBook, status);
+      this.selectedStatus = status;
+      this.successMessage = 'Estado guardado';
+    } else {
+      this.error = 'Selecciona un estado para guardar';
+      this.updatingStatusOrList = false;
+      this.clearAlertAfterDelay();
+      return;
+    }
+
+    this.updateSelectedListFromBook(this.selectedBook);
+    this.updatingStatusOrList = false;
+    this.clearAlertAfterDelay();
   }
 
   /**

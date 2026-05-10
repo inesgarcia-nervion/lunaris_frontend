@@ -30,12 +30,14 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
   private currentId: string = '';
   currentUser: string | null = null;
 
-  // Estado para la ventana de edición
+  loadingFromServer = false;
+
   editingList = false;
   editNombre = '';
   editIsPrivate = false;
   editOriginalNombre = '';
   editOriginalIsPrivate = false;
+  editError = '';
 
   constructor(private route: ActivatedRoute, private listas: ListasService, private router: Router, private bookSearch: BookSearchService, private location: Location, private confirm: ConfirmService, public auth: AuthService) {}
 
@@ -46,12 +48,25 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.currentId = this.route.snapshot.paramMap.get('id') || '';
     this.lista = this.listas.getById(this.currentId);
+    if (!this.lista && history.state && history.state.lista) {
+      this.lista = history.state.lista as ListaItem;
+    }
     this.updatePagination();
     this.currentUser = this.listas.getCurrentUser();
+    if (!this.lista) {
+      this.loadingFromServer = true;
+      this.listas.getByIdFromServer(this.currentId).subscribe(l => {
+        this.loadingFromServer = false;
+        if (l) { this.lista = l; this.updatePagination(); }
+      });
+    }
     this.subs.push(this.listas.listas$.subscribe(() => {
-      this.lista = this.listas.getById(this.currentId);
-      this.currentPage = 1;
-      this.updatePagination();
+      const found = this.listas.getById(this.currentId);
+      if (found) {
+        this.lista = found;
+        this.currentPage = 1;
+        this.updatePagination();
+      }
     }));
   }
 
@@ -237,6 +252,13 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
     if (!nuevo) return;
     const nombre = nuevo.trim();
     if (!nombre) return;
+    const duplicate = this.listas.getAll().some(
+      l => l.id !== this.lista!.id && l.owner === this.currentUser && (l.nombre || '').toLowerCase() === nombre.toLowerCase()
+    );
+    if (duplicate) {
+      alert('Ya tienes una lista con ese nombre.');
+      return;
+    }
     this.listas.updateListName(this.lista.id, nombre);
     this.lista = this.listas.getById(this.currentId);
   }
@@ -259,6 +281,14 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
     if (!this.lista) return;
     const nombre = this.editNombre.trim();
     if (!nombre) return;
+    const duplicate = this.listas.getAll().some(
+      l => l.id !== this.lista!.id && l.owner === this.currentUser && (l.nombre || '').toLowerCase() === nombre.toLowerCase()
+    );
+    if (duplicate) {
+      this.editError = 'Ya tienes una lista con ese nombre.';
+      return;
+    }
+    this.editError = '';
     this.listas.updateListName(this.lista.id, nombre);
     this.listas.updateListPrivacy(this.lista.id, this.editIsPrivate);
     this.lista = this.listas.getById(this.currentId);
@@ -267,6 +297,7 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
 
   cancelEdit(): void {
     this.editingList = false;
+    this.editError = '';
   }
 
   hasChanges(): boolean {

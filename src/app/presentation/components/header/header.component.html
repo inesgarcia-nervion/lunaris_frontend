@@ -230,12 +230,14 @@
       <div class="detail-right-selectors">
         <div class="form-group-inline">
           <label class="selector-label">Añadir a una lista</label>
-          <div class="form-select-row">
-            <select [(ngModel)]="selectedList" class="form-select-header">
-              <option value="">Seleccione una lista</option>
-              <option *ngFor="let l of customLists" [value]="l.id">{{ l.nombre }}</option>
-            </select>
-            <button class="btn-add-list" (click)="addToList()" [disabled]="!selectedBook || (!selectedList && !selectedStatus)">Añadir</button>
+          <div *ngIf="customLists.length === 0" class="list-checkbox-empty">No tienes listas personalizadas</div>
+          <div *ngIf="customLists.length > 0" class="list-checkbox-container">
+            <label *ngFor="let l of customLists" class="list-checkbox-item">
+              <input type="checkbox"
+                     [checked]="isBookInList(l.id)"
+                     (change)="toggleBookInList(l.id)" />
+              <span class="list-checkbox-name">{{ l.nombre }}</span>
+            </label>
           </div>
         </div>
 
@@ -249,7 +251,7 @@
               <option value="Plan para leer">Plan para leer</option>
               <option value="Leyendo">Leyendo</option>
             </select>
-            <button class="btn-add-list" (click)="addStatus()" [disabled]="!selectedBook || !selectedStatus">Añadir</button>
+            <button class="btn-add-list" (click)="addStatus()" [disabled]="!selectedBook || (!selectedStatus && !bookHasStatus())">Añadir</button>
           </div>
         </div>
       </div>

@@ -88,12 +88,15 @@ export class PerfilComponent implements OnInit {
     } catch (e) {
       console.warn('Unable to read avatar', e);
     }
-    // refresh listas from server when entering profile
     try { this.listasService.refreshFromServer(); } catch (e) {}
     this.listasService.ensureProfileSections(this.username);
     this.loadLists();
     this.listasService.listas$.subscribe(() => this.loadLists());
     this.listasService.favorites$.subscribe(() => this.loadLists());
+    this.listasService.favoriteListDetails$.subscribe(details => {
+      this.favoriteLists = details;
+    });
+    this.listasService.refreshFavoriteListDetails();
   }
 
   /**
@@ -122,8 +125,6 @@ export class PerfilComponent implements OnInit {
     this.userLists = all.filter(l => !['Leyendo', 'Leído', 'Plan para leer'].includes(l.nombre));
     this.userListsPage = 1;
     this.updatePagedUserLists();
-
-    this.favoriteLists = this.listasService.getFavoriteListsForUser(this.username).filter(l => l.owner && l.owner !== this.username);
   }
 
   /**
@@ -228,6 +229,7 @@ export class PerfilComponent implements OnInit {
   navigateToList(id: string | null) {
     if (!id) return;
     this.bookSearchService.setNavigationOrigin({ type: 'profile', listId: id });
-    this.router.navigate(['/listas', id]);
+    const lista = [...this.userLists, ...this.favoriteLists].find(l => l.id === id);
+    this.router.navigate(['/listas', id], { state: { lista } });
   }
 }

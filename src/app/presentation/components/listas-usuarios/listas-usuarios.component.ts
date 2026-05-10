@@ -8,6 +8,9 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PaginationComponent } from '../../shared/pagination/pagination.component';
+import { HttpClient } from '@angular/common/http';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 /**
  * Componente para mostrar las listas de usuario (excepto las del perfil) 
@@ -35,6 +38,8 @@ export class ListasUsuariosComponent implements OnInit {
   private errorTimer: any = null;
   listSuccess: string | null = null;
 
+  private backendBase = 'http://localhost:8080';
+
   constructor(
     public bookSearchService: BookSearchService,
     private cdr: ChangeDetectorRef,
@@ -42,7 +47,8 @@ export class ListasUsuariosComponent implements OnInit {
     private route: ActivatedRoute,
     public router: Router,
     public auth: AuthService,
-    private confirm: ConfirmService
+    private confirm: ConfirmService,
+    private http: HttpClient
   ) {}
 
   /**
@@ -52,12 +58,21 @@ export class ListasUsuariosComponent implements OnInit {
    * para actualizar la vista cuando cambien las listas o favoritos.
    */
   ngOnInit(): void {
-    try { this.listasService.refreshFromServer(); } catch (e) {}
-    this.listas = this.filterOutProfileLists(this.listasService.getAll());
-    this.filteredListas = this.listas;
-    this.updatePagination();
     this.currentUser = this.listasService.getCurrentUser();
-    this.listasService.listas$.subscribe(l => { this.listas = this.filterOutProfileLists(l || []); this.filteredListas = this.listas; this.updatePagination(); this.cdr.markForCheck(); });
+    this.loadAllLists();
+    this.listasService.listas$.subscribe(updated => {
+      if (!updated) return;
+      this.listas = this.listas.map(l => {
+        const match = updated.find(u => u.id === l.id);
+        return match ? { ...l, nombre: match.nombre, isPrivate: match.isPrivate, libros: match.libros } : l;
+      });
+      const term = this.search.toLowerCase();
+      this.filteredListas = term
+        ? this.listas.filter(l => l.nombre.toLowerCase().includes(term))
+        : this.listas;
+      this.updatePagination();
+      this.cdr.markForCheck();
+    });
     this.listasService.favorites$.subscribe(() => { this.cdr.markForCheck(); });
     this.route.queryParams.subscribe((q: Record<string, any>) => {
       if (q && q['msg']) {
@@ -65,7 +80,27 @@ export class ListasUsuariosComponent implements OnInit {
         setTimeout(() => { this.listSuccess = null; try { this.cdr.markForCheck(); } catch(_){} }, 5000);
       }
     });
-    console.log('ListasUsuariosComponent initialized; current searchQuery:', this.bookSearchService.getSearchQuery());
+  }
+
+  private loadAllLists(): void {
+    this.http.get<any[]>(`${this.backendBase}/user_list/all`).pipe(
+      catchError(() => of([]))
+    ).subscribe(all => {
+      const mapped = (all || []).map((l: any) => ({
+        id: l.id?.toString() || '',
+        nombre: l.name || '',
+        libros: l.booksJson ? JSON.parse(l.booksJson) : [],
+        owner: l.owner || '',
+        isPrivate: !!l.isPrivate
+      }));
+      const sorted = this.filterOutProfileLists(mapped).sort((a, b) => Number(b.id) - Number(a.id));
+      this.listas = sorted;
+      this.filteredListas = this.search
+        ? this.listas.filter(l => l.nombre.toLowerCase().includes(this.search.toLowerCase()))
+        : this.listas;
+      this.updatePagination();
+      this.cdr.markForCheck();
+    });
   }
 
   /**
@@ -85,6 +120,13 @@ export class ListasUsuariosComponent implements OnInit {
     if (!nuevo) return;
     const nombre = nuevo.trim();
     if (!nombre) return;
+    const duplicate = this.listasService.getAll().some(
+      l => l.id !== listId && l.owner === this.currentUser && (l.nombre || '').toLowerCase() === nombre.toLowerCase()
+    );
+    if (duplicate) {
+      alert('Ya tienes una lista con ese nombre.');
+      return;
+    }
     this.listasService.updateListName(listId, nombre);
   }
 
@@ -127,9 +169,13 @@ export class ListasUsuariosComponent implements OnInit {
    * @returns void
    */
   updatePagination(): void {
-    const rest = this.filteredListas.slice(1);
-    const start = (this.currentPage - 1) * this.pageSize;
-    this.pagedListas = rest.slice(start, start + this.pageSize);
+    if (this.currentPage === 1) {
+      const rest = this.filteredListas.slice(1);
+      this.pagedListas = rest.slice(0, this.pageSize);
+    } else {
+      const start = this.pageSize + 1 + (this.currentPage - 2) * this.pageSize;
+      this.pagedListas = this.filteredListas.slice(start, start + this.pageSize);
+    }
   }
 
   /**
@@ -158,7 +204,7 @@ export class ListasUsuariosComponent implements OnInit {
         const isProfile = skip.has(nombre);
         const isPrivate = !!l.isPrivate;
         if (isProfile) return false;
-        if (isPrivate && !this.auth.isAdmin()) return false;
+        if (isPrivate && !this.auth.isAdmin() && l.owner !== this.currentUser) return false;
         return true;
       } catch {
         return true;
@@ -273,7 +319,8 @@ export class ListasUsuariosComponent implements OnInit {
    */
   openListFromListas(listId: string): void {
     this.bookSearchService.setNavigationOrigin({ type: 'listas' });
-    this.router.navigate(['/listas', listId]);
+    const lista = this.listas.find((l: any) => l.id === listId);
+    this.router.navigate(['/listas', listId], { state: { lista } });
   }
 
   /**

@@ -45,7 +45,8 @@
 
   <!-- Template alternativo si no se encuentra la lista -->
   <ng-template #notFound>
-    <p>Lista no encontrada.</p>
+    <p *ngIf="!loadingFromServer">Lista no encontrada.</p>
+    <p *ngIf="loadingFromServer">Cargando lista...</p>
   </ng-template>
 </div>
 
@@ -59,6 +60,7 @@
     <div class="edit-list-body">
       <label class="edit-list-label" for="edit-list-nombre">Nombre</label>
       <input id="edit-list-nombre" class="edit-list-input" type="text" [(ngModel)]="editNombre" maxlength="100" placeholder="Nombre de la lista" />
+      <div *ngIf="editError" class="edit-list-error">{{ editError }}</div>
       <div class="edit-list-privacy">
         <span class="edit-list-label">Visibilidad</span>
         <div class="privacy-toggle">

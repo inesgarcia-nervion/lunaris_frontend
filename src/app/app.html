@@ -5,14 +5,12 @@
   <footer class="app-footer" *ngIf="showFooter">
     <!-- Contenido del pie de página con diseño horizontal y adaptativo -->
     <div class="footer-content horizontal">
-      <div class="footer-item footer-copyright">©2025 Lunaris</div>
+      <div class="footer-item footer-copyright">©2026 Lunaris</div>
       <div class="footer-separator">•</div>
       <div class="footer-item footer-help">
-        <span *ngIf="!auth.isAdmin()" class="help-text">¿No encuentras lo que buscas?</span>
+        <span *ngIf="!auth.isAdmin()" class="help-text">¿No encuentras el libro que buscas?</span>
         <button *ngIf="!auth.isAdmin()" (click)="navigateToPeticiones()" class="footer-link">Accede a nuestras peticiones</button>
       </div>
-      <div class="footer-separator">•</div>
-      <div class="footer-item footer-terms">Terms &amp; Conditions</div>
     </div>
   </footer>
 </div>

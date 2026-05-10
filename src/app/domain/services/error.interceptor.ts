@@ -25,7 +25,7 @@ export class ErrorInterceptor implements HttpInterceptor {
 
     return next.handle(req).pipe(
       catchError((err: any) => {
-        if (err instanceof HttpErrorResponse && err.status === 401) {
+        if (err instanceof HttpErrorResponse && err.status === 401 && !req.url.includes('/auth/login')) {
           if (this.isRedirecting) return EMPTY;
           this.isRedirecting = true;
 

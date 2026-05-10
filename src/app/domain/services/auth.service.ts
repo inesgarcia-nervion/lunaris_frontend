@@ -340,8 +340,11 @@ export class AuthService {
    */
   getLocalAvatar(username?: string | null): string | null {
     try {
-      const fromSubject = this.avatarSubject.value;
-      if (fromSubject) return fromSubject;
+      const currentUser = this.getCurrentUsername();
+      if (!username || username === currentUser) {
+        const fromSubject = this.avatarSubject.value;
+        if (fromSubject) return fromSubject;
+      }
       return localStorage.getItem(this.getAvatarKey(username));
     } catch { return null; }
   }

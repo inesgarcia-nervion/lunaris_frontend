@@ -35,13 +35,16 @@
     />
   </div>
 
-  <div *ngIf="filteredListas.length === 0" class="listas-vacio">
+  <div *ngIf="filteredListas.length === 0 && listas.length === 0" class="listas-vacio">
     <p>No hay listas creadas todavía.</p>
+  </div>
+  <div *ngIf="filteredListas.length === 0 && listas.length > 0" class="listas-vacio">
+    <p>No existe ninguna lista con ese nombre.</p>
   </div>
 
   <!-- Mostrar la lista más reciente en grande arriba, el resto en la rejilla -->
   <!-- Lista destacada y grid de listas -->
-  <div *ngIf="filteredListas.length > 0" class="lista-featured">
+  <div *ngIf="filteredListas.length > 0 && currentPage === 1" class="lista-featured">
     <div class="lista-header">
       <div class="list-author">
         <ng-container *ngIf="getOwnerAvatar(filteredListas[0].owner) as avatarUrl; else letterAvatarFeatured">
@@ -67,7 +70,7 @@
   </div>
 
   <!-- Grid de listas de usuarios -->
-  <div *ngIf="filteredListas.length > 1" class="listas-grid">
+  <div *ngIf="pagedListas.length > 0" class="listas-grid">
     <div *ngFor="let lista of pagedListas" class="lista-card">
       <div class="lista-header">
         <div class="list-author">
@@ -94,7 +97,7 @@
     </div>
   </div>
   <app-pagination *ngIf="filteredListas.length > 1"
-    [totalItems]="filteredListas.length > 1 ? (filteredListas.length - 1) : 0"
+    [totalItems]="filteredListas.length"
     [pageSize]="pageSize"
     [currentPage]="currentPage"
     (pageChange)="onPageChange($event)">

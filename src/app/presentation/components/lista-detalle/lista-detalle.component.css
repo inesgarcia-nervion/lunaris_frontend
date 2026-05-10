@@ -366,6 +366,12 @@
   box-shadow: 0 0 0 2px rgba(108,99,255,0.15);
 }
 
+.edit-list-error {
+  color: #e05c5c;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
 .edit-list-privacy {
   display: flex;
   flex-direction: column;

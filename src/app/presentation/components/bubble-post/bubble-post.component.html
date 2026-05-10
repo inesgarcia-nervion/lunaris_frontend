@@ -22,7 +22,7 @@
   <div class="post-actions">
     <button class="like" (click)="$event.stopPropagation(); onToggleLike()">❤️ {{ post.likes }}</button>
     <button class="comment" (click)="$event.stopPropagation(); onOpen()">💬 {{ post.comments?.length || 0 }}</button>
-    <button class="edit" (click)="$event.stopPropagation(); onEdit()">✏️</button>
+    <button *ngIf="canEdit" class="edit" (click)="$event.stopPropagation(); onEdit()">✏️</button>
 
     <ng-container *ngIf="canDelete">
       <button class="btn-delete" (click)="$event.stopPropagation(); onDeleteConfirm()">Eliminar</button>

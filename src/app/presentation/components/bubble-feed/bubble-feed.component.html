@@ -8,7 +8,7 @@
     <div *ngIf="posts.length === 0" class="empty-state">Aún no hay publicaciones. Sé el primero en publicar.</div>
     <div *ngFor="let p of pagedPosts">
       <ng-container *ngIf="editingId !== p.id">
-        <app-bubble-post [post]="p" (like)="toggleLike($event)" (open)="openPost($event)" (edit)="startEdit($event)" [canDelete]="auth.isAdmin() || (auth.getCurrentUsername() === p.user.name)" (delete)="removeConfirmedPost($event)"></app-bubble-post>
+        <app-bubble-post [post]="p" (like)="toggleLike($event)" (open)="openPost($event)" (edit)="startEdit($event)" [canEdit]="auth.getCurrentUsername() === p.user.name" [canDelete]="auth.isAdmin() || (auth.getCurrentUsername() === p.user.name)" (delete)="removeConfirmedPost($event)"></app-bubble-post>
       </ng-container>
       <ng-container *ngIf="editingId === p.id && editInline">
         <!-- Tarjeta de edición: campos para editar una publicación -->

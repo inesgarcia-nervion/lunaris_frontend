@@ -109,7 +109,14 @@ export class RegisterComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.loading = false;
-        if (err.status === 409 || err.status === 400) {
+        if (err.status === 409) {
+          const msg: string = err.error?.message ?? '';
+          if (msg.toLowerCase().includes('username')) {
+            this.error = 'Error al crear la cuenta. Usuario ya existente';
+          } else {
+            this.error = 'Error al crear la cuenta. Correo ya existente';
+          }
+        } else if (err.status === 400) {
           this.error = 'El usuario o email ya existe';
         } else if (err.status === 0) {
           this.error = 'No se puede conectar con el servidor';
