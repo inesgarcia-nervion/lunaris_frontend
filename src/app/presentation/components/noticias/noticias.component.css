@@ -194,7 +194,8 @@
   background: rgba(0,0,0,0.75);
 }
 .create-modal {
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: 90vh;
 }
 .create-modal *, .create-modal *:before, .create-modal *:after {
   box-sizing: border-box;
