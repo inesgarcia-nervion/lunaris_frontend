@@ -111,7 +111,7 @@ describe('AuthService', () => {
     service.login('user1', 'pass1').subscribe(token => {
       expect(token).toBe(USER_TOKEN);
     });
-    const req = httpMock.expectOne('http://localhost:8080/auth/login');
+    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/login');
     expect(req.request.method).toBe('POST');
     req.flush({ token: USER_TOKEN });
     expect(sessionStorage.getItem('lunaris_jwt')).toBe(USER_TOKEN);
@@ -124,7 +124,7 @@ describe('AuthService', () => {
   it('should login and save token to localStorage when rememberMe=true', () => {
     setup();
     service.login('user1', 'pass1', true).subscribe();
-    httpMock.expectOne('http://localhost:8080/auth/login').flush({ token: USER_TOKEN });
+    httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/login').flush({ token: USER_TOKEN });
     expect(localStorage.getItem('lunaris_jwt')).toBe(USER_TOKEN);
     expect(localStorage.getItem('lunaris_current_user')).toBe('user1');
     expect(sessionStorage.getItem('lunaris_jwt')).toBeNull();
@@ -136,7 +136,7 @@ describe('AuthService', () => {
   it('should detect admin role from token on login', () => {
     setup();
     service.login('admin', 'pass').subscribe();
-    httpMock.expectOne('http://localhost:8080/auth/login').flush({ token: ADMIN_TOKEN });
+    httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/login').flush({ token: ADMIN_TOKEN });
     expect(service.isAdmin()).toBe(true);
     expect(localStorage.getItem('lunaris_is_admin')).toBe('true');
   });
@@ -147,7 +147,7 @@ describe('AuthService', () => {
   it('should set admin=true when username is admin even without ADMIN role in token', () => {
     setup();
     service.login('admin', 'pass').subscribe();
-    httpMock.expectOne('http://localhost:8080/auth/login').flush({ token: USER_TOKEN });
+    httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/login').flush({ token: USER_TOKEN });
     expect(service.isAdmin()).toBe(true);
   });
 
@@ -157,7 +157,7 @@ describe('AuthService', () => {
   it('should save username to sessionStorage when rememberMe=false on login', () => {
     setup();
     service.login('bob', 'pass').subscribe();
-    httpMock.expectOne('http://localhost:8080/auth/login').flush({ token: USER_TOKEN });
+    httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/login').flush({ token: USER_TOKEN });
     expect(sessionStorage.getItem('lunaris_current_user')).toBe('bob');
     expect(localStorage.getItem('lunaris_current_user')).toBeNull();
   });
@@ -171,7 +171,7 @@ describe('AuthService', () => {
     let avatar: string | null = null;
     service.avatar$.subscribe(a => (avatar = a));
     service.login('bob', 'pass').subscribe();
-    httpMock.expectOne('http://localhost:8080/auth/login').flush({ token: USER_TOKEN });
+    httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/login').flush({ token: USER_TOKEN });
     expect(avatar).toBe('avatar-data');
   });
 
@@ -182,7 +182,7 @@ describe('AuthService', () => {
     localStorage.setItem('lunaris_theme_bob', 'dark');
     setup();
     service.login('bob', 'pass').subscribe();
-    httpMock.expectOne('http://localhost:8080/auth/login').flush({ token: USER_TOKEN });
+    httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/login').flush({ token: USER_TOKEN });
     expect(document.body.classList.contains('theme-dark')).toBe(true);
     document.body.classList.remove('theme-dark');
     document.documentElement.classList.remove('theme-dark');
@@ -196,7 +196,7 @@ describe('AuthService', () => {
     localStorage.setItem('lunaris_theme_bob', 'light');
     setup();
     service.login('bob', 'pass').subscribe();
-    httpMock.expectOne('http://localhost:8080/auth/login').flush({ token: USER_TOKEN });
+    httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/login').flush({ token: USER_TOKEN });
     expect(document.body.classList.contains('theme-dark')).toBe(false);
   });
 
@@ -230,7 +230,7 @@ describe('AuthService', () => {
     service.register('user', 'email@test.com', 'pass123').subscribe(res => {
       expect(res.id).toBe(1);
     });
-    const req = httpMock.expectOne('http://localhost:8080/users');
+    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/users');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({ username: 'user', email: 'email@test.com', password: 'pass123' });
     req.flush({ id: 1, username: 'user' });
@@ -568,7 +568,7 @@ describe('AuthService', () => {
     setup();
     service.updateUser('alice', { username: 'alice2' }).subscribe();
     const req = httpMock.expectOne(
-      'http://localhost:8080/users/username/alice'
+      'https://lunaris-backend-nxj3.onrender.com/users/username/alice'
     );
     expect(req.request.method).toBe('PUT');
     expect(req.request.body).toEqual({ username: 'alice2' });
@@ -581,7 +581,7 @@ describe('AuthService', () => {
   it('updateUser should work without token (no Authorization header)', () => {
     setup();
     service.updateUser('user1', { email: 'new@test.com' }).subscribe();
-    const req = httpMock.expectOne('http://localhost:8080/users/username/user1');
+    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/users/username/user1');
     expect(req.request.headers.has('Authorization')).toBe(false);
     req.flush({});
   });
@@ -592,7 +592,7 @@ describe('AuthService', () => {
   it('updateUser encodes special characters in username', () => {
     setup();
     service.updateUser('user name', { username: 'username' }).subscribe();
-    const req = httpMock.expectOne('http://localhost:8080/users/username/user%20name');
+    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/users/username/user%20name');
     req.flush({});
   });
 
@@ -604,7 +604,7 @@ describe('AuthService', () => {
     const emitted: boolean[] = [];
     service.isAdmin$.subscribe(v => emitted.push(v));
     service.login('admin', 'pass').subscribe();
-    httpMock.expectOne('http://localhost:8080/auth/login').flush({ token: ADMIN_TOKEN });
+    httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/login').flush({ token: ADMIN_TOKEN });
     expect(emitted).toContain(true);
   });
 });

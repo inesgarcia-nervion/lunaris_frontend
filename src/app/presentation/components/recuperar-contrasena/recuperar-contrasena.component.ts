@@ -26,7 +26,7 @@ export class RecuperarContrasenaComponent {
   error: string | null = null;
   loading = false;
 
-  private readonly backendBase = 'http://localhost:8080';
+  private readonly backendBase = 'https://lunaris-backend-nxj3.onrender.com';
 
   constructor(public router: Router, private http: HttpClient, private cdr: ChangeDetectorRef) {}
 

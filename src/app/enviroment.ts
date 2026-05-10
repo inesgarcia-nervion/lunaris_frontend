@@ -1,3 +1,3 @@
 export const environment = {
-    URL: "https://lunaris-backend-nxj3.onrender.com/"
+    apiUrl: 'https://lunaris-backend-nxj3.onrender.com/'
 };

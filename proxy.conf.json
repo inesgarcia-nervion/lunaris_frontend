@@ -1,43 +1,43 @@
 {
   "/auth": {
-    "target": "http://localhost:8080",
+    "target": "https://lunaris-backend-nxj3.onrender.com",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "info"
   },
   "/users": {
-    "target": "http://localhost:8080",
+    "target": "https://lunaris-backend-nxj3.onrender.com",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "info"
   },
   "/users/**": {
-    "target": "http://localhost:8080",
+    "target": "https://lunaris-backend-nxj3.onrender.com",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "info"
   }
   ,
   "/requests": {
-    "target": "http://localhost:8080",
+    "target": "https://lunaris-backend-nxj3.onrender.com",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "info"
   },
   "/requests/**": {
-    "target": "http://localhost:8080",
+    "target": "https://lunaris-backend-nxj3.onrender.com",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "info"
   },
   "/news": {
-    "target": "http://localhost:8080",
+    "target": "https://lunaris-backend-nxj3.onrender.com",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "info"
   },
   "/news/**": {
-    "target": "http://localhost:8080",
+    "target": "https://lunaris-backend-nxj3.onrender.com",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "info"

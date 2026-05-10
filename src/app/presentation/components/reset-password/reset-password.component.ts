@@ -29,7 +29,7 @@ export class ResetPasswordComponent implements OnInit {
   showPassword = false;
   showConfirmPassword = false;
 
-  private readonly backendBase = 'http://localhost:8080';
+  private readonly backendBase = 'https://lunaris-backend-nxj3.onrender.com';
 
   constructor(
     public router: Router,

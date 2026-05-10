@@ -88,7 +88,7 @@ export class AuthService {
     return this.injector.get(HttpClient);
   }
 
-  private readonly backendBase = 'http://localhost:8080';
+  private readonly backendBase = 'https://lunaris-backend-nxj3.onrender.com';
 
 
   login(username: string, password: string, rememberMe: boolean = false): Observable<string> {

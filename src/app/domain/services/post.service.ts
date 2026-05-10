@@ -19,7 +19,7 @@ export interface CommentRequestPayload {
  */
 @Injectable({ providedIn: 'root' })
 export class PostService {
-  private readonly apiUrl = 'http://localhost:8080';
+  private readonly apiUrl = 'https://lunaris-backend-nxj3.onrender.com';
 
   constructor(private http: HttpClient) {}
 

@@ -44,7 +44,7 @@ export class ListasService {
 
   private pendingStatusUpdates = 0;
 
-  private backendBase = 'http://localhost:8080';
+  private backendBase = 'https://lunaris-backend-nxj3.onrender.com';
 
   constructor(private http: HttpClient, private auth: AuthService) {
     const current = this.getCurrentUser();

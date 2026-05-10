@@ -38,7 +38,7 @@ export class ListasUsuariosComponent implements OnInit {
   private errorTimer: any = null;
   listSuccess: string | null = null;
 
-  private backendBase = 'http://localhost:8080';
+  private backendBase = 'https://lunaris-backend-nxj3.onrender.com';
 
   constructor(
     public bookSearchService: BookSearchService,
