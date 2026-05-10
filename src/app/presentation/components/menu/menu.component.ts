@@ -7,8 +7,10 @@ import { PeticionesService, BookRequestDto } from '../../../domain/services/peti
 import { ListasService, ListaItem } from '../../../domain/services/listas.service';
 import { ReviewService, ReviewDto } from '../../../domain/services/review.service';
 import { NewsService, NewsItem } from '../../../domain/services/news.service';
-import { Subscription } from 'rxjs';
+import { Subscription, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 /**
  * Componente principal que muestra el menú de búsqueda, resultados, 
@@ -46,6 +48,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   latestNews: NewsItem[] = [];
 
   private customCoverCache = new Map<string, string>();
+  private backendBase = 'https://lunaris-backend-nxj3.onrender.com';
 
   userRating: number = 0;
   userReview: string = '';
@@ -54,7 +57,7 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   private subs: Subscription[] = [];
 
-  constructor(public bookSearchService: BookSearchService, private auth: AuthService, private router: Router, private peticiones: PeticionesService, private listasService: ListasService, private reviewService: ReviewService, private newsService: NewsService, private cdr: ChangeDetectorRef) {
+  constructor(public bookSearchService: BookSearchService, private auth: AuthService, private router: Router, private peticiones: PeticionesService, private listasService: ListasService, private reviewService: ReviewService, private newsService: NewsService, private cdr: ChangeDetectorRef, private http: HttpClient) {
     this.isAdmin = this.auth.isAdmin();
   }
 
@@ -66,6 +69,9 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.subs.push(this.auth.isAdmin$.subscribe(isAdmin => {
       this.isAdmin = isAdmin;
     }));
+    this.subs.push(this.auth.avatarMap$.subscribe(() => {
+      try { this.cdr.detectChanges(); } catch {}
+    }));
     // refresh listas when entering menu so lists appear without page reload
     try { this.listasService.refreshFromServer(); } catch (e) {}
     if (this.isAdmin) this.loadAdminRequests();
@@ -75,14 +81,7 @@ export class MenuComponent implements OnInit, OnDestroy {
       this.totalResults = r?.numFound || 0;
     }));
 
-    this.subs.push(this.listasService.listas$.subscribe(listas => {
-      this.userLists = listas
-        .filter(l => !this.listasService.isProfileListName(l.nombre) && (!l.isPrivate || this.auth.isAdmin()))
-        .sort((a, b) => Number(b.id) - Number(a.id));
-      if (this.listPageIndex >= this.listTotalPages) {
-        this.listPageIndex = Math.max(0, this.listTotalPages - 1);
-      }
-    }));
+    this.loadAllPublicLists();
 
     this.subs.push(this.bookSearchService.selectedBook$.subscribe(b => {
       this.selectedBook = b;
@@ -99,6 +98,7 @@ export class MenuComponent implements OnInit, OnDestroy {
 
     this.subs.push(this.reviewService.reviews$.subscribe(reviews => {
       this.allReviews = reviews;
+      this.auth.prefetchAvatarsForUsers(reviews.map(r => r.username));
       if (this.reviewPageIndex >= this.reviewTotalPages) {
         this.reviewPageIndex = Math.max(0, this.reviewTotalPages - 1);
       }
@@ -116,6 +116,29 @@ export class MenuComponent implements OnInit, OnDestroy {
    */
   private loadAdminRequests(): void {
     this.peticiones.getAll().subscribe({ next: (r) => { this.adminRequests = r || []; }, error: () => { this.adminRequests = []; } });
+  }
+
+  private loadAllPublicLists(): void {
+    this.http.get<any[]>(`${this.backendBase}/user_list/all`).pipe(
+      catchError(() => of([]))
+    ).subscribe(all => {
+      const isAdmin = this.auth.isAdmin();
+      this.userLists = (all || [])
+        .filter((l: any) => !this.listasService.isProfileListName(l.name) && (!l.isPrivate || isAdmin))
+        .map((l: any) => ({
+          id: l.id?.toString() || '',
+          nombre: l.name || '',
+          libros: l.booksJson ? JSON.parse(l.booksJson) : [],
+          owner: l.owner || '',
+          isPrivate: !!l.isPrivate
+        } as ListaItem))
+        .sort((a: ListaItem, b: ListaItem) => Number(b.id) - Number(a.id));
+      this.auth.prefetchAvatarsForUsers(this.userLists.map(l => l.owner));
+      if (this.listPageIndex >= this.listTotalPages) {
+        this.listPageIndex = Math.max(0, this.listTotalPages - 1);
+      }
+      try { this.cdr.detectChanges(); } catch {}
+    });
   }
 
   /**

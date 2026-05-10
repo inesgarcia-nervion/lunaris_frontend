@@ -29,7 +29,7 @@
           <img class="libro-cover" [src]="getCover(book)" alt="portada" />
           <h3 class="libro-title">{{ book.title }}</h3>
           <p class="libro-author">{{ getAuthor(book) }}</p>
-          <button class="btn-delete btn-delete--small btn-delete--muted" (click)="removeFromList(lista.id, book, $event)">Eliminar</button>
+          <button *ngIf="lista.owner === currentUser || auth.isAdmin()" class="btn-delete btn-delete--small btn-delete--muted" (click)="removeFromList(lista.id, book, $event)">Eliminar</button>
         </div>
       </div>
     </div>

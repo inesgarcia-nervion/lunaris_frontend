@@ -318,6 +318,9 @@ export class AuthService {
   private avatarSubject = new BehaviorSubject<string | null>(null);
   public avatar$ = this.avatarSubject.asObservable();
 
+  private avatarMapSubject = new BehaviorSubject<Map<string, string>>(new Map());
+  public readonly avatarMap$ = this.avatarMapSubject.asObservable();
+
 
   /**
    * Genera la clave para almacenar el avatar en localStorage, basada en el nombre de usuario. 
@@ -345,8 +348,57 @@ export class AuthService {
         const fromSubject = this.avatarSubject.value;
         if (fromSubject) return fromSubject;
       }
+      if (username) {
+        const fromMap = this.avatarMapSubject.value.get(username);
+        if (fromMap !== undefined) return fromMap || null;
+      }
       return localStorage.getItem(this.getAvatarKey(username));
     } catch { return null; }
+  }
+
+  private prefetchInFlight = new Set<string>();
+
+  /**
+   * Foto de perfil de usuario: método para precargar los avatares de una lista de usuarios.
+   * @param usernames 
+   * @returns 
+   */
+  prefetchAvatarsForUsers(usernames: (string | undefined | null)[]): void {
+    const token = this.getToken();
+    if (!token) return;
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    const unique = [...new Set(usernames.filter((u): u is string => !!u))];
+    for (const username of unique) {
+      const key = this.getAvatarKey(username);
+      if (this.prefetchInFlight.has(username)) continue;
+      if (this.avatarMapSubject.value.has(username)) continue;
+      try { if (localStorage.getItem(key) !== null) {
+        const map = new Map(this.avatarMapSubject.value);
+        map.set(username, localStorage.getItem(key)!);
+        this.avatarMapSubject.next(map);
+        continue;
+      }} catch {}
+      this.prefetchInFlight.add(username);
+      this.http.get<any>(
+        `${this.backendBase}/users/username/${encodeURIComponent(username)}`,
+        { headers }
+      ).subscribe({
+        next: (u: any) => {
+          const url: string = u?.avatarUrl ?? '';
+          try { localStorage.setItem(key, url); } catch {}
+          const map = new Map(this.avatarMapSubject.value);
+          map.set(username, url);
+          this.avatarMapSubject.next(map);
+          this.prefetchInFlight.delete(username);
+        },
+        error: () => {
+          const map = new Map(this.avatarMapSubject.value);
+          map.set(username, '');
+          this.avatarMapSubject.next(map);
+          this.prefetchInFlight.delete(username);
+        }
+      });
+    }
   }
 
   /**

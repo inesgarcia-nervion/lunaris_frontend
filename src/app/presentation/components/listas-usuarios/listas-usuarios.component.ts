@@ -60,6 +60,7 @@ export class ListasUsuariosComponent implements OnInit {
   ngOnInit(): void {
     this.currentUser = this.listasService.getCurrentUser();
     this.loadAllLists();
+    this.auth.avatarMap$.subscribe(() => { try { this.cdr.markForCheck(); } catch {} });
     this.listasService.listas$.subscribe(updated => {
       if (!updated) return;
       this.listas = this.listas.map(l => {
@@ -95,6 +96,7 @@ export class ListasUsuariosComponent implements OnInit {
       }));
       const sorted = this.filterOutProfileLists(mapped).sort((a, b) => Number(b.id) - Number(a.id));
       this.listas = sorted;
+      this.auth.prefetchAvatarsForUsers(sorted.map((l: any) => l.owner));
       this.filteredListas = this.search
         ? this.listas.filter(l => l.nombre.toLowerCase().includes(this.search.toLowerCase()))
         : this.listas;
