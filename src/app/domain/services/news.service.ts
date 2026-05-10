@@ -35,7 +35,7 @@ interface NewsBackendItem {
  */
 @Injectable({ providedIn: 'root' })
 export class NewsService {
-  private base = '/news';
+  private base = 'https://lunaris-backend-nxj3.onrender.com/news';
   private newsSubject = new BehaviorSubject<NewsItem[]>([]);
   public news$ = this.newsSubject.asObservable();
   private refreshTrigger = new Subject<void>();

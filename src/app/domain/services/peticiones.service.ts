@@ -26,7 +26,7 @@ export interface BookRequestDto {
  */
 @Injectable({ providedIn: 'root' })
 export class PeticionesService {
-  private base = '/requests';
+  private base = 'https://lunaris-backend-nxj3.onrender.com/requests';
 
   constructor(private http: HttpClient) {}
 
