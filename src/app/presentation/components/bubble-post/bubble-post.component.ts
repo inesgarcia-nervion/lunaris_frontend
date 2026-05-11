@@ -47,6 +47,7 @@ export class BubblePostComponent {
   @Input() post!: BubblePost;
   @Input() canDelete: boolean = false;
   @Input() canEdit: boolean = false;
+  deleting = false;
   @Output() like = new EventEmitter<number>();
   @Output() edit = new EventEmitter<number>();
   @Output() open = new EventEmitter<BubblePost>();
@@ -114,6 +115,7 @@ export class BubblePostComponent {
   async onDeleteConfirm() {
     const ok = await this.confirmService.confirm('¿Estás seguro de eliminar esta publicación?');
     if (!ok) return;
+    this.deleting = true;
     this.delete.emit(this.post.id);
   }
 

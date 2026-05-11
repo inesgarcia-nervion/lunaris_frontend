@@ -64,10 +64,14 @@ export class ListasUsuariosComponent implements OnInit {
     this.auth.avatarMap$.subscribe(() => { try { this.cdr.markForCheck(); } catch {} });
     this.listasService.listas$.subscribe(updated => {
       if (!updated) return;
-      this.listas = this.listas.map(l => {
-        const match = updated.find(u => u.id === l.id);
-        return match ? { ...l, nombre: match.nombre, isPrivate: match.isPrivate, libros: match.libros } : l;
-      });
+      const otherUsersLists = this.listas.filter(l => l.owner !== this.currentUser);
+      const myUpdatedLists = this.listas
+        .filter(l => l.owner === this.currentUser && updated.some(u => u.id === l.id))
+        .map(l => {
+          const match = updated.find(u => u.id === l.id);
+          return match ? { ...l, nombre: match.nombre, isPrivate: match.isPrivate, libros: match.libros } : l;
+        });
+      this.listas = [...otherUsersLists, ...myUpdatedLists].sort((a, b) => Number(b.id) - Number(a.id));
       const term = this.search.toLowerCase();
       this.filteredListas = term
         ? this.listas.filter(l => l.nombre.toLowerCase().includes(term))
@@ -96,8 +100,10 @@ export class ListasUsuariosComponent implements OnInit {
         isPrivate: !!l.isPrivate
       }));
       const sorted = this.filterOutProfileLists(mapped).sort((a, b) => Number(b.id) - Number(a.id));
-      this.listas = sorted;
-      this.auth.prefetchAvatarsForUsers(sorted.map((l: any) => l.owner));
+      const serviceKnownIds = new Set(this.listasService.getAll().map(l => l.id));
+      const filtered = sorted.filter(l => l.owner !== this.currentUser || serviceKnownIds.has(l.id));
+      this.listas = filtered;
+      this.auth.prefetchAvatarsForUsers(filtered.map((l: any) => l.owner));
       this.filteredListas = this.search
         ? this.listas.filter(l => l.nombre.toLowerCase().includes(this.search.toLowerCase()))
         : this.listas;

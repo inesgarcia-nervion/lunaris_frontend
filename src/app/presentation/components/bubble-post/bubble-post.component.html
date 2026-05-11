@@ -25,7 +25,7 @@
     <button *ngIf="canEdit" class="edit" (click)="$event.stopPropagation(); onEdit()">✏️</button>
 
     <ng-container *ngIf="canDelete">
-      <button class="btn-delete" (click)="$event.stopPropagation(); onDeleteConfirm()">Eliminar</button>
+      <button class="btn-delete" (click)="$event.stopPropagation(); onDeleteConfirm()" [disabled]="deleting">Eliminar</button>
     </ng-container>
   </div>
 </div>

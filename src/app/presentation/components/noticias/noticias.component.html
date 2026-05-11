@@ -48,7 +48,7 @@
       </div>
       <div *ngIf="isAdmin" class="news-actions">
         <!-- Usar el diálogo global de confirmación para mantener consistencia visual -->
-        <button class="btn-delete" (click)="$event.stopPropagation(); confirmRemove(n.id)">Eliminar</button>
+        <button class="btn-delete" [disabled]="deletingNewsId === n.id" (click)="$event.stopPropagation(); confirmRemove(n.id)">Eliminar</button>
       </div>
     </div>
   </div>

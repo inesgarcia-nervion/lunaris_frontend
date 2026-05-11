@@ -341,6 +341,7 @@
             <span class="review-date">{{ r.date | date:'dd/MM/yyyy' }}</span>
             <button *ngIf="isAdmin || (r.username && r.username === username)"
                     (click)="$event.stopPropagation(); deleteReviewById(r.id)"
+                    [disabled]="deletingReviewId === r.id"
                     class="btn btn-delete btn-delete-inline">
               Eliminar
             </button>

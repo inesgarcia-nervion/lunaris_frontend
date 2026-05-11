@@ -43,6 +43,7 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
   selectedImageIndex = 0;
   newCommentText = '';
   pendingDeleteId: number | null = null;
+  deletingCommentId: number | null = null;
 
   pageSize = 5;
   currentPage = 1;
@@ -231,12 +232,18 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     if (!this.selected || !this.selected.comments) return;
     const ok = await this.confirm.confirm('¿Estás seguro de eliminar este comentario?');
     if (!ok) return;
+    this.deletingCommentId = commentId;
     this.postService.deleteComment(this.selected.id, commentId).subscribe({
       next: (updated) => {
         const idx = this.posts.findIndex(x => x.id === updated.id);
         if (idx !== -1) this.posts[idx] = updated;
         this.selected = updated;
+        this.deletingCommentId = null;
         this.updatePagination();
+        try { this.cdr.detectChanges(); } catch (_) {}
+      },
+      error: () => {
+        this.deletingCommentId = null;
         try { this.cdr.detectChanges(); } catch (_) {}
       }
     });

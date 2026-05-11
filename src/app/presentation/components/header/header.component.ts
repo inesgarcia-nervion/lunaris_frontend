@@ -56,6 +56,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   currentUserReview: any | null = null;
   reviewSuccess: string | null = null;
   reviewError: string | null = null;
+  deletingReviewId: number | null = null;
   submittingReview = false;
   isMenuRoute: boolean = false;
   @ViewChild('reviewEditor') reviewEditor?: ElementRef<HTMLElement>;
@@ -1071,8 +1072,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (!id) return;
     const ok = await this.confirmService.confirm('¿Estás seguro de eliminar esta reseña?');
     if (!ok) return;
+    this.deletingReviewId = id;
     this.reviewService.delete(id).subscribe({
       next: () => {
+        this.deletingReviewId = null;
         this.reviews = this.reviews.filter(r => r.id !== id);
         if (this.currentUserReview && this.currentUserReview.id === id) {
           this.currentUserReview = null;
@@ -1085,6 +1088,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       },
       error: (err) => {
+        this.deletingReviewId = null;
         console.error('Error eliminando reseña:', err);
         this.reviewError = 'Error al eliminar la reseña';
         this.clearReviewAlertAfterDelay();

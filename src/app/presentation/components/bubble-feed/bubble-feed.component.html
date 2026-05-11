@@ -170,7 +170,7 @@
             <strong>{{ c.user.name }}:</strong>
             <div class="comment-body">{{ c.text }}</div>
             <div class="comment-meta">
-              <button class="btn-delete btn-delete--small btn-delete--muted" *ngIf="auth.isAdmin() || (auth.getCurrentUsername() === c.user.name)" (click)="$event.stopPropagation(); deleteComment(c.id)">Eliminar</button>
+              <button class="btn-delete btn-delete--small btn-delete--muted" *ngIf="auth.isAdmin() || (auth.getCurrentUsername() === c.user.name)" [disabled]="deletingCommentId === c.id" (click)="$event.stopPropagation(); deleteComment(c.id)">Eliminar</button>
             </div>
           </div>
         </div>

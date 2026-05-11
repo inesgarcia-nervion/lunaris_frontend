@@ -30,6 +30,7 @@ export class NoticiasComponent implements OnInit {
   isAdmin = false;
   error: string | null = null;
   pendingDeleteId: string | null = null;
+  deletingNewsId: string | null = null;
 
   pageSize = 5;
   currentPage = 1;
@@ -239,15 +240,18 @@ export class NoticiasComponent implements OnInit {
     if (!this.isAdmin) return;
     const ok = await this.confirm.confirm('¿Estás seguro de eliminar esta noticia?');
     if (!ok) return;
+    this.deletingNewsId = id;
     this.newsService.removeNews(id).subscribe({
       next: () => {
         this.news = this.news.filter(n => n.id !== id);
         this.updatePagination();
+        this.deletingNewsId = null;
         this.cdr.detectChanges();
         this.newsSuccess = 'Noticia eliminada';
         setTimeout(() => { this.newsSuccess = null; try { this.cdr.detectChanges(); } catch(_){} }, 5000);
       },
       error: (err) => {
+        this.deletingNewsId = null;
         this.error = err?.error?.message || 'Error al eliminar la noticia';
         setTimeout(() => { try { this.error = null; this.cdr.detectChanges(); } catch(_){} }, 5000);
       }

@@ -23,6 +23,7 @@ import { PaginationComponent } from '../../shared/pagination/pagination.componen
 })
 export class ListaDetalleComponent implements OnInit, OnDestroy {
   lista: ListaItem | undefined;
+  deletingList = false;
   pageSize = 12;
   currentPage = 1;
   pagedLibros: any[] = [];
@@ -234,6 +235,7 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
     }
     const ok = await this.confirm.confirm(`¿Estás seguro de que quieres eliminar la lista "${this.lista.nombre}"? Esta acción no se puede deshacer.`);
     if (!ok) return;
+    this.deletingList = true;
     this.listas.deleteList(this.lista.id);
     this.router.navigate(['/listas-usuarios'], { queryParams: { msg: 'Lista eliminada' } });
   }
