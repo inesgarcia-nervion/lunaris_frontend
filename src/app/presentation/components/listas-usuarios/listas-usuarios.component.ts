@@ -32,6 +32,7 @@ export class ListasUsuariosComponent implements OnInit {
   pagedListas: any[] = [];
   showCreateInput: boolean = false;
   newListName: string = '';
+  creatingList: boolean = false;
   newListPrivate: boolean = false;
   currentUser: string | null = null;
   createError: string = '';
@@ -246,13 +247,18 @@ export class ListasUsuariosComponent implements OnInit {
       return;
     }
     this.createError = '';
-    const nueva = await this.listasService.addList(name, !!this.newListPrivate);
-    this.bookSearchService.setNavigationOrigin({ type: 'listas' });
-    this.router.navigate(['/listas', nueva.id]);
-    this.cdr.detectChanges();
-    this.newListName = '';
-    this.showCreateInput = false;
-    this.newListPrivate = false;
+    this.creatingList = true;
+    try {
+      const nueva = await this.listasService.addList(name, !!this.newListPrivate);
+      this.bookSearchService.setNavigationOrigin({ type: 'listas' });
+      this.router.navigate(['/listas', nueva.id]);
+      this.newListName = '';
+      this.showCreateInput = false;
+      this.newListPrivate = false;
+    } finally {
+      this.creatingList = false;
+      this.cdr.detectChanges();
+    }
   }
 
   /**

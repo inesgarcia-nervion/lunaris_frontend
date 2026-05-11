@@ -20,7 +20,7 @@
     <label class="create-list-privada">
       <input type="checkbox" [(ngModel)]="newListPrivate" /> Privada
     </label>
-    <button class="btn-confirm" (click)="confirmCreate()" [disabled]="!newListName.trim()">Crear</button>
+    <button class="btn-confirm" (click)="confirmCreate()" [disabled]="!newListName.trim() || creatingList">{{ creatingList ? 'Creando...' : 'Crear' }}</button>
     <button class="btn-cancel" (click)="cancelCreate()">Cancelar</button>
   </div>
   <div class="message error" *ngIf="createError">{{ createError }}</div>

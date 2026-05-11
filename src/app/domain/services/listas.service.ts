@@ -250,19 +250,28 @@ export class ListasService {
    * @param id ID de la lista a eliminar
    */
   deleteList(id: string) {
+    const previous = this.getAll();
+    const listasAfter = previous.filter(l => l.id !== id);
+    try { localStorage.setItem(this.storageKey, JSON.stringify(listasAfter)); } catch {}
+    this.listasSubject.next(listasAfter);
+
     const owner = this.getCurrentUser();
     const numericId = Number(id);
     if (owner && !isNaN(numericId)) {
-      this.http.delete(`${this.backendBase}/user_list/${numericId}`).pipe(catchError(_ => of(null))).subscribe(() => {
-        const listas = this.getAll().filter(l => l.id !== id);
-        try { localStorage.setItem(this.storageKey, JSON.stringify(listas)); } catch {}
-        this.listasSubject.next(listas);
+      this.http.delete(`${this.backendBase}/user_list/${numericId}`).pipe(
+        catchError(err => {
+          // restore previous state on error
+          try { localStorage.setItem(this.storageKey, JSON.stringify(previous)); } catch {}
+          this.listasSubject.next(previous);
+          return of(null);
+        })
+      ).subscribe(() => {
+        // success — nothing to do, UI already updated
       });
       return;
     }
-    const listas = this.getAll().filter(l => l.id !== id);
-    this.saveToStorage(listas);
-    this.listasSubject.next(listas);
+
+    // Offline / no-owner case: already updated local storage and subject above
   }
 
   /**
