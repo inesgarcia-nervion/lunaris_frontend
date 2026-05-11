@@ -65,7 +65,7 @@ describe('RecuperarContrasenaComponent', () => {
     component.email = 'test@test.com';
     component.submit();
     expect(component.loading).toBe(true);
-    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/forgot-password');
+    const req = httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/forgot-password');
     expect(req.request.method).toBe('POST');
     req.flush({ message: 'Email sent' });
     expect(component.message).toBe('Email sent');
@@ -78,7 +78,7 @@ describe('RecuperarContrasenaComponent', () => {
   it('submit uses default message when response has no message field', () => {
     component.email = 'a@b.com';
     component.submit();
-    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/forgot-password');
+    const req = httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/forgot-password');
     req.flush({});
     expect(component.message).toBeTruthy();
     expect(component.loading).toBe(false);
@@ -90,7 +90,7 @@ describe('RecuperarContrasenaComponent', () => {
   it('submit handles connection error (status 0)', () => {
     component.email = 'a@b.com';
     component.submit();
-    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/forgot-password');
+    const req = httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/forgot-password');
     req.flush('connection refused', { status: 0, statusText: '' });
     expect(component.error).toContain('conectar');
     expect(component.loading).toBe(false);
@@ -102,7 +102,7 @@ describe('RecuperarContrasenaComponent', () => {
   it('submit handles 404 error', () => {
     component.email = 'a@b.com';
     component.submit();
-    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/forgot-password');
+    const req = httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/forgot-password');
     req.flush({ error: 'No account' }, { status: 404, statusText: 'Not Found' });
     expect(component.error).toContain('No account');
     expect(component.loading).toBe(false);
@@ -114,7 +114,7 @@ describe('RecuperarContrasenaComponent', () => {
   it('submit handles 404 without error body', () => {
     component.email = 'a@b.com';
     component.submit();
-    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/forgot-password');
+    const req = httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/forgot-password');
     req.flush({}, { status: 404, statusText: 'Not Found' });
     expect(component.error).toBeTruthy();
   });
@@ -125,7 +125,7 @@ describe('RecuperarContrasenaComponent', () => {
   it('submit handles generic server error', () => {
     component.email = 'a@b.com';
     component.submit();
-    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/forgot-password');
+    const req = httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/forgot-password');
     req.flush({ error: 'Server issue' }, { status: 500, statusText: 'Internal Server Error' });
     expect(component.error).toContain('Server issue');
     expect(component.loading).toBe(false);
@@ -137,7 +137,7 @@ describe('RecuperarContrasenaComponent', () => {
   it('submit handles generic error without body', () => {
     component.email = 'a@b.com';
     component.submit();
-    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/forgot-password');
+    const req = httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/forgot-password');
     req.flush({}, { status: 500, statusText: 'Server Error' });
     expect(component.error).toBeTruthy();
   });
@@ -150,6 +150,6 @@ describe('RecuperarContrasenaComponent', () => {
     component.email = 'a@b.com';
     component.submit();
     expect(component.error).toBeNull();
-    httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/forgot-password').flush({});
+    httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/forgot-password').flush({});
   });
 });

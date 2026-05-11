@@ -311,7 +311,7 @@
               </div>
             </div>
             <div class="review-actions">
-              <button (click)="submitReview()" class="btn btn-primary" [disabled]="(!userReview?.trim() && !userRating)">
+              <button (click)="submitReview()" class="btn btn-primary" [disabled]="(!userReview?.trim() && !userRating) || submittingReview">
                 {{ currentUserReview ? 'Editar reseña' : 'Publicar' }}
               </button>
             </div>

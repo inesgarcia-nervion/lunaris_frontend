@@ -56,6 +56,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   currentUserReview: any | null = null;
   reviewSuccess: string | null = null;
   reviewError: string | null = null;
+  submittingReview = false;
   isMenuRoute: boolean = false;
   @ViewChild('reviewEditor') reviewEditor?: ElementRef<HTMLElement>;
 
@@ -987,9 +988,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
       username: this.auth.getCurrentUsername() || this.listasService.getCurrentUser()
     };
 
+    this.submittingReview = true;
     if (this.currentUserReview && this.currentUserReview.id) {
       this.reviewService.update(this.currentUserReview.id, payload).subscribe({
         next: (updated) => {
+          this.submittingReview = false;
           const idx = this.reviews.findIndex(r => r.id === updated.id);
           if (idx >= 0) this.reviews[idx] = updated;
           this.currentUserReview = updated;
@@ -999,6 +1002,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         },
         error: (err) => {
+          this.submittingReview = false;
           console.error('Error actualizando reseña:', err);
           this.reviewError = 'Error al actualizar la reseña';
           this.clearReviewAlertAfterDelay();
@@ -1007,6 +1011,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     } else {
       this.reviewService.create(payload).subscribe({
         next: (created) => {
+          this.submittingReview = false;
           this.reviews.unshift(created);
           this.currentUserReview = created;
           this.reviewSuccess = 'Reseña publicada';
@@ -1015,6 +1020,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         },
         error: (err) => {
+          this.submittingReview = false;
           console.error('Error creando reseña:', err);
           this.reviewError = (err?.error && err.error.message) ? err.error.message : 'Error al publicar la reseña';
           this.clearReviewAlertAfterDelay();

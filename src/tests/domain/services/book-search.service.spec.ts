@@ -7,7 +7,7 @@ import { BookSearchService, OpenLibraryBook, OpenLibrarySearchResponse } from '.
  * Tests para BookSearchService. Cubre principalmente la lógica de búsqueda y manejo de estado, 
  * así como los métodos auxiliares relacionados con los libros.
  */
-const BASE = 'https://lunaris-backend-nxj3.onrender.com';
+const BASE = 'https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net';
 
 /**
  * Helper para crear un libro de OpenLibrary con valores por defecto, permitiendo sobreescribir campos específicos.

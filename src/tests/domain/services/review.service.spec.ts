@@ -54,7 +54,7 @@ describe('ReviewService', () => {
     const mockReviews: ReviewDto[] = [{ id: 1, comment: 'Great', rating: 5 }];
     let result: ReviewDto[] | null = null;
     service.getByBookApiId('api123').subscribe(r => (result = r));
-    const req = httpMock.expectOne(r => r.url === 'https://lunaris-backend-nxj3.onrender.com/reviews/book');
+    const req = httpMock.expectOne(r => r.url === 'https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/reviews/book');
     expect(req.request.method).toBe('GET');
     expect(req.request.params.get('apiId')).toBe('api123');
     req.flush(mockReviews);
@@ -71,7 +71,7 @@ describe('ReviewService', () => {
     let emitted: ReviewDto[] | null = null;
     service.reviews$.subscribe(r => (emitted = r));
     service.getAll().subscribe();
-    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/reviews');
+    const req = httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/reviews');
     req.flush(mockReviews);
     expect(emitted).toEqual(mockReviews);
   });
@@ -89,7 +89,7 @@ describe('ReviewService', () => {
     let emitted: ReviewDto[] | null = null;
     service.reviews$.subscribe(r => (emitted = r));
     service.getAll().subscribe();
-    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/reviews');
+    const req = httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/reviews');
     req.flush(mockReviews);
     expect(bookSearchServiceMock.getBookByApiId).toHaveBeenCalledWith('custom-abc');
     expect(emitted![0].bookTitle).toBe('Custom Book');
@@ -107,7 +107,7 @@ describe('ReviewService', () => {
       of({ title: 'Other Title', coverImage: 'other.jpg' })
     );
     service.getAll().subscribe();
-    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/reviews');
+    const req = httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/reviews');
     req.flush(mockReviews);
     expect(service['reviewsSubject'].getValue()[0].bookTitle).toBe('Existing Title');
   });
@@ -121,7 +121,7 @@ describe('ReviewService', () => {
     ];
     bookSearchServiceMock.getBookByApiId.mockReturnValue(of(null));
     service.getAll().subscribe();
-    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/reviews');
+    const req = httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/reviews');
     req.flush(mockReviews);
     expect(service['reviewsSubject'].getValue()[0].bookTitle).toBeNull();
   });
@@ -134,7 +134,7 @@ describe('ReviewService', () => {
       { id: 5, bookApiId: 'ol-standard', bookTitle: 'Std', coverUrl: 'std.jpg' },
     ];
     service.getAll().subscribe();
-    httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/reviews').flush(mockReviews);
+    httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/reviews').flush(mockReviews);
     expect(bookSearchServiceMock.getBookByApiId).not.toHaveBeenCalled();
   });
 
@@ -143,7 +143,7 @@ describe('ReviewService', () => {
    */
   it('refreshAll should call getAll without error', () => {
     service.refreshAll();
-    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/reviews');
+    const req = httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/reviews');
     req.flush([]);
   });
 
@@ -152,7 +152,7 @@ describe('ReviewService', () => {
    */
   it('refreshAll should not throw on HTTP error', () => {
     service.refreshAll();
-    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/reviews');
+    const req = httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/reviews');
     req.flush('error', { status: 500, statusText: 'Server Error' });
   });
 
@@ -163,7 +163,7 @@ describe('ReviewService', () => {
     const review: ReviewDto = { comment: 'Good', rating: 4 };
     let result: ReviewDto | null = null;
     service.create(review).subscribe(r => (result = r));
-    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/reviews');
+    const req = httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/reviews');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(review);
     req.flush({ id: 10, ...review });
@@ -177,7 +177,7 @@ describe('ReviewService', () => {
     const review: ReviewDto = { comment: 'Updated', rating: 3 };
     let result: ReviewDto | null = null;
     service.update(7, review).subscribe(r => (result = r));
-    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/reviews/7');
+    const req = httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/reviews/7');
     expect(req.request.method).toBe('PUT');
     req.flush({ id: 7, ...review });
     expect(result!.comment).toBe('Updated');
@@ -189,7 +189,7 @@ describe('ReviewService', () => {
   it('delete should DELETE /reviews/:id', () => {
     let completed = false;
     service.delete(3).subscribe(() => (completed = true));
-    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/reviews/3');
+    const req = httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/reviews/3');
     expect(req.request.method).toBe('DELETE');
     req.flush(null);
     expect(completed).toBe(true);

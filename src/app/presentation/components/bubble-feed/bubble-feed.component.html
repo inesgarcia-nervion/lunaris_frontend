@@ -57,7 +57,7 @@
 
           <!-- Acciones: botones Guardar/Cancelar para edición -->
           <div class="create-actions">
-            <button (click)="publish()" [disabled]="!editHasChanges()">Guardar</button>
+            <button (click)="publish()" [disabled]="publishing || !editHasChanges()">Guardar</button>
             <button class="cancel" (click)="cancelCreate()">Cancelar</button>
           </div>
         </div>
@@ -120,7 +120,7 @@
 
         <!-- Acciones: botones Publicar/Cancelar para creación -->
         <div class="create-actions">
-          <button (click)="publish()" [disabled]="editingId != null ? !editHasChanges() : ( !newText.trim() && !newImagePreviews.length )">Publicar</button>
+          <button (click)="publish()" [disabled]="publishing || (editingId != null ? !editHasChanges() : ( !newText.trim() && !newImagePreviews.length ))">Publicar</button>
           <button class="cancel" (click)="cancelCreate()">Cancelar</button>
         </div>
       </div>
@@ -178,7 +178,7 @@
         <!-- Formulario para agregar nuevo comentario -->
         <div class="add-comment">
           <div #commentEditor contenteditable="true" class="comment-input editable" data-placeholder="Escribe tu comentario aquí..." (input)="onCommentInput(commentEditor)" (keydown)="onCommentKeydown($event, commentEditor)" aria-label="Escribe un comentario..."></div>
-          <div class="comment-actions"><button (click)="addComment()" [disabled]="!canSendComment()">Enviar</button></div>
+          <div class="comment-actions"><button (click)="addComment()" [disabled]="!canSendComment() || submittingComment">Enviar</button></div>
         </div>
       </div>
     </div>

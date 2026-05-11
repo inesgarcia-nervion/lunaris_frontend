@@ -44,7 +44,7 @@ export class ListasService {
 
   private pendingStatusUpdates = 0;
 
-  private backendBase = 'https://lunaris-backend-nxj3.onrender.com';
+  private backendBase = 'https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net';
 
   constructor(private http: HttpClient, private auth: AuthService) {
     const current = this.getCurrentUser();

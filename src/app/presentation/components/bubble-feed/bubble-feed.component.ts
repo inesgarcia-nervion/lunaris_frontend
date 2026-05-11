@@ -27,6 +27,8 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
   postSuccess: string | null = null;
 
   creating = false;
+  publishing = false;
+  submittingComment = false;
   newText = '';
   newImageFiles: File[] = [];
   newImagePreviews: string[] = [];
@@ -202,8 +204,10 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
     const text = this.newCommentText?.trim();
     if (!text) return;
     const avatarUrl = this.auth.getLocalAvatar() || undefined;
+    this.submittingComment = true;
     this.postService.addComment(this.selected.id, { text, userAvatarUrl: avatarUrl }).subscribe({
       next: (updated) => {
+        this.submittingComment = false;
         const idx = this.posts.findIndex(x => x.id === updated.id);
         if (idx !== -1) this.posts[idx] = updated;
         this.selected = updated;
@@ -211,7 +215,8 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
         try { if (this.commentEditorRef?.nativeElement) this.commentEditorRef.nativeElement.innerHTML = ''; } catch (_) {}
         this.updatePagination();
         try { this.cdr.detectChanges(); } catch (_) {}
-      }
+      },
+      error: () => { this.submittingComment = false; }
     });
   }
 
@@ -560,10 +565,12 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
   publish() {
     const avatar = this.auth.getLocalAvatar() || undefined;
     const imageUrls = this.newImagePreviews.slice(0, 3);
+    this.publishing = true;
     if (this.editingId != null) {
       const editId = this.editingId;
       this.postService.update(editId, { text: this.newText || '', imageUrls, userAvatarUrl: avatar }).subscribe({
         next: (updated) => {
+          this.publishing = false;
           const idx = this.posts.findIndex(x => x.id === editId);
           if (idx !== -1) this.posts[idx] = updated;
           if (this.selected && this.selected.id === editId) this.selected = updated;
@@ -572,20 +579,23 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
           this.creating = false;
           this.updatePagination();
           try { this.cdr.detectChanges(); } catch (_) {}
-        }
+        },
+        error: () => { this.publishing = false; }
       });
       return;
     }
 
     this.postService.create({ text: this.newText || '', imageUrls, userAvatarUrl: avatar }).subscribe({
       next: (created) => {
+        this.publishing = false;
         this.posts.unshift(created);
         this.clearForm();
         this.creating = false;
         this.currentPage = 1;
         this.updatePagination();
         try { this.cdr.detectChanges(); } catch (_) {}
-      }
+      },
+      error: () => { this.publishing = false; }
     });
   }
 

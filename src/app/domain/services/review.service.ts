@@ -31,7 +31,7 @@ export interface ReviewDto {
  */
 @Injectable({ providedIn: 'root' })
 export class ReviewService {
-  private apiUrl = 'https://lunaris-backend-nxj3.onrender.com';
+  private apiUrl = 'https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net';
 
   private reviewsSubject = new BehaviorSubject<ReviewDto[]>([]);
   reviews$ = this.reviewsSubject.asObservable();

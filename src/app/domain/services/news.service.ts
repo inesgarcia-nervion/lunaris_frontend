@@ -35,7 +35,7 @@ interface NewsBackendItem {
  */
 @Injectable({ providedIn: 'root' })
 export class NewsService {
-  private base = 'https://lunaris-backend-nxj3.onrender.com/news';
+  private base = 'https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/news';
   private newsSubject = new BehaviorSubject<NewsItem[]>([]);
   public news$ = this.newsSubject.asObservable();
   private refreshTrigger = new Subject<void>();

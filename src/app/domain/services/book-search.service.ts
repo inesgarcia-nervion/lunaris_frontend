@@ -86,7 +86,7 @@ export interface SagaScraped {
   providedIn: 'root'
 })
 export class BookSearchService {
-  private apiUrl = 'https://lunaris-backend-nxj3.onrender.com'; 
+  private apiUrl = 'https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net'; 
   private pageCache = new Map<string, OpenLibrarySearchResponse>();
 
   private responseSubject = new BehaviorSubject<OpenLibrarySearchResponse | null>(null);

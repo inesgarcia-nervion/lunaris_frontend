@@ -19,7 +19,7 @@ export interface CommentRequestPayload {
  */
 @Injectable({ providedIn: 'root' })
 export class PostService {
-  private readonly apiUrl = 'https://lunaris-backend-nxj3.onrender.com';
+  private readonly apiUrl = 'https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net';
 
   constructor(private http: HttpClient) {}
 

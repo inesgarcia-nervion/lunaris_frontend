@@ -88,7 +88,7 @@ export class AuthService {
     return this.injector.get(HttpClient);
   }
 
-  private readonly backendBase = 'https://lunaris-backend-nxj3.onrender.com';
+  private readonly backendBase = 'https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net';
 
 
   login(username: string, password: string, rememberMe: boolean = false): Observable<string> {

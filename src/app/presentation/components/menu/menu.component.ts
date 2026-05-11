@@ -48,7 +48,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   latestNews: NewsItem[] = [];
 
   private customCoverCache = new Map<string, string>();
-  private backendBase = 'https://lunaris-backend-nxj3.onrender.com';
+  private backendBase = 'https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net';
 
   userRating: number = 0;
   userReview: string = '';

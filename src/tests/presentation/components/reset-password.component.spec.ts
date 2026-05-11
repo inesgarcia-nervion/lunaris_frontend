@@ -58,7 +58,7 @@ describe('ResetPasswordComponent', () => {
   it('should be created', () => {
     createComponent('my-token');
     fixture.detectChanges();
-    const req = httpMock.expectOne(`https://lunaris-backend-nxj3.onrender.com/auth/validate-token?token=my-token`);
+    const req = httpMock.expectOne(`https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/validate-token?token=my-token`);
     req.flush({ valid: true });
     expect(component).toBeTruthy();
   });
@@ -69,7 +69,7 @@ describe('ResetPasswordComponent', () => {
   it('ngOnInit with no token sets error and does not send request', () => {
     createComponent(null);
     fixture.detectChanges();
-    httpMock.expectNone('https://lunaris-backend-nxj3.onrender.com/auth/validate-token');
+    httpMock.expectNone('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/validate-token');
     expect(component.error).toBeTruthy();
     expect(component.validating).toBe(false);
   });
@@ -80,7 +80,7 @@ describe('ResetPasswordComponent', () => {
   it('ngOnInit validates token as valid', () => {
     createComponent('good-token');
     fixture.detectChanges();
-    const req = httpMock.expectOne(`https://lunaris-backend-nxj3.onrender.com/auth/validate-token?token=good-token`);
+    const req = httpMock.expectOne(`https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/validate-token?token=good-token`);
     req.flush({ valid: true });
     expect(component.tokenValid).toBe(true);
     expect(component.validating).toBe(false);
@@ -92,7 +92,7 @@ describe('ResetPasswordComponent', () => {
   it('ngOnInit validates token as invalid', () => {
     createComponent('bad-token');
     fixture.detectChanges();
-    const req = httpMock.expectOne(`https://lunaris-backend-nxj3.onrender.com/auth/validate-token?token=bad-token`);
+    const req = httpMock.expectOne(`https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/validate-token?token=bad-token`);
     req.flush({ valid: false });
     expect(component.tokenValid).toBe(false);
     expect(component.validating).toBe(false);
@@ -104,7 +104,7 @@ describe('ResetPasswordComponent', () => {
   it('ngOnInit handles validation error', () => {
     createComponent('expired-token');
     fixture.detectChanges();
-    const req = httpMock.expectOne(`https://lunaris-backend-nxj3.onrender.com/auth/validate-token?token=expired-token`);
+    const req = httpMock.expectOne(`https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/validate-token?token=expired-token`);
     req.flush({ error: 'Token expired' }, { status: 400, statusText: 'Bad Request' });
     expect(component.tokenValid).toBe(false);
     expect(component.error).toContain('Token expired');
@@ -116,7 +116,7 @@ describe('ResetPasswordComponent', () => {
   it('ngOnInit handles validation error without body', () => {
     createComponent('expired-token2');
     fixture.detectChanges();
-    const req = httpMock.expectOne(`https://lunaris-backend-nxj3.onrender.com/auth/validate-token?token=expired-token2`);
+    const req = httpMock.expectOne(`https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/validate-token?token=expired-token2`);
     req.flush({}, { status: 400, statusText: 'Bad Request' });
     expect(component.error).toBeTruthy();
   });
@@ -184,7 +184,7 @@ describe('ResetPasswordComponent', () => {
   it('submit sends POST request with valid inputs', () => {
     createComponent('tok');
     fixture.detectChanges();
-    httpMock.expectOne(`https://lunaris-backend-nxj3.onrender.com/auth/validate-token?token=tok`).flush({ valid: true });
+    httpMock.expectOne(`https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/validate-token?token=tok`).flush({ valid: true });
 
     component.newPassword = 'newpass123';
     component.confirmPassword = 'newpass123';
@@ -192,7 +192,7 @@ describe('ResetPasswordComponent', () => {
     component.submit();
 
     expect(component.loading).toBe(true);
-    const req = httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/reset-password');
+    const req = httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/reset-password');
     expect(req.request.method).toBe('POST');
     req.flush({ message: 'Password changed' });
     expect(component.message).toBe('Password changed');
@@ -205,13 +205,13 @@ describe('ResetPasswordComponent', () => {
   it('submit uses default message when response has none', () => {
     createComponent('tok2');
     fixture.detectChanges();
-    httpMock.expectOne(`https://lunaris-backend-nxj3.onrender.com/auth/validate-token?token=tok2`).flush({ valid: true });
+    httpMock.expectOne(`https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/validate-token?token=tok2`).flush({ valid: true });
 
     component.newPassword = 'newpass123';
     component.confirmPassword = 'newpass123';
     component.token = 'tok2';
     component.submit();
-    httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/reset-password').flush({});
+    httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/reset-password').flush({});
     expect(component.message).toContain('Contraseña');
   });
 
@@ -222,13 +222,13 @@ describe('ResetPasswordComponent', () => {
     vi.useFakeTimers();
     createComponent('tok3');
     fixture.detectChanges();
-    httpMock.expectOne(`https://lunaris-backend-nxj3.onrender.com/auth/validate-token?token=tok3`).flush({ valid: true });
+    httpMock.expectOne(`https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/validate-token?token=tok3`).flush({ valid: true });
 
     component.newPassword = 'validpass123';
     component.confirmPassword = 'validpass123';
     component.token = 'tok3';
     component.submit();
-    httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/reset-password').flush({ message: 'Done' });
+    httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/reset-password').flush({ message: 'Done' });
 
     vi.advanceTimersByTime(2500);
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
@@ -241,13 +241,13 @@ describe('ResetPasswordComponent', () => {
   it('submit handles HTTP error', () => {
     createComponent('tok4');
     fixture.detectChanges();
-    httpMock.expectOne(`https://lunaris-backend-nxj3.onrender.com/auth/validate-token?token=tok4`).flush({ valid: true });
+    httpMock.expectOne(`https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/validate-token?token=tok4`).flush({ valid: true });
 
     component.newPassword = 'errpass123';
     component.confirmPassword = 'errpass123';
     component.token = 'tok4';
     component.submit();
-    httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/reset-password').flush(
+    httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/reset-password').flush(
       { error: 'Token expired' },
       { status: 400, statusText: 'Bad Request' }
     );
@@ -261,13 +261,13 @@ describe('ResetPasswordComponent', () => {
   it('submit handles HTTP error without body', () => {
     createComponent('tok5');
     fixture.detectChanges();
-    httpMock.expectOne(`https://lunaris-backend-nxj3.onrender.com/auth/validate-token?token=tok5`).flush({ valid: true });
+    httpMock.expectOne(`https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/validate-token?token=tok5`).flush({ valid: true });
 
     component.newPassword = 'errpass123';
     component.confirmPassword = 'errpass123';
     component.token = 'tok5';
     component.submit();
-    httpMock.expectOne('https://lunaris-backend-nxj3.onrender.com/auth/reset-password').flush({}, { status: 500, statusText: 'Server Error' });
+    httpMock.expectOne('https://lunarisback-h2h2hjdeagbghwgq.italynorth-01.azurewebsites.net/auth/reset-password').flush({}, { status: 500, statusText: 'Server Error' });
     expect(component.error).toBeTruthy();
   });
 });
