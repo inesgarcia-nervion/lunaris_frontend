@@ -535,7 +535,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     this.sagaLoading = true;
     const author = this.bookSearchService.getFirstAuthor(book);
-    this.bookSearchService.scrapeSaga(book.title, author !== 'Autor desconocido' ? author : undefined).subscribe({
+    const subjects = book.subject ?? book.subjects ?? [];
+    this.bookSearchService.scrapeSaga(book.title, author !== 'Autor desconocido' ? author : undefined, subjects).subscribe({
       next: (data) => {
         this.sagaData = data;
         this.sagaLoading = false;
