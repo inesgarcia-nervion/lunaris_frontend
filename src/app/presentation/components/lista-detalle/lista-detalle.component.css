@@ -128,9 +128,70 @@
   border: 1px solid rgba(46,125,50,0.25);
 }
 
+/* Botón circular para añadir libro */
+.btn-add-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: #6c63ff;
+  color: #fff;
+  font-size: 1.4rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.15s ease, transform 0.12s ease;
+  flex-shrink: 0;
+}
+.btn-add-circle:hover {
+  background: #554fd8;
+  transform: translateY(-2px);
+}
+
+/* Fila de búsqueda para añadir libro */
+.add-book-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+.input-add-book {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--bg-input);
+  color: var(--text-primary);
+}
+.btn-confirm {
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+.btn-confirm:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.btn-cancel-add {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
 /* Botón de eliminar/like en noticias */
-.btn-delete-like-news {
-  background: transparent;
+.btn-delete-like-news {  background: transparent;
   color: #d32f2f;
   border: 1px solid rgba(211,47,47,0.12);
   padding: 8px 12px;

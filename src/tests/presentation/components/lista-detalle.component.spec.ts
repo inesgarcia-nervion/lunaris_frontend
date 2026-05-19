@@ -565,7 +565,7 @@ describe('ListaDetalleComponent', () => {
       expect(component.editingList).toBe(false);
     });
 
-    it('should call updateListName when only name is changed', () => {
+    it('should call updateList when only name is changed', () => {
       setup('list1', { id: 'list1', nombre: 'Mi Lista', libros: [], owner: 'testuser', isPrivate: false });
       component.editOriginalNombre = 'Mi Lista';
       component.editOriginalIsPrivate = false;
@@ -574,12 +574,12 @@ describe('ListaDetalleComponent', () => {
 
       component.saveEdit();
 
-      expect(listasMock.updateListName).toHaveBeenCalledWith('list1', 'New Name');
-      expect(listasMock.updateList).not.toHaveBeenCalled();
+      expect(listasMock.updateList).toHaveBeenCalledWith('list1', 'New Name', false);
+      expect(listasMock.updateListName).not.toHaveBeenCalled();
       expect(listasMock.updateListPrivacy).not.toHaveBeenCalled();
     });
 
-    it('should call updateListPrivacy when only privacy is changed', () => {
+    it('should call updateList when only privacy is changed', () => {
       setup('list1', { id: 'list1', nombre: 'Mi Lista', libros: [], owner: 'testuser', isPrivate: false });
       component.editOriginalNombre = 'Mi Lista';
       component.editOriginalIsPrivate = false;
@@ -588,9 +588,9 @@ describe('ListaDetalleComponent', () => {
 
       component.saveEdit();
 
-      expect(listasMock.updateListPrivacy).toHaveBeenCalledWith('list1', true);
-      expect(listasMock.updateList).not.toHaveBeenCalled();
+      expect(listasMock.updateList).toHaveBeenCalledWith('list1', 'Mi Lista', true);
       expect(listasMock.updateListName).not.toHaveBeenCalled();
+      expect(listasMock.updateListPrivacy).not.toHaveBeenCalled();
     });
 
     it('should update lista with both new name and new privacy after saving both', () => {

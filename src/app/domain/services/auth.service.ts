@@ -321,6 +321,10 @@ export class AuthService {
   private avatarMapSubject = new BehaviorSubject<Map<string, string>>(new Map());
   public readonly avatarMap$ = this.avatarMapSubject.asObservable();
 
+  getAvatarMapSnapshot(): Map<string, string> {
+    return this.avatarMapSubject.value;
+  }
+
 
   /**
    * Genera la clave para almacenar el avatar en localStorage, basada en el nombre de usuario. 

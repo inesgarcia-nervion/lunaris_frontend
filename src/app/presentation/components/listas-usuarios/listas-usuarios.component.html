@@ -96,8 +96,8 @@
       </button>
     </div>
   </div>
-  <app-pagination *ngIf="filteredListas.length > 1"
-    [totalItems]="filteredListas.length"
+  <app-pagination *ngIf="filteredListas.length > pageSize + 1"
+    [totalItems]="filteredListas.length - 1"
     [pageSize]="pageSize"
     [currentPage]="currentPage"
     (pageChange)="onPageChange($event)">

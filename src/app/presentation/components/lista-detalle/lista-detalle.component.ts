@@ -40,6 +40,10 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
   editOriginalIsPrivate = false;
   editError = '';
 
+  showAddBookInput = false;
+  addBookQuery = '';
+  addBookSearching = false;
+
   constructor(private route: ActivatedRoute, private listas: ListasService, private router: Router, private bookSearch: BookSearchService, private location: Location, private confirm: ConfirmService, public auth: AuthService, private cdr: ChangeDetectorRef) {}
 
   /**
@@ -294,19 +298,8 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
       return;
     }
     this.editError = '';
-    const newIsPrivate = this.editIsPrivate;
-    const nameChanged = nombre !== this.editOriginalNombre;
-    const privacyChanged = newIsPrivate !== this.editOriginalIsPrivate;
-
-    if (nameChanged && privacyChanged) {
-      this.listas.updateList(this.lista.id, nombre, newIsPrivate);
-    } else if (nameChanged) {
-      this.listas.updateListName(this.lista.id, nombre);
-    } else if (privacyChanged) {
-      this.listas.updateListPrivacy(this.lista.id, newIsPrivate);
-    }
-
-    this.lista = { ...this.lista, nombre, isPrivate: newIsPrivate };
+    this.listas.updateList(this.lista.id, nombre, this.editIsPrivate);
+    this.lista = { ...this.lista, nombre, isPrivate: this.editIsPrivate };
     this.editingList = false;
   }
 
@@ -341,6 +334,27 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
    * utilizando el servicio de listas para realizar la acción y actualizar el estado de la lista. 
    * @returns void
    */
+  openAddBook(): void {
+    this.showAddBookInput = true;
+    this.addBookQuery = '';
+  }
+
+  cancelAddBook(): void {
+    this.showAddBookInput = false;
+    this.addBookQuery = '';
+    this.addBookSearching = false;
+  }
+
+  searchAndAddBook(): void {
+    if (!this.addBookQuery.trim()) return;
+    this.addBookSearching = true;
+    this.bookSearch.setSearchQuery(this.addBookQuery);
+    this.bookSearch.setSelectedBook(null);
+    this.bookSearch.setNavigationOrigin({ type: 'list', listId: this.currentId });
+    this.bookSearch.searchCurrent();
+    this.router.navigate(['/menu']);
+  }
+
   async confirmAndRemoveFavorite(): Promise<void> {
     if (!this.lista) return;
     const ok = await this.confirm.confirm(`¿Quieres eliminar "${this.lista.nombre}" de tus favoritos?`);

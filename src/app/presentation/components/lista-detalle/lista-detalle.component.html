@@ -15,8 +15,26 @@
         <button class="btn-edit-list" (click)="openEditModal()" *ngIf="lista.owner === currentUser">Editar</button>
         <button class="btn-delete" (click)="confirmAndDeleteList()" [disabled]="deletingList">Eliminar lista</button>
       </div>
+        <button *ngIf="lista.owner && lista.owner === currentUser" class="btn-add-circle" (click)="openAddBook()" aria-label="Añadir libro a la lista" title="Añadir libro">+</button>
         <button *ngIf="lista.owner && lista.owner !== currentUser && isFavorited() && !lista.isPrivate" class="btn-delete-like-news" (click)="$event.stopPropagation(); confirmAndRemoveFavorite()">Eliminar favorito</button>
       </div>
+    </div>
+
+    <!-- Buscador inline para añadir libro a la lista -->
+    <div *ngIf="showAddBookInput" class="add-book-row">
+      <input
+        type="text"
+        [(ngModel)]="addBookQuery"
+        (keyup.enter)="addBookQuery.trim() && searchAndAddBook()"
+        (keyup.esc)="cancelAddBook()"
+        placeholder="Buscar libro por título o autor..."
+        class="input-add-book"
+        autofocus
+      />
+      <button class="btn-confirm" (click)="searchAndAddBook()" [disabled]="!addBookQuery.trim() || addBookSearching">
+        {{ addBookSearching ? 'Buscando...' : 'Buscar' }}
+      </button>
+      <button class="btn-cancel-add" (click)="cancelAddBook()">Cancelar</button>
     </div>
 
     <!-- Mensaje si la lista está vacía -->

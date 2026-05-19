@@ -1,4 +1,5 @@
 import { Component, OnInit, NgZone, ChangeDetectorRef, OnDestroy, ElementRef, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -54,6 +55,7 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
 
   imageLoading = false;
   private imageObjectUrl: string | null = null;
+  private avatarSub?: Subscription;
 
   constructor(public auth: AuthService, private zone: NgZone, private cdr: ChangeDetectorRef, private route: ActivatedRoute, private router: Router, private location: Location, private confirm: ConfirmService, private bookSearchService: BookSearchService, private postService: PostService) {}
 
@@ -61,6 +63,15 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
    * Al iniciar el componente, se cargan las publicaciones desde el servidor.
    */
   ngOnInit(): void {
+    this.avatarSub = this.auth.avatarMap$.subscribe(avatarMap => {
+      if (!avatarMap.size) return;
+      this.posts = this.patchAllAvatars(this.posts, avatarMap);
+      if (this.selected) {
+        this.selected = this.patchAllAvatars([this.selected], avatarMap)[0];
+      }
+      this.updatePagination();
+      try { this.cdr.detectChanges(); } catch (_) {}
+    });
     this.loadPosts();
     this.route.params.subscribe(params => {
       const id = params['id'];
@@ -145,6 +156,7 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
    */
   ngOnDestroy(): void {
     try { document.body.style.overflow = ''; } catch (_) {}
+    this.avatarSub?.unsubscribe();
   }
 
   private clearPostAlertAfterDelay(): void {
@@ -609,10 +621,30 @@ export class BubbleFeedComponent implements OnInit, OnDestroy {
   /**
    * Carga la lista de publicaciones desde el servidor.
    */
+  private patchAllAvatars(posts: BubblePost[], avatarMap: Map<string, string>): BubblePost[] {
+    return posts.map(p => {
+      const postAvatar = avatarMap.get(p.user.name);
+      const patchedPost = postAvatar !== undefined ? { ...p, user: { ...p.user, avatarUrl: postAvatar || undefined } } : p;
+      if (patchedPost.comments && patchedPost.comments.length) {
+        patchedPost.comments = patchedPost.comments.map(c => {
+          const commentAvatar = avatarMap.get(c.user.name);
+          return commentAvatar !== undefined ? { ...c, user: { ...c.user, avatarUrl: commentAvatar || undefined } } : c;
+        });
+      }
+      return patchedPost;
+    });
+  }
+
   private loadPosts() {
     this.postService.getAll().subscribe({
       next: (posts) => {
-        this.posts = posts;
+        const uniqueUsers = [...new Set([
+          ...posts.map(p => p.user.name),
+          ...posts.flatMap(p => (p.comments || []).map(c => c.user.name))
+        ].filter(Boolean))];
+        this.auth.prefetchAvatarsForUsers(uniqueUsers);
+        const avatarMap = this.auth.getAvatarMapSnapshot();
+        this.posts = avatarMap.size ? this.patchAllAvatars(posts, avatarMap) : posts;
         this.updatePagination();
         try {
           const params = this.route.snapshot.params;
