@@ -283,34 +283,43 @@ export class ListasService {
     const owner = this.getCurrentUser();
     const numericId = Number(id);
     const listas = this.getAll().map(l => l.id === id ? { ...l, nombre: newName } : l);
+    this.saveToStorage(listas);
+    this.listasSubject.next(listas);
     if (owner && !isNaN(numericId)) {
       const toSave = listas.find(l => l.id === id);
       const payload = { name: newName, owner, isPrivate: toSave?.isPrivate || false, booksJson: JSON.stringify(toSave?.libros || []) };
-      this.http.put<any>(`${this.backendBase}/user_list/${numericId}`, payload).pipe(catchError(_ => of(null))).subscribe(() => {
-        try { localStorage.setItem(this.storageKey, JSON.stringify(listas)); } catch {}
-        this.listasSubject.next(listas);
-      });
-      return;
+      this.http.put<any>(`${this.backendBase}/user_list/${numericId}`, payload).pipe(catchError(_ => of(null))).subscribe();
     }
+  }
+
+  /**
+   * Actualiza nombre e isPrivate en una única operación para evitar condiciones de carrera
+   * cuando se editan ambos campos al mismo tiempo.
+   */
+  updateList(id: string, newName: string, isPrivate: boolean) {
+    const owner = this.getCurrentUser();
+    const numericId = Number(id);
+    const listas = this.getAll().map(l => l.id === id ? { ...l, nombre: newName, isPrivate } : l);
     this.saveToStorage(listas);
     this.listasSubject.next(listas);
+    if (owner && !isNaN(numericId)) {
+      const toSave = listas.find(l => l.id === id);
+      const payload = { name: toSave?.nombre || newName, owner, isPrivate: !!toSave?.isPrivate, booksJson: JSON.stringify(toSave?.libros || []) };
+      this.http.put<any>(`${this.backendBase}/user_list/${numericId}`, payload).pipe(catchError(_ => of(null))).subscribe();
+    }
   }
 
   updateListPrivacy(id: string, isPrivate: boolean) {
     const owner = this.getCurrentUser();
     const numericId = Number(id);
     const listas = this.getAll().map(l => l.id === id ? { ...l, isPrivate } : l);
+    this.saveToStorage(listas);
+    this.listasSubject.next(listas);
     if (owner && !isNaN(numericId)) {
       const toSave = listas.find(l => l.id === id);
       const payload = { name: toSave?.nombre || '', owner, isPrivate, booksJson: JSON.stringify(toSave?.libros || []) };
-      this.http.put<any>(`${this.backendBase}/user_list/${numericId}`, payload).pipe(catchError(_ => of(null))).subscribe(() => {
-        try { localStorage.setItem(this.storageKey, JSON.stringify(listas)); } catch {}
-        this.listasSubject.next(listas);
-      });
-      return;
+      this.http.put<any>(`${this.backendBase}/user_list/${numericId}`, payload).pipe(catchError(_ => of(null))).subscribe();
     }
-    this.saveToStorage(listas);
-    this.listasSubject.next(listas);
   }
 
 

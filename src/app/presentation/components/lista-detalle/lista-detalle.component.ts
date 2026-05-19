@@ -123,8 +123,9 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
         return;
       }
       if (origin.type === 'listas') {
+        const page = (origin as any).page ?? 1;
         this.bookSearch.setNavigationOrigin(null);
-        this.router.navigateByUrl('/listas-usuarios');
+        this.router.navigate(['/listas-usuarios'], { state: { listasPage: page } });
         return;
       }
       if (origin.type === 'profile') {
@@ -138,7 +139,7 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
         return;
       }
     }
-    this.router.navigateByUrl('/listas-usuarios');
+    this.router.navigate(['/listas-usuarios']);
   }
 
   /**
@@ -293,9 +294,19 @@ export class ListaDetalleComponent implements OnInit, OnDestroy {
       return;
     }
     this.editError = '';
-    this.listas.updateListName(this.lista.id, nombre);
-    this.listas.updateListPrivacy(this.lista.id, this.editIsPrivate);
-    this.lista = this.listas.getById(this.currentId);
+    const newIsPrivate = this.editIsPrivate;
+    const nameChanged = nombre !== this.editOriginalNombre;
+    const privacyChanged = newIsPrivate !== this.editOriginalIsPrivate;
+
+    if (nameChanged && privacyChanged) {
+      this.listas.updateList(this.lista.id, nombre, newIsPrivate);
+    } else if (nameChanged) {
+      this.listas.updateListName(this.lista.id, nombre);
+    } else if (privacyChanged) {
+      this.listas.updateListPrivacy(this.lista.id, newIsPrivate);
+    }
+
+    this.lista = { ...this.lista, nombre, isPrivate: newIsPrivate };
     this.editingList = false;
   }
 

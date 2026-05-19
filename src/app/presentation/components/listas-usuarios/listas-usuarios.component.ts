@@ -60,6 +60,10 @@ export class ListasUsuariosComponent implements OnInit {
    */
   ngOnInit(): void {
     this.currentUser = this.listasService.getCurrentUser();
+    const navState = history.state;
+    if (navState && navState['listasPage']) {
+      this.currentPage = Number(navState['listasPage']) || 1;
+    }
     this.loadAllLists();
     this.auth.avatarMap$.subscribe(() => { try { this.cdr.markForCheck(); } catch {} });
     this.listasService.listas$.subscribe(updated => {
@@ -213,7 +217,7 @@ export class ListasUsuariosComponent implements OnInit {
         const isProfile = skip.has(nombre);
         const isPrivate = !!l.isPrivate;
         if (isProfile) return false;
-        if (isPrivate && !this.auth.isAdmin() && l.owner !== this.currentUser) return false;
+        if (isPrivate && !this.auth.isAdmin()) return false;
         return true;
       } catch {
         return true;
@@ -332,7 +336,7 @@ export class ListasUsuariosComponent implements OnInit {
    * @param listId El ID de la lista que se desea abrir en detalle.
    */
   openListFromListas(listId: string): void {
-    this.bookSearchService.setNavigationOrigin({ type: 'listas' });
+    this.bookSearchService.setNavigationOrigin({ type: 'listas', page: this.currentPage });
     const lista = this.listas.find((l: any) => l.id === listId);
     this.router.navigate(['/listas', listId], { state: { lista } });
   }

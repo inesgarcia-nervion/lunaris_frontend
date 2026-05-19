@@ -35,10 +35,12 @@ describe('ListaDetalleComponent', () => {
       getById: vi.fn().mockReturnValue(currentLista),
       getCurrentUser: vi.fn().mockReturnValue('testuser'),
       isProfileListName: vi.fn().mockReturnValue(false),
+      getAll: vi.fn().mockReturnValue([currentLista]),
       removeBookFromList: vi.fn(),
       deleteList: vi.fn(),
       updateListName: vi.fn(),
       updateListPrivacy: vi.fn(),
+      updateList: vi.fn(),
       toggleFavorite: vi.fn(),
       isFavorited: vi.fn().mockReturnValue(false)
     };
@@ -215,25 +217,34 @@ describe('ListaDetalleComponent', () => {
 
       component.back();
 
-      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/listas-usuarios');
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/listas-usuarios']);
     });
 
-    it('should call location.back() when origin is menu', () => {
+    it('should navigate to /menu with scrollY when origin is menu', () => {
       setup();
-      bookSearchMock.getNavigationOrigin.mockReturnValue({ type: 'menu' });
+      bookSearchMock.getNavigationOrigin.mockReturnValue({ type: 'menu', scrollY: 200 });
 
       component.back();
 
-      expect(locationSpy.back).toHaveBeenCalled();
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/menu'], { state: { menuScrollY: 200 } });
     });
 
-    it('should navigate to /listas-usuarios when origin is listas', () => {
+    it('should navigate to /listas-usuarios with page when origin is listas', () => {
+      setup();
+      bookSearchMock.getNavigationOrigin.mockReturnValue({ type: 'listas', page: 3 });
+
+      component.back();
+
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/listas-usuarios'], { state: { listasPage: 3 } });
+    });
+
+    it('should navigate to /listas-usuarios with page 1 when origin is listas and page is not set', () => {
       setup();
       bookSearchMock.getNavigationOrigin.mockReturnValue({ type: 'listas' });
 
       component.back();
 
-      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/listas-usuarios');
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/listas-usuarios'], { state: { listasPage: 1 } });
     });
 
     it('should navigate to /perfil when origin is profile', () => {
@@ -539,17 +550,60 @@ describe('ListaDetalleComponent', () => {
    * Pruebas para saveEdit().
    */
   describe('saveEdit()', () => {
-    it('should save the edited list name and privacy', () => {
-      setup();
-      component.editingList = true;
+    it('should call updateList when both name and privacy are changed simultaneously', () => {
+      setup('list1', { id: 'list1', nombre: 'Mi Lista', libros: [], owner: 'testuser', isPrivate: false });
+      component.editOriginalNombre = 'Mi Lista';
+      component.editOriginalIsPrivate = false;
       component.editNombre = 'New Name';
       component.editIsPrivate = true;
 
       component.saveEdit();
 
-      expect(listasMock.updateListName).toHaveBeenCalledWith('list1', 'New Name');
-      expect(listasMock.updateListPrivacy).toHaveBeenCalledWith('list1', true);
+      expect(listasMock.updateList).toHaveBeenCalledWith('list1', 'New Name', true);
+      expect(listasMock.updateListName).not.toHaveBeenCalled();
+      expect(listasMock.updateListPrivacy).not.toHaveBeenCalled();
       expect(component.editingList).toBe(false);
+    });
+
+    it('should call updateListName when only name is changed', () => {
+      setup('list1', { id: 'list1', nombre: 'Mi Lista', libros: [], owner: 'testuser', isPrivate: false });
+      component.editOriginalNombre = 'Mi Lista';
+      component.editOriginalIsPrivate = false;
+      component.editNombre = 'New Name';
+      component.editIsPrivate = false;
+
+      component.saveEdit();
+
+      expect(listasMock.updateListName).toHaveBeenCalledWith('list1', 'New Name');
+      expect(listasMock.updateList).not.toHaveBeenCalled();
+      expect(listasMock.updateListPrivacy).not.toHaveBeenCalled();
+    });
+
+    it('should call updateListPrivacy when only privacy is changed', () => {
+      setup('list1', { id: 'list1', nombre: 'Mi Lista', libros: [], owner: 'testuser', isPrivate: false });
+      component.editOriginalNombre = 'Mi Lista';
+      component.editOriginalIsPrivate = false;
+      component.editNombre = 'Mi Lista';
+      component.editIsPrivate = true;
+
+      component.saveEdit();
+
+      expect(listasMock.updateListPrivacy).toHaveBeenCalledWith('list1', true);
+      expect(listasMock.updateList).not.toHaveBeenCalled();
+      expect(listasMock.updateListName).not.toHaveBeenCalled();
+    });
+
+    it('should update lista with both new name and new privacy after saving both', () => {
+      setup('list1', { id: 'list1', nombre: 'Mi Lista', libros: [], owner: 'testuser', isPrivate: false });
+      component.editOriginalNombre = 'Mi Lista';
+      component.editOriginalIsPrivate = false;
+      component.editNombre = 'New Name';
+      component.editIsPrivate = true;
+
+      component.saveEdit();
+
+      expect(component.lista?.nombre).toBe('New Name');
+      expect(component.lista?.isPrivate).toBe(true);
     });
 
     it('should not save when editNombre is empty', () => {
@@ -558,6 +612,25 @@ describe('ListaDetalleComponent', () => {
 
       component.saveEdit();
 
+      expect(listasMock.updateList).not.toHaveBeenCalled();
+      expect(listasMock.updateListName).not.toHaveBeenCalled();
+      expect(listasMock.updateListPrivacy).not.toHaveBeenCalled();
+    });
+
+    it('should show error and not save when name is duplicate', () => {
+      const other = { id: 'list2', nombre: 'Existing Name', libros: [], owner: 'testuser', isPrivate: false };
+      setup('list1', { id: 'list1', nombre: 'Mi Lista', libros: [], owner: 'testuser', isPrivate: false });
+      listasMock.getAll.mockReturnValue([
+        { id: 'list1', nombre: 'Mi Lista', libros: [], owner: 'testuser', isPrivate: false },
+        other
+      ]);
+      component.editOriginalNombre = 'Mi Lista';
+      component.editNombre = 'Existing Name';
+
+      component.saveEdit();
+
+      expect(component.editError).toBeTruthy();
+      expect(listasMock.updateList).not.toHaveBeenCalled();
       expect(listasMock.updateListName).not.toHaveBeenCalled();
     });
   });

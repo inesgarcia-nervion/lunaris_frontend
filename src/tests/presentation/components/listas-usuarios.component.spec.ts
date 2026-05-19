@@ -468,7 +468,7 @@ describe('ListasUsuariosComponent', () => {
 
       component.openListFromListas('list1');
 
-      expect(bookSearchMock.setNavigationOrigin).toHaveBeenCalledWith({ type: 'listas' });
+      expect(bookSearchMock.setNavigationOrigin).toHaveBeenCalledWith({ type: 'listas', page: 1 });
       expect(routerSpy.navigate).toHaveBeenCalledWith(['/listas', 'list1']);
     });
   });
