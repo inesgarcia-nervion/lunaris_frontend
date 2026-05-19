@@ -744,13 +744,16 @@ export class BookSearchService {
    * backend para obtener la información de la saga a la que pertenece el libro, 
    * incluyendo el nombre de la saga y los libros que forman parte de ella.
    */
-  scrapeSaga(title: string, author?: string, subjects?: string[]): Observable<SagaScraped | null> {
+  scrapeSaga(title: string, author?: string, subjects?: string[], series?: string[]): Observable<SagaScraped | null> {
     let params = new HttpParams().set('title', title);
     if (author) {
       params = params.set('author', author);
     }
     if (subjects && subjects.length > 0) {
       subjects.forEach(s => { params = params.append('subjects', s); });
+    }
+    if (series && series.length > 0) {
+      series.forEach(s => { params = params.append('series', s); });
     }
     return this.http.get<SagaScraped>(`${this.apiUrl}/api/saga/scrape`, { params }).pipe(
       rxCatchError(() => of(null))
